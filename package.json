@@ -10,11 +10,12 @@
     ".": "./dist/index.mjs"
   },
   "types": "./dist/index.d.mts",
+  "bin": "./dist/cli.mjs",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "pnpm obuild . src/cli.ts",
+    "build": "pnpm obuild . src/cli.ts && chmod +x dist/cli.mjs",
     "obuild": "pnpm node-ts src/cli.ts",
     "lint": "eslint . && prettier -c src test",
     "lint:fix": "automd && eslint . --fix && prettier -w src test",
