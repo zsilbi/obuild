@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.4
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.3...v0.0.4)
+
+### 🩹 Fixes
+
+- Increase node compat by conditionally using fs.glob ([7bb2595](https://github.com/unjs/obuild/commit/7bb2595))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.3
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.2...v0.0.3)
