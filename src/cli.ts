@@ -2,13 +2,27 @@
 
 import type { BuildEntry } from "./types.ts";
 
+import { parseArgs } from "node:util";
 import { consola } from "consola";
 import { build } from "./build.ts";
 
-const [dir, ...rawEntries] = process.argv.slice(2);
+// https://nodejs.org/api/util.html#utilparseargsconfig
+const args = parseArgs({
+  args: process.argv.slice(2),
+  allowPositionals: true,
+  options: {
+    dir: {
+      type: "string",
+      default: ".",
+    },
+  },
+});
+
+const dir = args.values.dir;
+const rawEntries = args.positionals as string[];
 
 if (!dir || rawEntries.length === 0) {
-  consola.error("Usage: obuild <dir> <entry1>...");
+  consola.error("Usage: obuild [--dir=<dir>] <entry1>...");
   process.exit(1);
 }
 

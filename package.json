@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm obuild . src/cli.ts && chmod +x dist/cli.mjs",
+    "build": "pnpm obuild ./src/cli.ts && chmod +x ./dist/cli.mjs",
     "obuild": "pnpm node-ts src/cli.ts",
     "lint": "eslint . && prettier -c src test",
     "lint:fix": "automd && eslint . --fix && prettier -w src test",
@@ -23,7 +23,7 @@
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && pnpm test:fixture",
-    "test:fixture": "pnpm obuild test/fixture src/index src/runtime/:dist/runtime",
+    "test:fixture": "pnpm obuild --dir test/fixture src/index src/runtime/:dist/runtime",
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
