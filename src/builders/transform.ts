@@ -2,7 +2,7 @@ import type { BuildContext, TransformEntry } from "../types.ts";
 
 import { pathToFileURL } from "node:url";
 import { dirname, extname, join, relative } from "node:path";
-import { glob, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { consola } from "consola";
 import { resolveModulePath } from "exsolve";
 import MagicString from "magic-string";
@@ -20,6 +20,8 @@ export async function transformDir(
   const start = Date.now();
 
   const promises: Promise<void>[] = [];
+
+  const { glob } = await import("node:fs/promises");
 
   for await (const entryName of glob("**/*.*", { cwd: entry.input })) {
     promises.push(
