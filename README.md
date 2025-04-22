@@ -14,10 +14,22 @@ The **obuild** project aims to be the next-generation successor to current [unbu
 
 Some differences are not easy to adopt. Developing as a standalone project allows faster progress and dogfooding in real projects.
 
-### Currently used by
+## Usage
 
-- 📦 [obuild](https://github.com/unjs/obuild/) itself
+```sh
+# bundle
+npx obuild ./src.index.ts
+
+# transform
+npx obuild src/runtime/:dist/runtime
+```
+
+## Currently used by
+
+- [📦 obuild](https://github.com/unjs/obuild/) itself
 - [🌳 rou3](https://github.com/h3js/rou3/)
+
+## Proof of concept
 
 > [!IMPORTANT]
 >
