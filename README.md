@@ -21,8 +21,13 @@ Some differences are not easy to adopt. Developing as a standalone project allow
 npx obuild ./src.index.ts
 
 # transform
-npx obuild src/runtime/:dist/runtime
+npx obuild ./src/runtime/:./dist/runtime
 ```
+
+You can use `--dir` to set working directory.
+
+> [!NOTE]
+> Auto inference similar to unbuild coming soon ([#4](https://github.com/unjs/obuild/issues/4)).
 
 ## Currently used by
 
