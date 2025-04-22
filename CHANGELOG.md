@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.3
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.2...v0.0.3)
+
+### 🚀 Enhancements
+
+- Simple cli arg parser ([84ae630](https://github.com/unjs/obuild/commit/84ae630))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.2
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.1...v0.0.2)
