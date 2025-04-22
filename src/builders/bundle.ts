@@ -22,7 +22,7 @@ export async function rolldownBuild(
   const res = await rolldown({
     cwd: ctx.pkgDir,
     input: input,
-    plugins: [dts({ isolatedDeclaration: true })],
+    plugins: [dts({ isolatedDeclarations: true })],
     external: [
       ...builtinModules,
       ...builtinModules.map((m) => `node:${m}`),
