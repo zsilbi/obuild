@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.6
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.5...v0.0.6)
+
+### 🩹 Fixes
+
+- Externalize subpath exports of deps as well ([d6343a0](https://github.com/unjs/obuild/commit/d6343a0))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.5
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.4...v0.0.5)
