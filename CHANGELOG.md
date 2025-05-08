@@ -1,6 +1,39 @@
 # Changelog
 
 
+## v0.0.5
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.4...v0.0.5)
+
+### 🚀 Enhancements
+
+- Support `build.config` ([#9](https://github.com/unjs/obuild/pull/9))
+- Expose programmatic `build` ([e35a743](https://github.com/unjs/obuild/commit/e35a743))
+- **cli:** Support multi input bundle entries ([e5e2b61](https://github.com/unjs/obuild/commit/e5e2b61))
+- Basic hooks via config ([3ac4a9a](https://github.com/unjs/obuild/commit/3ac4a9a))
+
+### 🩹 Fixes
+
+- Correct the src directory in the transform complete message ([#10](https://github.com/unjs/obuild/pull/10))
+
+### 🏡 Chore
+
+- Update readme ([b46d8a4](https://github.com/unjs/obuild/commit/b46d8a4))
+- Fix typo ([4d8c877](https://github.com/unjs/obuild/commit/4d8c877))
+- Update readme ([7bfc621](https://github.com/unjs/obuild/commit/7bfc621))
+- Update readme ([359223c](https://github.com/unjs/obuild/commit/359223c))
+- **readme:** Add `omnichron` to `used by` section ([#8](https://github.com/unjs/obuild/pull/8))
+- Update deps ([1b43ed6](https://github.com/unjs/obuild/commit/1b43ed6))
+- Update readme ([#17](https://github.com/unjs/obuild/pull/17))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Restent Ou ([@gxres042](https://github.com/gxres042))
+- Connor Pearson ([@cjpearson](https://github.com/cjpearson))
+- Dominik Opyd <dominik.opyd@gmail.com>
+- Oskar Lebuda ([@OskarLebuda](https://github.com/OskarLebuda))
+
 ## v0.0.4
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.3...v0.0.4)
