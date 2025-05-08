@@ -16,6 +16,8 @@ Some differences are not easy to adopt. Developing as a standalone project allow
 
 ## Usage
 
+**CLI:**
+
 ```sh
 # bundle
 npx obuild ./src/index.ts
@@ -26,8 +28,16 @@ npx obuild ./src/runtime/:./dist/runtime
 
 You can use `--dir` to set the working directory.
 
+**Programmatic:**
+
+```js
+import { build } from "obuild";
+
+await build(".", ["./src/index.ts"]);
+```
+
 > [!NOTE]
-> Auto inference similar to unbuild coming soon ([#4](https://github.com/unjs/obuild/issues/4)).
+> Auto entries inference similar to unbuild coming soon ([#4](https://github.com/unjs/obuild/issues/4)).
 
 ## Currently used by
 
