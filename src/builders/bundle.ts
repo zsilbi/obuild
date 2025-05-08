@@ -27,8 +27,10 @@ export async function rolldownBuild(
     external: [
       ...builtinModules,
       ...builtinModules.map((m) => `node:${m}`),
-      ...Object.keys(ctx.pkg.dependencies || {}),
-      ...Object.keys(ctx.pkg.peerDependencies || {}),
+      ...[
+        ...Object.keys(ctx.pkg.dependencies || {}),
+        ...Object.keys(ctx.pkg.peerDependencies || {}),
+      ].flatMap((p) => [p, new RegExp(`^${p}/`)]),
     ],
   };
 
