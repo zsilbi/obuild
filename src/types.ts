@@ -36,3 +36,7 @@ export type TransformEntry = {
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;
+
+export interface BuildConfig {
+  entries?: (BuildEntry | string)[];
+}
