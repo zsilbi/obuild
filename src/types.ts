@@ -1,3 +1,5 @@
+import type { InputOptions } from "rolldown";
+
 export interface BuildContext {
   pkgDir: string;
   pkg: { name: string } & Record<string, unknown>;
@@ -37,6 +39,17 @@ export type TransformEntry = {
 
 export type BuildEntry = BundleEntry | TransformEntry;
 
+export interface BuildHooks {
+  start?: (ctx: BuildContext) => void | Promise<void>;
+  end?: (ctx: BuildContext) => void | Promise<void>;
+  entries?: (entries: BuildEntry[], ctx: BuildContext) => void | Promise<void>;
+  rolldownConfig?: (
+    cfg: InputOptions,
+    ctx: BuildContext,
+  ) => void | Promise<void>;
+}
+
 export interface BuildConfig {
   entries?: (BuildEntry | string)[];
+  hooks?: BuildHooks;
 }

@@ -47,4 +47,4 @@ if (rawEntries.length === 0) {
   process.exit(1);
 }
 
-await build(dir, entries);
+await build(dir, entries, config);

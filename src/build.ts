@@ -1,4 +1,4 @@
-import type { BuildEntry, BuildContext } from "./types.ts";
+import type { BuildEntry, BuildContext, BuildConfig } from "./types.ts";
 
 import { fileURLToPath } from "node:url";
 import { isAbsolute, join, resolve } from "node:path";
@@ -14,6 +14,7 @@ import { fmtPath } from "./utils.ts";
 export async function build(
   _cwd: string | URL,
   _entries: BuildEntry[],
+  { hooks = {} }: Omit<BuildConfig, "entries"> = {},
 ): Promise<void> {
   const start = Date.now();
 
@@ -24,6 +25,8 @@ export async function build(
   consola.info(
     `Building \`${ctx.pkg.name || "<no name>"}\` (in \`${ctx.pkgDir}\`)...`,
   );
+
+  await hooks.start?.(ctx);
 
   const entries = _entries.map((entry) => {
     if (!entry.input) {
@@ -39,6 +42,8 @@ export async function build(
     return entry;
   });
 
+  await hooks.entries?.(entries, ctx);
+
   const outDirs: Array<string> = [];
   for (const outDir of entries.map((e) => e.outDir).sort() as string[]) {
     if (!outDirs.some((dir) => outDir.startsWith(dir))) {
@@ -52,9 +57,11 @@ export async function build(
 
   for (const entry of entries) {
     await (entry.type === "bundle"
-      ? rolldownBuild(ctx, entry)
+      ? rolldownBuild(ctx, entry, hooks)
       : transformDir(ctx, entry));
   }
+
+  await hooks.end?.(ctx);
 
   consola.log(`Build finished in ${Date.now() - start}ms`);
 }

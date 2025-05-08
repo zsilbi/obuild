@@ -1,8 +1,8 @@
-import type { BuildContext, BundleEntry } from "../types.ts";
+import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
 
 import { builtinModules } from "node:module";
 import { consola } from "consola";
-import { rolldown } from "rolldown";
+import { type InputOptions, rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
 import { fmtPath } from "../utils.ts";
 import { resolveModulePath } from "exsolve";
@@ -10,6 +10,7 @@ import { resolveModulePath } from "exsolve";
 export async function rolldownBuild(
   ctx: BuildContext,
   entry: BundleEntry,
+  hooks: BuildHooks,
 ): Promise<void> {
   const start = Date.now();
 
@@ -19,7 +20,7 @@ export async function rolldownBuild(
       i,
   );
 
-  const res = await rolldown({
+  const rolldownConfig: InputOptions = {
     cwd: ctx.pkgDir,
     input: input,
     plugins: [dts({ isolatedDeclarations: true })],
@@ -29,7 +30,11 @@ export async function rolldownBuild(
       ...Object.keys(ctx.pkg.dependencies || {}),
       ...Object.keys(ctx.pkg.peerDependencies || {}),
     ],
-  });
+  };
+
+  await hooks.rolldownConfig?.(rolldownConfig, ctx);
+
+  const res = await rolldown(rolldownConfig);
 
   await res.write({
     dir: entry.outDir,
