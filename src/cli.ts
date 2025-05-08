@@ -22,6 +22,7 @@ const args = parseArgs({
 const { config = {} } = await loadConfig<BuildConfig>({
   name: "obuild",
   configFile: "build.config",
+  cwd: args.values.dir,
 });
 
 const dir = args.values.dir;
@@ -36,7 +37,7 @@ const entries: BuildEntry[] = rawEntries.map((entry) => {
     const [input, outDir] = entry.split(":") as [string, string | undefined];
     return input.endsWith("/")
       ? { type: "transform", input, outDir }
-      : { type: "bundle", input, outDir };
+      : { type: "bundle", input: input.split(","), outDir };
   }
   return entry;
 });
