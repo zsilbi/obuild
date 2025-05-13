@@ -2,7 +2,7 @@ import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
 
 import { builtinModules } from "node:module";
 import { consola } from "consola";
-import { type InputOptions, rolldown } from "rolldown";
+import { type InputOptions, OutputOptions, rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
 import { fmtPath } from "../utils.ts";
 import { resolveModulePath } from "exsolve";
@@ -38,11 +38,15 @@ export async function rolldownBuild(
 
   const res = await rolldown(rolldownConfig);
 
-  await res.write({
+  const outConfig: OutputOptions = {
     dir: entry.outDir,
     entryFileNames: "[name].mjs",
     chunkFileNames: "[name].mjs",
-  });
+  };
+
+  await hooks.rolldownOutput?.(outConfig, res, ctx);
+
+  await res.write(outConfig);
 
   await res.close();
 

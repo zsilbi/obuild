@@ -1,4 +1,4 @@
-import type { InputOptions } from "rolldown";
+import type { InputOptions, OutputOptions, RolldownBuild } from "rolldown";
 
 export interface BuildContext {
   pkgDir: string;
@@ -45,6 +45,11 @@ export interface BuildHooks {
   entries?: (entries: BuildEntry[], ctx: BuildContext) => void | Promise<void>;
   rolldownConfig?: (
     cfg: InputOptions,
+    ctx: BuildContext,
+  ) => void | Promise<void>;
+  rolldownOutput?: (
+    cfg: OutputOptions,
+    res: RolldownBuild,
     ctx: BuildContext,
   ) => void | Promise<void>;
 }
