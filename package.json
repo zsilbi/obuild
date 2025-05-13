@@ -1,6 +1,6 @@
 {
   "name": "obuild",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Zero-config ESM/TS package builder",
   "repository": "unjs/obuild",
   "license": "MIT",
