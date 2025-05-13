@@ -41,7 +41,7 @@ export async function rolldownBuild(
   const outConfig: OutputOptions = {
     dir: entry.outDir,
     entryFileNames: "[name].mjs",
-    chunkFileNames: "[name].mjs",
+    chunkFileNames: "chunks/[name]-[hash].mjs",
   };
 
   await hooks.rolldownOutput?.(outConfig, res, ctx);
