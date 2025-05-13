@@ -1,11 +1,12 @@
-import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
-
 import { builtinModules } from "node:module";
 import { consola } from "consola";
-import { type InputOptions, OutputOptions, rolldown } from "rolldown";
+import { rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
 import { fmtPath } from "../utils.ts";
 import { resolveModulePath } from "exsolve";
+
+import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
+import type { InputOptions, OutputOptions } from "rolldown";
 
 export async function rolldownBuild(
   ctx: BuildContext,
