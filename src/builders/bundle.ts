@@ -49,6 +49,7 @@ export async function rolldownBuild(
     cwd: ctx.pkgDir,
     input: inputs,
     plugins: [] as Plugin[],
+    platform: "neutral",
     external: [
       ...builtinModules,
       ...builtinModules.map((m) => `node:${m}`),
