@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { dirname, extname, join, relative } from "node:path";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { consola } from "consola";
+import { colors as c } from "consola/utils";
 import { resolveModulePath } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform from "oxc-transform";
@@ -21,9 +22,7 @@ export async function transformDir(
   ctx: BuildContext,
   entry: TransformEntry,
 ): Promise<void> {
-  const start = Date.now();
-
-  const promises: Promise<void>[] = [];
+  const promises: Promise<string>[] = [];
 
   for await (const entryName of await glob("**/*.*", { cwd: entry.input })) {
     promises.push(
@@ -51,26 +50,28 @@ export async function transformDir(
                   "utf8",
                 );
               }
+              return entryDistPath;
             }
-            break;
           }
           default: {
             {
               const entryDistPath = join(entry.outDir!, entryName);
               await mkdir(dirname(entryDistPath), { recursive: true });
               await writeFile(entryDistPath, await readFile(entryPath), "utf8");
+              return entryDistPath;
             }
-            break;
           }
         }
       })(),
     );
   }
 
-  await Promise.all(promises);
+  const writtenFiles = await Promise.all(promises);
 
   consola.log(
-    `Transformed ${promises.length} files from \`${fmtPath(entry.input!)}\` to \`${fmtPath(entry.outDir!)}\` in ${Date.now() - start}ms`,
+    `\n${c.magenta("[transform] ")}${c.underline(fmtPath(entry.outDir!) + "/")}\n${writtenFiles
+      .map((f) => c.dim(fmtPath(f)))
+      .join("\n\n")}`,
   );
 }
 

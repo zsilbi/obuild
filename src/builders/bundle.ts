@@ -1,12 +1,13 @@
 import { builtinModules } from "node:module";
 import { dirname, relative, join, basename, extname, resolve } from "node:path";
 import { consola } from "consola";
+import { colors as c } from "consola/utils";
 import { rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
 import { fmtPath } from "../utils.ts";
 import { resolveModulePath } from "exsolve";
 
-import type { Plugin } from "rolldown";
+import type { OutputChunk, Plugin } from "rolldown";
 import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
 import type { InputOptions, OutputOptions } from "rolldown";
 
@@ -15,8 +16,6 @@ export async function rolldownBuild(
   entry: BundleEntry,
   hooks: BuildHooks,
 ): Promise<void> {
-  const start = Date.now();
-
   const inputs: Record<string, string> = {};
 
   for (let src of Array.isArray(entry.input) ? entry.input : [entry.input]) {
@@ -70,8 +69,10 @@ export async function rolldownBuild(
 
   const res = await rolldown(rolldownConfig);
 
+  const outDir = resolve(ctx.pkgDir, entry.outDir || "dist");
+
   const outConfig: OutputOptions = {
-    dir: entry.outDir,
+    dir: outDir,
     entryFileNames: "[name].mjs",
     chunkFileNames: "_chunks/[name]-[hash].mjs",
     minify: entry.minify,
@@ -83,15 +84,67 @@ export async function rolldownBuild(
 
   await res.close();
 
+  const outputEntries: {
+    name: string;
+    exports: string[];
+    deps: string[];
+    size: number;
+  }[] = [];
+
+  const depsCache = new Map<OutputChunk, Set<string>>();
+  const resolveDeps = (chunk: OutputChunk) => {
+    if (!depsCache.has(chunk)) {
+      depsCache.set(chunk, new Set<string>());
+    }
+    const deps = depsCache.get(chunk)!;
+    for (const id of chunk.imports) {
+      if (builtinModules.includes(id) || id.startsWith("node:")) {
+        deps.add(`[Node.js]`);
+        continue;
+      }
+      const depChunk = output.find(
+        (o) => o.type === "chunk" && o.fileName === id,
+      ) as OutputChunk | undefined;
+      if (depChunk) {
+        for (const dep of resolveDeps(depChunk)) {
+          deps.add(dep);
+        }
+        continue;
+      }
+      deps.add(id);
+    }
+    return [...deps].sort();
+  };
+
+  for (const chunk of output) {
+    if (chunk.type !== "chunk" || !chunk.isEntry) continue;
+    if (chunk.fileName.endsWith("ts")) continue;
+    outputEntries.push({
+      name: chunk.fileName,
+      exports: chunk.exports,
+      deps: resolveDeps(chunk),
+      size: chunk.code.length,
+    });
+  }
+
   consola.log(
-    `📦 Bundled in ${Date.now() - start}ms:\n${output
-      .filter(
-        (o) => o.type === "chunk" && o.isEntry && o.fileName.endsWith("js"),
+    `\n${outputEntries
+      .map((o) =>
+        [
+          c.magenta(`[bundle] `) +
+            `${c.underline(fmtPath(join(outDir, o.name)))}`,
+          o.exports.length > 0
+            ? c.dim(
+                `${c.bold("Exports:")} ${o.exports.map((e) => e).join(", ")}`,
+              )
+            : "",
+          o.deps.length > 0
+            ? c.dim(`${c.bold("Dependencies:")} ${o.deps.join(", ")}`)
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
       )
-      .map(
-        (o) =>
-          ` - ${fmtPath(resolve(ctx.pkgDir, entry.outDir || "dist", o.fileName))}`,
-      )
-      .join("\n")} `,
+      .join("\n\n")}`,
   );
 }

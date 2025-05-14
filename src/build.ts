@@ -22,8 +22,8 @@ export async function build(
   const pkg = await readJSON(join(pkgDir, "package.json")).catch(() => ({}));
   const ctx: BuildContext = { pkg, pkgDir };
 
-  consola.info(
-    `Building \`${ctx.pkg.name || "<no name>"}\` (in \`${ctx.pkgDir}\`)...`,
+  consola.log(
+    `📦 Building \`${ctx.pkg.name || "<no name>"}\` (\`${ctx.pkgDir}\`)`,
   );
 
   await hooks.start?.(ctx);
@@ -51,7 +51,7 @@ export async function build(
     }
   }
   for (const outDir of outDirs) {
-    consola.log(`Cleaning up \`${fmtPath(outDir)}\``);
+    consola.log(`🧻 Cleaning up \`${fmtPath(outDir)}\``);
     await rm(outDir, { recursive: true, force: true });
   }
 
@@ -63,7 +63,7 @@ export async function build(
 
   await hooks.end?.(ctx);
 
-  consola.log(`Build finished in ${Date.now() - start}ms`);
+  consola.log(`\n✅ obuild finished in ${Date.now() - start}ms`);
 }
 
 // --- utils ---
