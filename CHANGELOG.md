@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.0
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.8...v0.1.0)
+
+### 🚀 Enhancements
+
+- ⚠️  Map dist paths based on source ([4170d54](https://github.com/unjs/obuild/commit/4170d54))
+
+### 💅 Refactors
+
+- Show dist info in cli output ([a6d475b](https://github.com/unjs/obuild/commit/a6d475b))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Map dist paths based on source ([4170d54](https://github.com/unjs/obuild/commit/4170d54))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.8
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.7...v0.0.8)
