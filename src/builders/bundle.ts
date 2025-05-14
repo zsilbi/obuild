@@ -1,4 +1,5 @@
 import { builtinModules } from "node:module";
+import { dirname, relative, join, basename, extname, resolve } from "node:path";
 import { consola } from "consola";
 import { rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
@@ -16,15 +17,38 @@ export async function rolldownBuild(
 ): Promise<void> {
   const start = Date.now();
 
-  const input = (Array.isArray(entry.input) ? entry.input : [entry.input]).map(
-    (i) =>
-      resolveModulePath(i, { try: true, extensions: [".ts", ".mjs", ".js"] }) ||
-      i,
-  );
+  const inputs: Record<string, string> = {};
+
+  for (let src of Array.isArray(entry.input) ? entry.input : [entry.input]) {
+    src = resolveModulePath(src, {
+      from: ctx.pkgDir,
+      extensions: [".ts", ".mjs", ".js"],
+    });
+    let relativeSrc = relative(join(ctx.pkgDir, "src"), src);
+    if (relativeSrc.startsWith("..")) {
+      relativeSrc = relative(join(ctx.pkgDir), src);
+    }
+    if (relativeSrc.startsWith("..")) {
+      throw new Error(
+        `Source should be within the package directory (${ctx.pkgDir}): ${src}`,
+      );
+    }
+
+    const distName = join(
+      dirname(relativeSrc),
+      basename(relativeSrc, extname(relativeSrc)),
+    );
+    if (inputs[distName]) {
+      throw new Error(
+        `Rename one of the entries to avoid a conflict in the dist name "${distName}":\n - ${src}\n - ${inputs[distName]}`,
+      );
+    }
+    inputs[distName] = src;
+  }
 
   const rolldownConfig = {
     cwd: ctx.pkgDir,
-    input: input,
+    input: inputs,
     plugins: [] as Plugin[],
     external: [
       ...builtinModules,
@@ -49,17 +73,25 @@ export async function rolldownBuild(
   const outConfig: OutputOptions = {
     dir: entry.outDir,
     entryFileNames: "[name].mjs",
-    chunkFileNames: "chunks/[name]-[hash].mjs",
+    chunkFileNames: "_chunks/[name]-[hash].mjs",
     minify: entry.minify,
   };
 
   await hooks.rolldownOutput?.(outConfig, res, ctx);
 
-  await res.write(outConfig);
+  const { output } = await res.write(outConfig);
 
   await res.close();
 
   consola.log(
-    `Bundled \`${input.map((i) => fmtPath(i)).join(", ")}\` to \`${fmtPath(entry.outDir!)}\` in ${Date.now() - start}ms`,
+    `📦 Bundled in ${Date.now() - start}ms:\n${output
+      .filter(
+        (o) => o.type === "chunk" && o.isEntry && o.fileName.endsWith("js"),
+      )
+      .map(
+        (o) =>
+          ` - ${fmtPath(resolve(ctx.pkgDir, entry.outDir || "dist", o.fileName))}`,
+      )
+      .join("\n")} `,
   );
 }
