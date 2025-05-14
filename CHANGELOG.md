@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v0.0.8
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.0.7...v0.0.8)
+
+### 🚀 Enhancements
+
+- Support minify and declaration options (per entry) ([#20](https://github.com/unjs/obuild/pull/20))
+
+### 💅 Refactors
+
+- Switch to tinyglobby ([#22](https://github.com/unjs/obuild/pull/22))
+
+### 🏡 Chore
+
+- Update deps ([9b72c42](https://github.com/unjs/obuild/commit/9b72c42))
+
+### ❤️ Contributors
+
+- Restent Ou ([@gxres042](https://github.com/gxres042))
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Victor Berchet ([@vicb](https://github.com/vicb))
+
 ## v0.0.7
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.6...v0.0.7)
