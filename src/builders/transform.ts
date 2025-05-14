@@ -1,4 +1,6 @@
 import type { BuildContext, TransformEntry } from "../types.ts";
+import type { IsolatedDeclarationsOptions } from "oxc-transform";
+import type { MinifyOptions } from "oxc-minify";
 
 import { pathToFileURL } from "node:url";
 import { dirname, extname, join, relative } from "node:path";
@@ -10,6 +12,7 @@ import oxcTransform from "oxc-transform";
 import oxcParser from "oxc-parser";
 import { fmtPath } from "../utils.ts";
 import { glob } from "tinyglobby";
+import { minify } from "oxc-minify";
 
 /**
  * Transform all .ts modules in a directory using oxc-transform.
@@ -30,18 +33,24 @@ export async function transformDir(
         switch (ext) {
           case ".ts": {
             {
-              const transformed = await transformModule(entryPath);
+              const transformed = await transformModule(
+                entryPath,
+                entry.declaration,
+                entry.minify,
+              );
               const entryDistPath = join(
                 entry.outDir!,
                 entryName.replace(/\.ts$/, ".mjs"),
               );
               await mkdir(dirname(entryDistPath), { recursive: true });
               await writeFile(entryDistPath, transformed.code, "utf8");
-              await writeFile(
-                entryDistPath.replace(/\.mjs$/, ".d.mts"),
-                transformed.declaration!,
-                "utf8",
-              );
+              if (transformed.declaration) {
+                await writeFile(
+                  entryDistPath.replace(/\.mjs$/, ".d.mts"),
+                  transformed.declaration,
+                  "utf8",
+                );
+              }
             }
             break;
           }
@@ -68,7 +77,11 @@ export async function transformDir(
 /**
  * Transform a .ts module using oxc-transform.
  */
-async function transformModule(entryPath: string) {
+async function transformModule(
+  entryPath: string,
+  declaration: undefined | boolean | IsolatedDeclarationsOptions,
+  minifyOpts: undefined | boolean | MinifyOptions,
+) {
   let sourceText = await readFile(entryPath, "utf8");
 
   const sourceOptions = {
@@ -134,7 +147,15 @@ async function transformModule(entryPath: string) {
   const transformed = oxcTransform.transform(entryPath, sourceText, {
     ...sourceOptions,
     cwd: dirname(entryPath),
-    typescript: { declaration: { stripInternal: true } },
+    typescript: {
+      declaration:
+        declaration === false
+          ? undefined
+          : {
+              stripInternal: true,
+              ...(declaration as IsolatedDeclarationsOptions),
+            },
+    },
   });
 
   const transformErrors = transformed.errors.filter(
@@ -154,6 +175,16 @@ async function transformModule(entryPath: string) {
         cause: transformErrors,
       },
     );
+  }
+
+  if (minifyOpts) {
+    const res = minify(
+      entryPath,
+      transformed.code,
+      minifyOpts === true ? undefined : minifyOpts,
+    );
+    transformed.code = res.code;
+    transformed.map = res.map;
   }
 
   return transformed;
