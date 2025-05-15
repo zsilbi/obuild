@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.1.1
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.1.0...v0.1.1)
+
+### 🚀 Enhancements
+
+- Better bundle analyzes ([67bd713](https://github.com/unjs/obuild/commit/67bd713))
+
+### 🩹 Fixes
+
+- Default rolldown platform to `neutral` ([2930787](https://github.com/unjs/obuild/commit/2930787))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.1.0
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.0.8...v0.1.0)
