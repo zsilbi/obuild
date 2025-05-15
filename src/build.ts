@@ -4,9 +4,11 @@ import { fileURLToPath } from "node:url";
 import { isAbsolute, join, resolve } from "node:path";
 import { rm } from "node:fs/promises";
 import { consola } from "consola";
+import { colors as c } from "consola/utils";
 import { rolldownBuild } from "./builders/bundle.ts";
 import { transformDir } from "./builders/transform.ts";
-import { fmtPath } from "./utils.ts";
+import { fmtPath, analyzeDir } from "./utils.ts";
+import prettyBytes from "pretty-bytes";
 
 /**
  * Build dist/ from src/
@@ -62,6 +64,13 @@ export async function build(
   }
 
   await hooks.end?.(ctx);
+
+  const dirSize = analyzeDir(outDirs);
+  consola.log(
+    c.dim(
+      `\nΣ Total dist byte size: ${c.underline(prettyBytes(dirSize.size))} (${c.underline(dirSize.files)} files)`,
+    ),
+  );
 
   consola.log(`\n✅ obuild finished in ${Date.now() - start}ms`);
 }

@@ -4,8 +4,9 @@ import { consola } from "consola";
 import { colors as c } from "consola/utils";
 import { rolldown } from "rolldown";
 import { dts } from "rolldown-plugin-dts";
-import { fmtPath } from "../utils.ts";
+import { distSize, fmtPath, sideEffectSize } from "../utils.ts";
 import { resolveModulePath } from "exsolve";
+import prettyBytes from "pretty-bytes";
 
 import type { OutputChunk, Plugin } from "rolldown";
 import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
@@ -90,6 +91,9 @@ export async function rolldownBuild(
     exports: string[];
     deps: string[];
     size: number;
+    minSize: number;
+    minGzipSize: number;
+    sideEffectSize: number;
   }[] = [];
 
   const depsCache = new Map<OutputChunk, Set<string>>();
@@ -120,11 +124,13 @@ export async function rolldownBuild(
   for (const chunk of output) {
     if (chunk.type !== "chunk" || !chunk.isEntry) continue;
     if (chunk.fileName.endsWith("ts")) continue;
+
     outputEntries.push({
       name: chunk.fileName,
       exports: chunk.exports,
       deps: resolveDeps(chunk),
-      size: chunk.code.length,
+      ...(await distSize(outDir, chunk.fileName)),
+      sideEffectSize: await sideEffectSize(outDir, chunk.fileName),
     });
   }
 
@@ -134,7 +140,10 @@ export async function rolldownBuild(
         [
           c.magenta(`[bundle] `) +
             `${c.underline(fmtPath(join(outDir, o.name)))}`,
-          o.exports.length > 0
+          c.dim(
+            `${c.bold("Size:")} ${prettyBytes(o.size)}, ${c.bold(prettyBytes(o.minSize))} minified, ${prettyBytes(o.minGzipSize)} min+gzipped (Side effects: ${prettyBytes(o.sideEffectSize)})`,
+          ),
+          o.exports.some((e) => e !== "default")
             ? c.dim(
                 `${c.bold("Exports:")} ${o.exports.map((e) => e).join(", ")}`,
               )
