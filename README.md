@@ -13,6 +13,8 @@ The **obuild** project aims to be the next-generation successor to the current [
 - 🪦 No support for CommonJS output.
 
 Some differences are not easy to adopt. Developing as a standalone project allows for faster progress and dogfooding in real projects.
+ 
+👀 See [this issue](https://github.com/unjs/obuild/issues/24) for more explanation about the difference between `obuild`, `unbuild`, `tsup`, and `tsdown`.
 
 ## Usage
 
