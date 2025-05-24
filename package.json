@@ -28,26 +28,26 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "c12": "^3.0.3",
+    "c12": "^3.0.4",
     "consola": "^3.4.2",
     "exsolve": "^1.0.5",
     "magic-string": "^0.30.17",
-    "oxc-minify": "^0.69.0",
-    "oxc-parser": "^0.69.0",
-    "oxc-transform": "^0.69.0",
+    "oxc-minify": "^0.72.0",
+    "oxc-parser": "^0.72.0",
+    "oxc-transform": "^0.72.0",
     "pretty-bytes": "^7.0.0",
-    "rolldown": "1.0.0-beta.8-commit.985af6d",
-    "rolldown-plugin-dts": "^0.12.2",
+    "rolldown": "1.0.0-beta.9",
+    "rolldown-plugin-dts": "^0.13.4",
     "tinyglobby": "^0.2.13"
   },
   "devDependencies": {
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.15.21",
     "automd": "^0.4.0",
     "changelogen": "^0.6.1",
-    "eslint": "^9.26.0",
+    "eslint": "^9.27.0",
     "eslint-config-unjs": "^0.4.2",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3"
   },
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.11.0"
 }
