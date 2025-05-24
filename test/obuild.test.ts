@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll } from "vitest";
 
 import { build } from "../src/build.ts";
-import { readdir, readFile, rm } from "node:fs/promises";
+import { readdir, readFile, rm, stat } from "node:fs/promises";
 
 const fixtureDir = new URL("fixture/", import.meta.url);
 const distDir = new URL("dist/", fixtureDir);
@@ -13,7 +13,7 @@ describe("obuild", () => {
 
   test("build fixture", async () => {
     await build(fixtureDir, [
-      { type: "bundle", input: "src/index" },
+      { type: "bundle", input: ["src/index", "src/cli"] },
       { type: "transform", input: "src/runtime", outDir: "dist/runtime" },
     ]);
   });
@@ -24,6 +24,8 @@ describe("obuild", () => {
     );
     expect(distFiles).toMatchInlineSnapshot(`
       [
+        "cli.d.mts",
+        "cli.mjs",
         "index.d.mts",
         "index.mjs",
         "runtime",
@@ -49,5 +51,11 @@ describe("obuild", () => {
       "utf8",
     );
     expect(runtimeIndexMts).contain("./test.mjs");
+  });
+
+  test("cli shebang is executable", async () => {
+    const cliPath = new URL("cli.mjs", distDir);
+    const stats = await stat(cliPath);
+    expect(stats.mode & 0o111).toBe(0o111); // Check if executable
   });
 });
