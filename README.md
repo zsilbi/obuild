@@ -14,7 +14,15 @@ The **obuild** project aims to be the next-generation successor to the current [
 
 Some differences are not easy to adopt. Developing as a standalone project allows for faster progress and dogfooding in real projects.
 
-👀 See [this issue](https://github.com/unjs/obuild/issues/24) for more explanation about the difference between `obuild`, `unbuild`, `tsup`, and `tsdown`.
+## Proof of concept
+
+> [!IMPORTANT]
+>
+> This is a proof-of-concept project.
+>
+> Features are incomplete, and output behavior may change between versions 0.x until rolldown reaches stable stable v1.
+>
+> Feedback and contributions are very welcome! If you'd like to make changes with more than a few lines of code, please open an issue first to discuss.
 
 ## Currently used by
 
@@ -72,15 +80,10 @@ You can use `stub: true` (per entry config) or the `--stub` CLI flag. In this mo
 - Using [oxc-node](https://github.com/oxc-project/oxc-node) (`node --import @oxc-node/core/register`)
 - Using [unloader](https://github.com/sxzz/unloader) (`node --import unloader/register`)
 
-## Proof of concept
+## Prior Arts
 
-> [!IMPORTANT]
->
-> This is a proof-of-concept project.
->
-> Features are incomplete, and output behavior may change between versions.
->
-> Feedback and contributions are very welcome! If you'd like to make changes with more than a few lines of code, please open an issue first to discuss.
+- [unbuild](https://github.com/unjs/unbuild): Stable solution based on rollup and [mkdist](https://github.com/unjs/mkdist).
+- [tsdown](https://tsdown.dev/): Alternative bundler based on rolldown.
 
 ## License
 
