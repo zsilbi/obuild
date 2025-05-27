@@ -1,6 +1,4 @@
 import type { BuildContext, TransformEntry } from "../types.ts";
-import type { IsolatedDeclarationsOptions } from "oxc-transform";
-import type { MinifyOptions } from "oxc-minify";
 
 import { pathToFileURL } from "node:url";
 import { dirname, extname, join, relative } from "node:path";
@@ -41,11 +39,7 @@ export async function transformDir(
         switch (ext) {
           case ".ts": {
             {
-              const transformed = await transformModule(
-                entryPath,
-                entry.declaration,
-                entry.minify,
-              );
+              const transformed = await transformModule(entryPath, entry);
               const entryDistPath = join(
                 entry.outDir!,
                 entryName.replace(/\.ts$/, ".mjs"),
@@ -98,11 +92,7 @@ export async function transformDir(
 /**
  * Transform a .ts module using oxc-transform.
  */
-async function transformModule(
-  entryPath: string,
-  declaration: undefined | boolean | IsolatedDeclarationsOptions,
-  minifyOpts: undefined | boolean | MinifyOptions,
-) {
+async function transformModule(entryPath: string, entry: TransformEntry) {
   let sourceText = await readFile(entryPath, "utf8");
 
   const sourceOptions = {
@@ -166,16 +156,12 @@ async function transformModule(
   sourceText = magicString.toString();
 
   const transformed = oxcTransform.transform(entryPath, sourceText, {
+    ...entry.oxc,
     ...sourceOptions,
     cwd: dirname(entryPath),
     typescript: {
-      declaration:
-        declaration === false
-          ? undefined
-          : {
-              stripInternal: true,
-              ...(declaration as IsolatedDeclarationsOptions),
-            },
+      declaration: { stripInternal: true },
+      ...entry.oxc?.typescript,
     },
   });
 
@@ -198,11 +184,11 @@ async function transformModule(
     );
   }
 
-  if (minifyOpts) {
+  if (entry.minify) {
     const res = minify(
       entryPath,
       transformed.code,
-      minifyOpts === true ? undefined : minifyOpts,
+      entry.minify === true ? {} : entry.minify,
     );
     transformed.code = res.code;
     transformed.map = res.map;

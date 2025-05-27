@@ -6,9 +6,7 @@ import type {
 } from "rolldown";
 
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
-
-import type { IsolatedDeclarationsOptions } from "oxc-transform";
-
+import type { TransformOptions } from "oxc-transform";
 import type { MinifyOptions as OXCMinifyOptions } from "oxc-minify";
 
 export interface BuildContext {
@@ -73,11 +71,11 @@ export type TransformEntry = _BuildEntry & {
   minify?: boolean | OXCMinifyOptions;
 
   /**
-   * Generate and bundle dts files via rolldown-plugin-dts.
+   * Options passed to oxc-transform.
    *
-   * Set to `false` to disable.
+   * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
    */
-  declaration?: boolean | IsolatedDeclarationsOptions;
+  oxc?: TransformOptions;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;
