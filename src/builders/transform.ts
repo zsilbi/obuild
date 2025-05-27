@@ -23,7 +23,7 @@ export async function transformDir(
 ): Promise<void> {
   if (entry.stub) {
     consola.log(
-      `${c.magenta("[transform] [stub]   ")} ${c.underline(fmtPath(entry.outDir!) + "/")}`,
+      `${c.magenta("[stub transform]   ")} ${c.underline(fmtPath(entry.outDir!) + "/")}`,
     );
     await symlink(entry.input, entry.outDir!, "junction");
     return;

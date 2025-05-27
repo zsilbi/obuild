@@ -37,7 +37,7 @@ export async function rolldownBuild(
       const distPath = join(ctx.pkgDir, "dist", `${distName}.mjs`);
       await mkdir(dirname(distPath), { recursive: true });
       consola.log(
-        `${c.magenta("[transform] [bundle] ")} ${c.underline(fmtPath(distPath))}`,
+        `${c.magenta("[stub bundle] ")} ${c.underline(fmtPath(distPath))}`,
       );
       const srcContents = await readFile(srcPath, "utf8");
       const parsed = await oxcParser.parseSync(srcPath, srcContents);
