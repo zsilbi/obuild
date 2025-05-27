@@ -24,7 +24,7 @@
     "obuild": "pnpm node-ts src/cli.ts",
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
-    "test": "pnpm lint && pnpm test:types && pnpm vitest --coverage",
+    "test": "pnpm lint && pnpm test:types && pnpm vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
