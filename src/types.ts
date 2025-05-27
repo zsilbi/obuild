@@ -9,6 +9,7 @@ import type {
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
 import type { TransformOptions } from "oxc-transform";
 import type { MinifyOptions as OXCMinifyOptions } from "oxc-minify";
+import type { ResolveOptions } from "exsolve";
 
 export interface BuildContext {
   pkgDir: string;
@@ -84,6 +85,13 @@ export type TransformEntry = _BuildEntry & {
    * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
    */
   oxc?: TransformOptions;
+
+  /**
+   * Options passed to exsolve for module resolution.
+   *
+   * See [exsolve](https://github.com/unjs/exsolve) for more details.
+   */
+  resolve?: Pick<ResolveOptions, "extensions" | "suffixes">;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;

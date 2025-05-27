@@ -129,6 +129,7 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
     updatedStarts.add(req.start);
     const resolvedAbsolute = resolveModulePath(moduleId, {
       from: pathToFileURL(entryPath),
+      ...entry.resolve,
     });
     const newId = relative(
       dirname(entryPath),

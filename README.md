@@ -83,6 +83,7 @@ export default defineBuildConfig({
       // minify: false,
       // stub: false,
       // oxc: {},
+      // resolve: {}
     },
   ],
   hooks: {
