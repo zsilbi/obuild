@@ -33,7 +33,7 @@ Some differences are not easy to adopt. Developing as a standalone project allow
 
 ## Usage
 
-**CLI:**
+### CLI
 
 ```sh
 # bundle
@@ -45,12 +45,46 @@ npx obuild ./src/runtime/:./dist/runtime
 
 You can use `--dir` to set the working directory.
 
-**Programmatic:**
+## Optional CLI Config
+
+**`build.config.mjs`:**
+
+```js
+import { defineBuildConfig } from "obuild";
+
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "bundle",
+      input: ["./src/index.ts", "./src/cli.ts"],
+      // outDir: "./dist",
+      // minify: false,
+      // stub: false,
+      // https://rolldown.rs/reference/config-options
+      // rolldown: {},
+      // https://github.com/sxzz/rolldown-plugin-dts#options
+      // dts: {},
+    },
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      // minify: false,
+      // stub: false,
+      // oxc: {},
+    },
+  ],
+});
+```
+
+### Programmatic
 
 ```js
 import { build } from "obuild";
 
-await build(".", ["./src/index.ts"]);
+await build(".", [
+  /* ... entries ... */
+]);
 ```
 
 > [!NOTE]
