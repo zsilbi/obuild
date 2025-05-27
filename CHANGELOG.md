@@ -1,6 +1,27 @@
 # Changelog
 
 
+## v0.2.1
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.2.0...v0.2.1)
+
+### 🩹 Fixes
+
+- Programmatic build with string entries ([#30](https://github.com/unjs/obuild/pull/30))
+
+### 💅 Refactors
+
+- Fix stub cli messages ([5c02fed](https://github.com/unjs/obuild/commit/5c02fed))
+
+### 🏡 Chore
+
+- Update deps ([4351bb8](https://github.com/unjs/obuild/commit/4351bb8))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Balázs Németh ([@zsilbi](https://github.com/zsilbi))
+
 ## v0.2.0
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.1.1...v0.2.0)
