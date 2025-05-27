@@ -1,6 +1,48 @@
 # Changelog
 
 
+## v0.2.0
+
+[compare changes](https://github.com/unjs/obuild/compare/v0.1.1...v0.2.0)
+
+### 🚀 Enhancements
+
+- Passthrough stub mode ([#28](https://github.com/unjs/obuild/pull/28))
+- Add `+x` permission to CLI entries ([#26](https://github.com/unjs/obuild/pull/26))
+- ⚠️  Allow passing all `dts` options for bundle ([2bab1e8](https://github.com/unjs/obuild/commit/2bab1e8))
+- ⚠️  Allow passing all `oxc-transform` options ([5729956](https://github.com/unjs/obuild/commit/5729956))
+- Allow passing all rolldown config to build entries ([edd39af](https://github.com/unjs/obuild/commit/edd39af))
+- ⚠️  Unified config for programmatic api ([33a5869](https://github.com/unjs/obuild/commit/33a5869))
+
+### 📖 Documentation
+
+- Update usage ([6d5567e](https://github.com/unjs/obuild/commit/6d5567e))
+
+### 🏡 Chore
+
+- **release:** V0.1.1 ([2ee321a](https://github.com/unjs/obuild/commit/2ee321a))
+- Add link to difference explanations ([7deb98d](https://github.com/unjs/obuild/commit/7deb98d))
+- Update deps ([974d495](https://github.com/unjs/obuild/commit/974d495))
+- Update readme ([aa3bf38](https://github.com/unjs/obuild/commit/aa3bf38))
+- Update deps ([db5b27f](https://github.com/unjs/obuild/commit/db5b27f))
+- Update readme ([170ebb4](https://github.com/unjs/obuild/commit/170ebb4))
+- Fix test script ([12214eb](https://github.com/unjs/obuild/commit/12214eb))
+
+### ✅ Tests
+
+- Add initial tests ([44f23f7](https://github.com/unjs/obuild/commit/44f23f7))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Allow passing all `dts` options for bundle ([2bab1e8](https://github.com/unjs/obuild/commit/2bab1e8))
+- ⚠️  Allow passing all `oxc-transform` options ([5729956](https://github.com/unjs/obuild/commit/5729956))
+- ⚠️  Unified config for programmatic api ([33a5869](https://github.com/unjs/obuild/commit/33a5869))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Kricsleo ([@kricsleo](https://github.com/kricsleo))
+
 ## v0.1.1
 
 [compare changes](https://github.com/unjs/obuild/compare/v0.1.0...v0.1.1)
