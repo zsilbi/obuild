@@ -29,8 +29,6 @@ const { config = {} } = await loadConfig<BuildConfig>({
   cwd: args.values.dir,
 });
 
-const dir = args.values.dir;
-
 const rawEntries =
   args.positionals.length > 0
     ? (args.positionals as string[])
@@ -57,4 +55,8 @@ if (rawEntries.length === 0) {
   process.exit(1);
 }
 
-await build(dir, entries, config);
+await build({
+  cwd: args.values.dir,
+  ...config,
+  entries,
+});

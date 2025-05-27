@@ -1,4 +1,9 @@
-import type { BuildEntry, BuildContext, BuildConfig } from "./types.ts";
+import type {
+  BuildContext,
+  BuildConfig,
+  TransformEntry,
+  BundleEntry,
+} from "./types.ts";
 
 import { fileURLToPath } from "node:url";
 import { isAbsolute, join, resolve } from "node:path";
@@ -13,14 +18,10 @@ import prettyBytes from "pretty-bytes";
 /**
  * Build dist/ from src/
  */
-export async function build(
-  _cwd: string | URL,
-  _entries: BuildEntry[],
-  { hooks = {} }: Omit<BuildConfig, "entries"> = {},
-): Promise<void> {
+export async function build(config: BuildConfig): Promise<void> {
   const start = Date.now();
 
-  const pkgDir = normalizePath(_cwd);
+  const pkgDir = normalizePath(config.cwd);
   const pkg = await readJSON(join(pkgDir, "package.json")).catch(() => ({}));
   const ctx: BuildContext = { pkg, pkgDir };
 
@@ -28,9 +29,18 @@ export async function build(
     `📦 Building \`${ctx.pkg.name || "<no name>"}\` (\`${ctx.pkgDir}\`)`,
   );
 
+  const hooks = config.hooks || {};
+
   await hooks.start?.(ctx);
 
-  const entries = _entries.map((entry) => {
+  const entries = (config.entries || []).map((entry) => {
+    if (typeof entry === "string") {
+      const [input, outDir] = entry.split(":") as [string, string | undefined];
+      return input.endsWith("/")
+        ? ({ type: "transform", input, outDir } as TransformEntry)
+        : ({ type: "bundle", input: input.split(","), outDir } as BundleEntry);
+    }
+
     if (!entry.input) {
       throw new Error(
         `Build entry missing \`input\`: ${JSON.stringify(entry, null, 2)}`,

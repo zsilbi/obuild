@@ -104,6 +104,7 @@ export interface BuildHooks {
 }
 
 export interface BuildConfig {
+  cwd?: string | URL;
   entries?: (BuildEntry | string)[];
   hooks?: BuildHooks;
 }

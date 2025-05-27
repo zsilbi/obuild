@@ -8,7 +8,7 @@ The **obuild** project aims to be the next-generation successor to the current [
 
 - 👌 Focus on ESM compatibility.
 - 🌱 Fresh rewrite with cleanups and removal of legacy features.
-- 🚀 Using [**oxc**](https://oxc.rs/) and [**rolldown**](https://rolldown.rs/) for much faster builds!
+- 🚀 Using [**oxc**](https://oxc.rs/) (for transform) and [**rolldown**](https://rolldown.rs/) (for bundle) for much faster builds!
 
 Some differences are not easy to adopt. Developing as a standalone project allows for faster progress and dogfooding in real projects.
 
@@ -45,9 +45,22 @@ npx obuild ./src/runtime/:./dist/runtime
 
 You can use `--dir` to set the working directory.
 
-## Optional CLI Config
+If paths end with `/`, obuild uses transpile mode using [oxc-transform](https://www.npmjs.com/package/oxc-transform) instead of bundle mode with [rolldown](https://rolldown.rs/).
 
-**`build.config.mjs`:**
+### Programmatic
+
+```js
+import { build } from "obuild";
+
+await build({
+  cwd: ".",
+  entries: ["./src/index.ts"],
+});
+```
+
+## Config
+
+You can use `build.config.mjs` (or `.ts`) or pass config to `build()` function.
 
 ```js
 import { defineBuildConfig } from "obuild";
@@ -60,10 +73,8 @@ export default defineBuildConfig({
       // outDir: "./dist",
       // minify: false,
       // stub: false,
-      // https://rolldown.rs/reference/config-options
-      // rolldown: {},
-      // https://github.com/sxzz/rolldown-plugin-dts#options
-      // dts: {},
+      // rolldown: {}, // https://rolldown.rs/reference/config-options
+      // dts: {}, // https://github.com/sxzz/rolldown-plugin-dts#options
     },
     {
       type: "transform",
@@ -74,21 +85,15 @@ export default defineBuildConfig({
       // oxc: {},
     },
   ],
+  hooks: {
+    // start: (ctx) => {},
+    // end: (ctx) => {},
+    // entries: (entries, ctx) => {},
+    // rolldownConfig: (config, ctx) => {},
+    // rolldownOutput: (output, res, ctx) => {},
+  },
 });
 ```
-
-### Programmatic
-
-```js
-import { build } from "obuild";
-
-await build(".", [
-  /* ... entries ... */
-]);
-```
-
-> [!NOTE]
-> Auto entries inference similar to unbuild coming soon ([#4](https://github.com/unjs/obuild/issues/4)).
 
 ## Stub Mode
 

@@ -12,10 +12,13 @@ describe("obuild", () => {
   });
 
   test("build fixture", async () => {
-    await build(fixtureDir, [
-      { type: "bundle", input: ["src/index", "src/cli"] },
-      { type: "transform", input: "src/runtime", outDir: "dist/runtime" },
-    ]);
+    await build({
+      cwd: fixtureDir,
+      entries: [
+        { type: "bundle", input: ["src/index", "src/cli"] },
+        { type: "transform", input: "src/runtime", outDir: "dist/runtime" },
+      ],
+    });
   });
 
   test("dist files match expected", async () => {
