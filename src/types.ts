@@ -49,7 +49,7 @@ export type BundleEntry = _BuildEntry & {
    *
    * See [rolldown config options](https://rolldown.rs/reference/config-options) for more details.
    */
-  rolldown?: InputOptions & { plugins: RolldownPluginOption[] };
+  rolldown?: InputOptions & { plugins?: RolldownPluginOption[] };
 
   /**
    * Declaration generation options.
