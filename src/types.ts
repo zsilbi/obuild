@@ -5,6 +5,8 @@ import type {
   RolldownBuild,
 } from "rolldown";
 
+import type { Options as DtsOptions } from "rolldown-plugin-dts";
+
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
 
 import type { MinifyOptions as OXCMinifyOptions } from "oxc-minify";
@@ -44,11 +46,15 @@ export type BundleEntry = _BuildEntry & {
   minify?: boolean | "dce-only" | MinifyOptions;
 
   /**
-   * Generate and bundle dts files via rolldown-plugin-dts.
+   * Declaration generation options.
+   *
+   * See [rolldown-plugin-dts](https://github.com/sxzz/rolldown-plugin-dts) for more details.
+   *
+   * Options are inferred from the `tsconfig.json` file if available.
    *
    * Set to `false` to disable.
    */
-  declaration?: boolean | IsolatedDeclarationsOptions;
+  dts?: boolean | DtsOptions;
 };
 
 export type TransformEntry = _BuildEntry & {

@@ -9,15 +9,17 @@ import oxcParser from "oxc-parser";
 import { resolveModulePath } from "exsolve";
 import prettyBytes from "pretty-bytes";
 import { distSize, fmtPath, sideEffectSize } from "../utils.ts";
+import { makeExecutable, shebangPlugin } from "./plugins/shebang.ts";
 
-import type { OutputChunk, Plugin } from "rolldown";
+import type {
+  OutputChunk,
+  Plugin,
+  InputOptions,
+  OutputOptions,
+} from "rolldown";
+
+import type { Options as DtsOptions } from "rolldown-plugin-dts";
 import type { BuildContext, BuildHooks, BundleEntry } from "../types.ts";
-import type { InputOptions, OutputOptions } from "rolldown";
-import {
-  hasShebang,
-  makeExecutable,
-  shebangPlugin,
-} from "./plugins/shebang.ts";
 
 export async function rolldownBuild(
   ctx: BuildContext,
@@ -78,10 +80,8 @@ export async function rolldownBuild(
     ],
   } satisfies InputOptions;
 
-  if (entry.declaration !== false) {
-    rolldownConfig.plugins!.push(
-      ...dts({ isolatedDeclarations: entry.declaration }),
-    );
+  if (entry.dts !== false) {
+    rolldownConfig.plugins!.push(...dts({ ...(entry.dts as DtsOptions) }));
   }
 
   await hooks.rolldownConfig?.(rolldownConfig, ctx);
