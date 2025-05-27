@@ -10,6 +10,7 @@ import { resolveModulePath } from "exsolve";
 import prettyBytes from "pretty-bytes";
 import { distSize, fmtPath, sideEffectSize } from "../utils.ts";
 import { makeExecutable, shebangPlugin } from "./plugins/shebang.ts";
+import { defu } from "defu";
 
 import type {
   OutputChunk,
@@ -65,7 +66,7 @@ export async function rolldownBuild(
     return;
   }
 
-  const rolldownConfig = {
+  const rolldownConfig = defu(entry.rolldown, {
     cwd: ctx.pkgDir,
     input: inputs,
     plugins: [shebangPlugin()] as Plugin[],
@@ -78,10 +79,10 @@ export async function rolldownBuild(
         ...Object.keys(ctx.pkg.peerDependencies || {}),
       ].flatMap((p) => [p, new RegExp(`^${p}/`)]),
     ],
-  } satisfies InputOptions;
+  } satisfies InputOptions);
 
   if (entry.dts !== false) {
-    rolldownConfig.plugins!.push(...dts({ ...(entry.dts as DtsOptions) }));
+    rolldownConfig.plugins.push(...dts({ ...(entry.dts as DtsOptions) }));
   }
 
   await hooks.rolldownConfig?.(rolldownConfig, ctx);

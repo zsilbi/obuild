@@ -3,6 +3,7 @@ import type {
   MinifyOptions,
   OutputOptions,
   RolldownBuild,
+  RolldownPluginOption,
 } from "rolldown";
 
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
@@ -42,6 +43,13 @@ export type BundleEntry = _BuildEntry & {
    * Defaults to `false` if not provided.
    */
   minify?: boolean | "dce-only" | MinifyOptions;
+
+  /**
+   * Options passed to rolldown.
+   *
+   * See [rolldown config options](https://rolldown.rs/reference/config-options) for more details.
+   */
+  rolldown?: InputOptions & { plugins: RolldownPluginOption[] };
 
   /**
    * Declaration generation options.
