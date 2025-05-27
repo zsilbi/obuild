@@ -53,6 +53,13 @@ export type BundleEntry = _BuildEntry & {
    * Set to `false` to disable.
    */
   dts?: boolean | DtsOptions;
+
+  /**
+   * Options passed to oxc-transform.
+   *
+   * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
+   */
+  oxc?: TransformOptions;
 };
 
 export type TransformEntry = _BuildEntry & {
@@ -69,13 +76,6 @@ export type TransformEntry = _BuildEntry & {
    * Defaults to `false` if not provided.
    */
   minify?: boolean | OXCMinifyOptions;
-
-  /**
-   * Options passed to oxc-transform.
-   *
-   * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
-   */
-  oxc?: TransformOptions;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;

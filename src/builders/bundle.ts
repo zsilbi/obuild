@@ -70,6 +70,7 @@ export async function rolldownBuild(
     input: inputs,
     plugins: [shebangPlugin()] as Plugin[],
     platform: "neutral",
+    transform: entry.oxc,
     external: [
       ...builtinModules,
       ...builtinModules.map((m) => `node:${m}`),
