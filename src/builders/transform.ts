@@ -111,8 +111,8 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
   }
 
   const resolveOptions: ResolveOptions = {
-    from: pathToFileURL(entryPath),
     ...entry.resolve,
+    from: pathToFileURL(entryPath),
     extensions: entry.resolve?.extensions ?? [
       ".ts",
       ".js",

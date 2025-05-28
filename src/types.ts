@@ -91,7 +91,7 @@ export type TransformEntry = _BuildEntry & {
    *
    * See [exsolve](https://github.com/unjs/exsolve) for more details.
    */
-  resolve?: ResolveOptions;
+  resolve?: Omit<ResolveOptions, "from">;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;
