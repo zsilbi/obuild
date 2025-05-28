@@ -20,7 +20,6 @@ describe("obuild", () => {
           type: "transform",
           input: "src/runtime",
           outDir: "dist/runtime",
-          transformers: ["oxc"],
           oxc: {
             minify: {
               sourcemap: true,
