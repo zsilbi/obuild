@@ -118,6 +118,8 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
       ".ts",
       ".jsx",
       ".js",
+      ".mjs",
+      ".cjs",
       ".json",
     ],
     suffixes: entry.resolve?.suffixes ?? ["", "/index"],
