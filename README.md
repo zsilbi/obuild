@@ -80,10 +80,10 @@ export default defineBuildConfig({
       type: "transform",
       input: "./src/runtime",
       outDir: "./dist/runtime",
-      // minify: false,
       // stub: false,
       // oxc: {},
       // resolve: {}
+      // transformers: []
     },
   ],
   hooks: {
