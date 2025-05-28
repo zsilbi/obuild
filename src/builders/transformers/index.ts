@@ -1,7 +1,7 @@
 import { consola } from "consola";
 import { oxcTransformer, type OxcTransformerOptions } from "./oxc.ts";
-import { BuildContext } from "../../types.ts";
-import { ResolveOptions } from "exsolve";
+import type { BuildContext } from "../../types.ts";
+import type { ResolveOptions } from "exsolve";
 
 type MaybePromise<T> = T | Promise<T>;
 
