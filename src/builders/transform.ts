@@ -5,7 +5,7 @@ import { dirname, extname, join, relative } from "node:path";
 import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { consola } from "consola";
 import { colors as c } from "consola/utils";
-import { resolveModulePath, ResolveOptions } from "exsolve";
+import { resolveModulePath, type ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform from "oxc-transform";
 import oxcParser from "oxc-parser";
