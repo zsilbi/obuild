@@ -10,7 +10,14 @@
     "composite": true,
     "allowImportingTsExtensions": true,
     "isolatedDeclarations": true,
-    "jsx": "preserve" 
   },
-  "include": ["src", "test"]
+  "references": [
+    {
+      "path": "./tsconfig.src.json"
+    },
+    {
+      "path": "./tsconfig.test.json"
+    }
+  ],
+  "include": []
 }
