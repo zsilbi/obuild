@@ -71,7 +71,7 @@ export function resolveTransformer(
 }
 
 export function resolveTransformers(
-  transformers: Array<TransformerName | Transformer> = defaultTransformers,
+  transformers: Array<TransformerName | Transformer>,
 ): Transformer[] {
   return transformers
     .map((transformerOrName) => {
@@ -89,7 +89,11 @@ export function resolveTransformers(
 export function createTransformer(options: CreateTransformerOptions): {
   transformFile: TransformFile;
 } {
-  const transformers = resolveTransformers(options.transformers);
+  const transformers = resolveTransformers([
+    // Provided transformers have higher priority
+    ...(options.transformers || []),
+    ...defaultTransformers,
+  ]);
 
   const transformFile = async function (
     input: InputFile,
