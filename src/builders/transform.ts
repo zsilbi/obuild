@@ -5,7 +5,7 @@ import { dirname, extname, join, relative } from "node:path";
 import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { consola } from "consola";
 import { colors as c } from "consola/utils";
-import { resolveModulePath } from "exsolve";
+import { resolveModulePath, type ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform from "oxc-transform";
 import oxcParser from "oxc-parser";
@@ -110,6 +110,19 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
     });
   }
 
+  const resolveOptions: ResolveOptions = {
+    ...entry.resolve,
+    from: pathToFileURL(entryPath),
+    extensions: entry.resolve?.extensions ?? [
+      ".ts",
+      ".js",
+      ".mjs",
+      ".cjs",
+      ".json",
+    ],
+    suffixes: entry.resolve?.suffixes ?? ["", "/index"],
+  };
+
   const magicString = new MagicString(sourceText);
 
   // Rewrite relative imports
@@ -127,9 +140,7 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
       return; // prevent double rewritings
     }
     updatedStarts.add(req.start);
-    const resolvedAbsolute = resolveModulePath(moduleId, {
-      from: pathToFileURL(entryPath),
-    });
+    const resolvedAbsolute = resolveModulePath(moduleId, resolveOptions);
     const newId = relative(
       dirname(entryPath),
       resolvedAbsolute.replace(/\.ts$/, ".mjs"),
