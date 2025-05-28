@@ -114,9 +114,7 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
     from: pathToFileURL(entryPath),
     extensions: entry.resolve?.extensions ?? [
       // Use the default extensions used by rolldown:
-      ".tsx",
       ".ts",
-      ".jsx",
       ".js",
       ".mjs",
       ".cjs",
