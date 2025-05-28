@@ -113,7 +113,6 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
   const resolveOptions: ResolveOptions = {
     from: pathToFileURL(entryPath),
     extensions: entry.resolve?.extensions ?? [
-      // Use the default extensions used by rolldown:
       ".ts",
       ".js",
       ".mjs",
