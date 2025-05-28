@@ -140,10 +140,7 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
       return; // prevent double rewritings
     }
     updatedStarts.add(req.start);
-    const resolvedAbsolute = resolveModulePath(moduleId, {
-      from: pathToFileURL(entryPath),
-      ...entry.resolve,
-    });
+    const resolvedAbsolute = resolveModulePath(moduleId, resolveOptions);
     const newId = relative(
       dirname(entryPath),
       resolvedAbsolute.replace(/\.ts$/, ".mjs"),
