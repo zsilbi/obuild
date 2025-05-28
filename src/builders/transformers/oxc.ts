@@ -27,7 +27,7 @@ type TransformConfig = Record<
   string,
   {
     transform?: boolean;
-    language?: ExternalOxcParserOptions["lang"];
+    language: ExternalOxcParserOptions["lang"];
     extension: Extension;
     declaration?: Extension | false;
   }
@@ -52,12 +52,15 @@ const transformConfig: Partial<TransformConfig> = {
     extension: ".jsx",
   },
   ".js": {
+    language: "js",
     extension: ".mjs",
   },
   ".mjs": {
+    language: "js",
     extension: ".mjs",
   },
   ".cjs": {
+    language: "js",
     extension: ".mjs",
   },
 };
