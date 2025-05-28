@@ -40,6 +40,17 @@ const transformConfig: Partial<TransformConfig> = {
     extension: ".mjs",
     declaration: ".d.mts",
   },
+  ".tsx": {
+    transform: true,
+    language: "tsx",
+    extension: ".jsx",
+    declaration: ".d.mts",
+  },
+  ".jsx": {
+    transform: true,
+    language: "jsx",
+    extension: ".jsx",
+  },
   ".js": {
     extension: ".mjs",
   },
@@ -217,7 +228,9 @@ function rewriteSpecifiers(
     const resolvedAbsolute = resolveModulePath(moduleId, {
       from: pathToFileURL(filePath),
       extensions: context.options.resolve?.extensions ?? [
+        ".tsx",
         ".ts",
+        ".jsx",
         ".js",
         ".mjs",
         ".cjs",
