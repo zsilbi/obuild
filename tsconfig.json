@@ -9,7 +9,8 @@
     "noEmit": true,
     "composite": true,
     "allowImportingTsExtensions": true,
-    "isolatedDeclarations": true
+    "isolatedDeclarations": true,
+    "jsx": "preserve"
   },
   "include": ["src", "test"]
 }

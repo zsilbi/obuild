@@ -8,11 +8,51 @@ import { colors as c } from "consola/utils";
 import { resolveModulePath, type ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform from "oxc-transform";
-import oxcParser from "oxc-parser";
+import oxcParser, { ParserOptions } from "oxc-parser";
 import { fmtPath } from "../utils.ts";
 import { glob } from "tinyglobby";
 import { minify } from "oxc-minify";
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
+
+const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
+
+type TransformConfig = Record<
+  string,
+  {
+    declaration?: string;
+    language?: ParserOptions["lang"];
+    extension?: string;
+  }
+>;
+
+const transformConfig: Partial<TransformConfig> = {
+  ".ts": {
+    language: "ts",
+    extension: ".mjs",
+    declaration: ".d.mts",
+  },
+  ".tsx": {
+    language: "tsx",
+    extension: ".jsx",
+    declaration: ".d.mts",
+  },
+  ".jsx": {
+    language: "jsx",
+  },
+  // ".js": {
+  //   extension: ".mjs",
+  // },
+};
+
+function transformPath(srcPath: string): string {
+  const config = transformConfig[extname(srcPath)];
+
+  if (config?.extension === undefined) {
+    return srcPath;
+  }
+
+  return srcPath.replace(KNOWN_EXT_RE, config.extension);
+}
 
 /**
  * Transform all .ts modules in a directory using oxc-transform.
@@ -34,48 +74,43 @@ export async function transformDir(
   for await (const entryName of await glob("**/*.*", { cwd: entry.input })) {
     promises.push(
       (async () => {
-        const entryPath = join(entry.input, entryName);
-        const ext = extname(entryPath);
-        switch (ext) {
-          case ".ts": {
-            {
-              const transformed = await transformModule(entryPath, entry);
-              const entryDistPath = join(
-                entry.outDir!,
-                entryName.replace(/\.ts$/, ".mjs"),
-              );
-              await mkdir(dirname(entryDistPath), { recursive: true });
-              await writeFile(entryDistPath, transformed.code, "utf8");
+        const entrySrcPath = join(entry.input, entryName);
+        const entryDistPath = join(entry.outDir!, transformPath(entryName));
 
-              if (SHEBANG_RE.test(transformed.code)) {
-                await makeExecutable(entryDistPath);
-              }
+        await mkdir(dirname(entryDistPath), { recursive: true });
 
-              if (transformed.declaration) {
-                await writeFile(
-                  entryDistPath.replace(/\.mjs$/, ".d.mts"),
-                  transformed.declaration,
-                  "utf8",
-                );
-              }
-              return entryDistPath;
-            }
+        const ext = extname(entrySrcPath);
+        const config = transformConfig[ext];
+
+        let code: string;
+
+        if (config?.language) {
+          const result = await transformModule(
+            entrySrcPath,
+            entry,
+            config.language,
+          );
+
+          code = result.code;
+
+          if (config.declaration && result.declaration) {
+            await writeFile(
+              entryDistPath.replace(KNOWN_EXT_RE, config.declaration),
+              result.declaration,
+              "utf8",
+            );
           }
-          default: {
-            {
-              const entryDistPath = join(entry.outDir!, entryName);
-              await mkdir(dirname(entryDistPath), { recursive: true });
-              const code = await readFile(entryPath, "utf8");
-              await writeFile(entryDistPath, code, "utf8");
-
-              if (SHEBANG_RE.test(code)) {
-                await makeExecutable(entryDistPath);
-              }
-
-              return entryDistPath;
-            }
-          }
+        } else {
+          code = await readFile(entrySrcPath, "utf8");
         }
+
+        await writeFile(entryDistPath, code, "utf8");
+
+        if (SHEBANG_RE.test(code)) {
+          await makeExecutable(entryDistPath);
+        }
+
+        return entryDistPath;
       })(),
     );
   }
@@ -92,17 +127,19 @@ export async function transformDir(
 /**
  * Transform a .ts module using oxc-transform.
  */
-async function transformModule(entryPath: string, entry: TransformEntry) {
+async function transformModule(
+  entryPath: string,
+  entry: TransformEntry,
+  language: ParserOptions["lang"] = "ts",
+) {
   let sourceText = await readFile(entryPath, "utf8");
 
-  const sourceOptions = {
-    lang: "ts",
+  const sourceOptions: ParserOptions = {
+    lang: language,
     sourceType: "module",
-  } as const;
+  };
 
-  const parsed = oxcParser.parseSync(entryPath, sourceText, {
-    ...sourceOptions,
-  });
+  const parsed = oxcParser.parseSync(entryPath, sourceText, sourceOptions);
 
   if (parsed.errors.length > 0) {
     throw new Error(`Errors while parsing ${entryPath}:`, {
@@ -114,7 +151,9 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
     from: pathToFileURL(entryPath),
     ...entry.resolve,
     extensions: entry.resolve?.extensions ?? [
+      ".tsx",
       ".ts",
+      ".jsx",
       ".js",
       ".mjs",
       ".cjs",
@@ -141,10 +180,7 @@ async function transformModule(entryPath: string, entry: TransformEntry) {
     }
     updatedStarts.add(req.start);
     const resolvedAbsolute = resolveModulePath(moduleId, resolveOptions);
-    const newId = relative(
-      dirname(entryPath),
-      resolvedAbsolute.replace(/\.ts$/, ".mjs"),
-    );
+    const newId = relative(dirname(entryPath), transformPath(resolvedAbsolute));
     magicString.remove(req.start, req.end);
     magicString.prependLeft(
       req.start,
