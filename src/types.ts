@@ -9,6 +9,7 @@ import type {
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
 import type { TransformOptions } from "oxc-transform";
 import type { MinifyOptions as OXCMinifyOptions } from "oxc-minify";
+import { Transformer, TransformerName } from "./builders/transformers/index.ts";
 import type { ResolveOptions } from "exsolve";
 
 export interface BuildContext {
@@ -72,19 +73,25 @@ export type TransformEntry = _BuildEntry & {
    */
   input: string;
 
-  /**
-   * Minify the output using oxc-minify.
-   *
-   * Defaults to `false` if not provided.
-   */
-  minify?: boolean | OXCMinifyOptions;
+  oxc?: {
+    /**
+     * Options passed to oxc-transform.
+     *
+     * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
+     */
+    transform?: TransformOptions;
+    /**
+     * Minify the output using oxc-minify.
+     *
+     * Defaults to `false` if not provided.
+     */
+    minify?: boolean | OXCMinifyOptions;
+  };
 
   /**
-   * Options passed to oxc-transform.
-   *
-   * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
+   * List of transformers to invoke.
    */
-  oxc?: TransformOptions;
+  transformers?: Array<TransformerName | Transformer>;
 
   /**
    * Options passed to exsolve for module resolution.

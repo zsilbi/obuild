@@ -16,7 +16,17 @@ describe("obuild", () => {
       cwd: fixtureDir,
       entries: [
         { type: "bundle", input: ["src/index", "src/cli"] },
-        { type: "transform", input: "src/runtime", outDir: "dist/runtime" },
+        {
+          type: "transform",
+          input: "src/runtime",
+          outDir: "dist/runtime",
+          transformers: ["oxc"],
+          oxc: {
+            minify: {
+              sourcemap: true,
+            },
+          },
+        },
         "src/utils.ts",
       ],
     });
@@ -35,11 +45,15 @@ describe("obuild", () => {
         "runtime",
         "runtime/index.d.mts",
         "runtime/index.mjs",
-        "runtime/js-module.js",
+        "runtime/index.mjs.map",
+        "runtime/js-module.mjs",
+        "runtime/js-module.mjs.map",
         "runtime/test.d.mts",
         "runtime/test.mjs",
+        "runtime/test.mjs.map",
         "runtime/ts-module.d.mts",
         "runtime/ts-module.mjs",
+        "runtime/ts-module.mjs.map",
         "utils.d.mts",
         "utils.mjs",
       ]
