@@ -21,13 +21,6 @@ export interface TransformerContext {
   transformFile: TransformFile;
 
   /**
-   * For compatibility with `mkdist` loaders
-   *
-   * @deprecated Use `transformFile()` instead
-   */
-  loadFile: TransformFile;
-
-  /**
    * Options passed to the transformer, such as `resolve` options for module resolution.
    */
   options: TransformerOptions;
@@ -89,12 +82,19 @@ export interface OutputFile {
   contents?: string;
 
   /**
-   * The output file is a declaration file (e.g. `.d.mts`)
+   * Set to `true` to skip writing this file to the output directory.
    */
-  declaration?: boolean;
+  skip?: boolean;
 
   /**
-   * The output file is a source map (e.g. `.js.map`)
+   * The file is a declaration file (e.g. `.d.mts`)
+   *
+   * If `"generate"` is set, the transformer will generate a declaration file from the source file.
+   */
+  declaration?: boolean | "generate";
+
+  /**
+   * The file is a source map (e.g. `.js.map`)
    */
   sourceMap?: boolean;
 
@@ -102,11 +102,6 @@ export interface OutputFile {
    * Whether the file is raw (not modified from the input)
    */
   raw?: boolean;
-
-  /**
-   * Set to `true` to skip writing this file to the output directory.
-   */
-  skip?: boolean;
 }
 
 export type TransformResult = OutputFile[] | undefined;
@@ -117,7 +112,7 @@ export type TransformResult = OutputFile[] | undefined;
  * @param input - The input file to transform.
  * @returns A promise that resolves to an array of output files.
  */
-type TransformFile = (input: InputFile) => MaybePromise<OutputFile[]>;
+export type TransformFile = (input: InputFile) => MaybePromise<OutputFile[]>;
 
 function resolveTransformer(
   transformer: TransformerName | Transformer,
@@ -156,10 +151,6 @@ export function createTransformer(
   options: TransformerOptions = {},
 ): {
   transformFile: TransformFile;
-  /**
-   * @deprecated Use `transformFile()` instead
-   */
-  loadFile: TransformFile;
 } {
   const resolvedTransformers = resolveTransformers([
     // Provided transformers have higher priority
@@ -172,7 +163,6 @@ export function createTransformer(
   ): Promise<OutputFile[]> {
     const context: TransformerContext = {
       transformFile,
-      loadFile: transformFile,
       options,
     };
 
@@ -195,6 +185,7 @@ export function createTransformer(
 
   return {
     transformFile,
-    loadFile: transformFile,
   };
 }
+
+export { mkdistLoader } from "./mkdist.ts";

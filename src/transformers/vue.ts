@@ -1,9 +1,20 @@
 import consola from "consola";
-import type { InputFile, Transformer, TransformerContext } from "./index.ts";
+import {
+  type InputFile,
+  type Transformer,
+  type TransformerContext,
+} from "./index.ts";
+import { mkdistLoader } from "./mkdist.ts";
 
 export interface VueTransformerOptions {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  vue?: {};
+  vue?: {
+    /**
+     * Declaration generation.
+     *
+     * Set to `false` to disable.
+     */
+    dts?: boolean;
+  };
 }
 
 let cachedVueTransformer: Transformer | undefined;
@@ -14,7 +25,10 @@ export const vueTransformer: Transformer = async (
 ) => {
   if (!cachedVueTransformer) {
     cachedVueTransformer = await import("vue-sfc-transformer/mkdist").then(
-      (r) => r.vueLoader,
+      (r) =>
+        mkdistLoader(r.vueLoader, {
+          declaration: context.options.vue?.dts,
+        }),
       (error) => {
         consola.error(
           `Failed to transform "${inputFile.path}" because vue-sfc-transformer is not installed.`,

@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { dirname, extname, relative } from "node:path";
+import { basename, dirname, extname, relative } from "node:path";
 import { writeFile } from "node:fs/promises";
 import { resolveModulePath, type ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
@@ -15,9 +15,8 @@ import {
 } from "oxc-minify";
 import type { OutputFile, Transformer, TransformResult } from "./index.ts";
 
-const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
-
 type Extension = `.${string}`;
+
 type TransformConfig = Record<
   string,
   {
@@ -91,22 +90,22 @@ export const oxcTransformer: Transformer = async (
 ): Promise<TransformResult> => {
   const { extension = extname(input.path), srcPath } = input;
   const { options } = context;
-  const config = transformConfig[extension];
+  const fileTransformConfig = transformConfig[extension];
 
-  if (srcPath === undefined || config === undefined) {
+  if (srcPath === undefined || fileTransformConfig === undefined) {
     return undefined;
   }
 
   const output: OutputFile[] = [];
 
   const code: OutputFile = {
-    path: replaceExtension(input.path, config.extension),
+    path: input.path,
     srcPath,
-    extension: config.extension,
+    extension: fileTransformConfig.extension,
   };
 
   const sourceOptions: ExternalOxcParserOptions = {
-    lang: config.language,
+    lang: fileTransformConfig.language,
     sourceType: "module",
   };
 
@@ -115,7 +114,7 @@ export const oxcTransformer: Transformer = async (
     ...options?.oxc?.resolve,
   });
 
-  if (config.transform === true) {
+  if (fileTransformConfig.transform === true) {
     const transformed = oxcTransform.transform(srcPath, code.contents, {
       ...options?.oxc?.transform,
       ...sourceOptions,
@@ -126,12 +125,13 @@ export const oxcTransformer: Transformer = async (
       },
     });
 
-    if (config.declaration && transformed.declaration) {
+    if (fileTransformConfig.declaration && transformed.declaration) {
       output.push({
         srcPath,
         contents: transformed.declaration,
         declaration: true,
-        path: replaceExtension(input.path, config.declaration),
+        path: input.path,
+        extension: fileTransformConfig.declaration,
       });
     }
 
@@ -176,8 +176,8 @@ export const oxcTransformer: Transformer = async (
 
       output.push({
         srcPath,
-        path: `${replaceExtension(input.path)}.map`,
-        extension: config.extension,
+        path: input.path,
+        extension: `${fileTransformConfig.extension}.map`,
         sourceMap: true,
         contents: JSON.stringify(minifyResult.map),
       });
@@ -186,27 +186,13 @@ export const oxcTransformer: Transformer = async (
     output.push({
       srcPath,
       path: code.path,
-      extension: config.extension,
+      extension: fileTransformConfig.extension,
       contents: minifyResult.code,
     });
   }
 
   return output;
 };
-
-function replaceExtension(path: string, target?: Extension): string {
-  if (target === undefined) {
-    const config = transformConfig[extname(path)];
-
-    if (config === undefined) {
-      return path;
-    }
-
-    target = config.extension;
-  }
-
-  return path.replace(KNOWN_EXT_RE, target);
-}
 
 function rewriteSpecifiers(
   filePath: string,
@@ -221,6 +207,16 @@ function rewriteSpecifiers(
     throw new Error(`Errors while parsing ${filePath}:`, {
       cause: parsed.errors,
     });
+  }
+
+  function replaceExtension(path: string): string {
+    const config = transformConfig[extname(path)];
+
+    if (config === undefined) {
+      return path;
+    }
+
+    return basename(path, extname(path)) + config.extension;
   }
 
   const magicString = new MagicString(code);

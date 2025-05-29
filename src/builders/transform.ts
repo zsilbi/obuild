@@ -3,11 +3,11 @@ import type { BuildContext, TransformEntry } from "../types.ts";
 import { consola } from "consola";
 import { colors as c } from "consola/utils";
 import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
-import { dirname, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import { glob } from "tinyglobby";
 import { fmtPath } from "../utils.ts";
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
-import { createTransformer } from "../transformers/index.ts";
+import { createTransformer, type OutputFile } from "../transformers/index.ts";
 
 /**
  * Transform all files in a directory using oxc-transform.
@@ -27,11 +27,11 @@ export async function transformDir(
   const transformer = createTransformer(entry.transformers, entry);
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
 
-  const entryPromises: Promise<string[]>[] = inputFileNames.map(
+  const entryPromises: Promise<OutputFile[]>[] = inputFileNames.map(
     async (inputFileName) => {
       const inputFilePath = join(entry.input, inputFileName);
 
-      const outputFiles = await transformer.transformFile({
+      return transformer.transformFile({
         path: inputFileName,
         extension: extname(inputFilePath),
         srcPath: inputFilePath,
@@ -39,37 +39,62 @@ export async function transformDir(
           return readFile(inputFilePath, "utf8");
         },
       });
-
-      const outputPromises: Promise<string>[] = outputFiles
-        .filter((outputFile) => !outputFile.skip)
-        .map(async (outputFile) => {
-          let code = outputFile.contents || "";
-          const outputFilePath = join(entry.outDir!, outputFile.path);
-
-          await mkdir(dirname(outputFilePath), { recursive: true });
-
-          if (outputFile.raw) {
-            if (outputFile.srcPath === undefined) {
-              throw new TypeError("Raw output files must have a `srcPath`");
-            }
-
-            code = await readFile(outputFile.srcPath, "utf8");
-          }
-
-          await writeFile(outputFilePath, code, "utf8");
-
-          if (SHEBANG_RE.test(code)) {
-            await makeExecutable(outputFilePath);
-          }
-
-          return outputFilePath;
-        });
-
-      return await Promise.all(outputPromises);
     },
   );
 
-  const writtenFiles = (await Promise.all(entryPromises)).flat();
+  const outputFiles = await Promise.all(entryPromises).then((results) =>
+    results.flat(),
+  );
+
+  // Rename output files to their new extensions
+  for (const output of outputFiles.filter((output) => output.extension)) {
+    const renamed =
+      basename(output.path, extname(output.path)) + output.extension;
+
+    output.path = join(dirname(output.path), renamed);
+  }
+
+  const dtsOutputFiles = outputFiles.filter(
+    (output) => !output.skip && output.declaration === "generate",
+  );
+
+  if (dtsOutputFiles.length > 0) {
+    // @todo - Support generating declaration files
+    for (const dtsOutputFile of dtsOutputFiles) {
+      dtsOutputFile.skip = true;
+
+      consola.warn(
+        `Generating a declaration file for "${dtsOutputFile.path}" is currently not supported.`,
+      );
+    }
+  }
+
+  const outputPromises: Promise<string>[] = outputFiles
+    .filter((outputFile) => !outputFile.skip)
+    .map(async (outputFile) => {
+      let code = outputFile.contents || "";
+      const outputFilePath = join(entry.outDir!, outputFile.path);
+
+      await mkdir(dirname(outputFilePath), { recursive: true });
+
+      if (outputFile.raw) {
+        if (outputFile.srcPath === undefined) {
+          throw new TypeError("Raw output files must have a `srcPath`");
+        }
+
+        code = await readFile(outputFile.srcPath, "utf8");
+      }
+
+      await writeFile(outputFilePath, code, "utf8");
+
+      if (SHEBANG_RE.test(code)) {
+        await makeExecutable(outputFilePath);
+      }
+
+      return outputFilePath;
+    });
+
+  const writtenFiles = await Promise.all(outputPromises);
 
   consola.log(
     `\n${c.magenta("[transform] ")}${c.underline(fmtPath(entry.outDir!) + "/")}\n${writtenFiles
