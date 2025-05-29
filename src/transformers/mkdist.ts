@@ -47,7 +47,7 @@ export function mkdistLoader(
   const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
 
   /**
-   * mkdist compatible JS loader that adds declaration file output `.js` files also
+   * mkdist compatible JS loader that adds declaration file output for `.js` files also
    */
   const jsLoader = async (
     input: InputFile,
@@ -107,15 +107,16 @@ export function mkdistLoader(
         const dtsOutput = (await jsLoader(inputFile)) || [];
         const output = await context.transformFile(inputFile);
 
-        return [...dtsOutput, ...output].map((element) =>
-          toMkdistOutputFile(element),
-        );
+        return [
+          ...dtsOutput,
+          ...output.map((file) => toMkdistOutputFile(file)),
+        ];
       },
       options: loaderOptions,
     };
 
     const output = await loader(input, mkdistContext);
 
-    return output?.map(fromMkdistOutputFile) || [];
+    return output?.map((file) => fromMkdistOutputFile(file)) || [];
   };
 }
