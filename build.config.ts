@@ -5,6 +5,9 @@ export default defineBuildConfig({
     {
       type: "bundle",
       input: ["./src/index.ts", "./src/cli.ts", "./src/config.ts"],
+      rolldown: {
+        external: ["vue-sfc-transformer/mkdist"],
+      },
     },
   ],
 });
