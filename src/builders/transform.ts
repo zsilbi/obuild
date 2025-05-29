@@ -48,10 +48,16 @@ export async function transformDir(
 
   // Rename output files to their new extensions
   for (const output of outputFiles.filter((output) => output.extension)) {
-    const renamed =
-      basename(output.path, extname(output.path)) + output.extension;
+    const originalExtension = extname(output.path);
 
-    output.path = join(dirname(output.path), renamed);
+    if (originalExtension === output.extension) {
+      continue;
+    }
+
+    output.path = join(
+      dirname(output.path),
+      basename(output.path, originalExtension) + output.extension,
+    );
   }
 
   const dtsOutputFiles = outputFiles.filter(
