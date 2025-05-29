@@ -190,6 +190,7 @@ function minify(
 
   minifyOutput.push({
     ...output,
+    skip: undefined,
     contents: minifyResult.code,
   });
 
