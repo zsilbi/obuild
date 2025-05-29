@@ -3,6 +3,7 @@ import { oxcTransformer } from "./oxc.ts";
 import { vueTransformer } from "./vue.ts";
 
 import type {
+  Transformer,
   InputFile,
   OutputFile,
   TransformerContext,

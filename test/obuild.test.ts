@@ -1,4 +1,6 @@
 import { describe, test, expect, beforeAll } from "vitest";
+import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { build } from "../src/build.ts";
 import { readdir, readFile, rm, stat } from "node:fs/promises";
@@ -16,63 +18,61 @@ describe("obuild", () => {
       cwd: fixtureDir,
       entries: [
         { type: "bundle", input: ["src/index", "src/cli"] },
+        "src/utils.ts",
         {
           type: "transform",
           input: "src/runtime",
           outDir: "dist/runtime",
+        },
+        {
+          type: "transform",
+          input: "src/min",
+          outDir: "dist/min",
           oxc: {
             minify: {
               sourcemap: true,
             },
           },
         },
-        "src/utils.ts",
-        {
-          type: "transform",
-          input: "src/vue",
-          outDir: "dist/vue",
-        },
       ],
     });
   });
 
   test("dist files match expected", async () => {
-    const distFiles = await readdir(distDir, { recursive: true }).then((r) =>
-      r.sort(),
+    const distFiles = await readdir(distDir, {
+      recursive: true,
+      withFileTypes: true,
+    }).then((entries) =>
+      entries
+        .filter((entry) => entry.isFile())
+        .map((entry) =>
+          relative(fileURLToPath(distDir), join(entry.parentPath, entry.name)),
+        )
+        .sort(),
     );
+
     expect(distFiles).toMatchInlineSnapshot(`
       [
         "cli.d.mts",
         "cli.mjs",
         "index.d.mts",
         "index.mjs",
-        "runtime",
-        "runtime/components",
-        "runtime/components/jsx-component.jsx",
-        "runtime/components/jsx-component.jsx.map",
-        "runtime/components/tsx-component.d.mts",
-        "runtime/components/tsx-component.jsx",
-        "runtime/components/tsx-component.jsx.map",
+        "min/test.mjs",
+        "min/test.mjs.map",
+        "runtime/components/jsx.jsx",
+        "runtime/components/tsx.d.mts",
+        "runtime/components/tsx.jsx",
+        "runtime/components/vue.vue",
         "runtime/index.d.mts",
         "runtime/index.mjs",
-        "runtime/index.mjs.map",
-        "runtime/modules",
-        "runtime/modules/cjs-module.cjs",
-        "runtime/modules/cjs-module.cjs.map",
         "runtime/modules/js-module.js",
-        "runtime/modules/js-module.js.map",
         "runtime/modules/mjs-module.mjs",
-        "runtime/modules/mjs-module.mjs.map",
         "runtime/modules/ts-module.d.mts",
         "runtime/modules/ts-module.mjs",
-        "runtime/modules/ts-module.mjs.map",
         "runtime/test.d.mts",
         "runtime/test.mjs",
-        "runtime/test.mjs.map",
         "utils.d.mts",
         "utils.mjs",
-        "vue",
-        "vue/TestComponent.vue",
       ]
     `);
   });
