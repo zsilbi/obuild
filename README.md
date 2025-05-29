@@ -82,7 +82,6 @@ export default defineBuildConfig({
       outDir: "./dist/runtime",
       // stub: false,
       // oxc: {},
-      // resolve: {}
       // transformers: []
     },
   ],
@@ -93,6 +92,107 @@ export default defineBuildConfig({
     // rolldownConfig: (config, ctx) => {},
     // rolldownOutput: (output, res, ctx) => {},
   },
+});
+```
+
+## Transformers
+
+For transform entries, you can use the `transformers` option to specify custom transformers or modify the order of the default transformers.
+
+```ts
+import { defineBuildConfig } from "obuild";
+import type {
+  InputFile,
+  OutputFile,
+  TransformerContext,
+} from "obuild/transformers";
+
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      transformers: [
+        "vue", // Prepend the default built-in Vue transformer before your custom transformer.
+        {
+          type: "transform",
+          input: "./src/transformers/index.ts",
+          transformers: [
+            (input: InputFile, context: TransformerContext): OutputFile[] => {
+              if (!input.path.endsWith(".foo")) {
+                // Do not process non-foo files
+                return undefined;
+              }
+
+              const output: OutputFile[] = [];
+              // ...do your transformation logic here and and them to the output array
+              return output;
+            },
+          ],
+        },
+        // The default transformers will be invoked after after "vue" and your custom transformer.
+      ],
+    },
+  ],
+});
+```
+
+### Composing a custom transformer
+
+You can create a custom transformer by implementing the `Transformer` interface. Here's an example of how to create a custom transformer that processes files with a specific extension and adds a custom option to the transformer context options:
+
+```ts
+// src/transformers/foo.ts
+import type {
+  InputFile,
+  OutputFile,
+  Transformer,
+  TransformerContext,
+  TransformerOptions
+} from "obuild/transformers";
+
+declare module "obuild/transformers" {
+  export interface TransformerOptions {
+    customFooExtension?: string; // Custom option for your transformer
+  }
+}
+
+export const fooTransformer: Transformer = async (
+  inputFile: InputFile,
+  context: TransformerContext,
+) => {
+  const { customFooExtension = ".foo" } = context.options;
+
+  if (!input.path.endsWith(customFooExtension)) {
+    // Do not process non-foo files
+    return undefined;
+  }
+
+  const output: OutputFile[] = [];
+  // ...do your transformation logic here and and them to the output array
+  return output;
+};
+```
+
+Then you can use it in your build config:
+
+```ts
+import { defineBuildConfig } from "obuild";
+import { fooTransformer } from "./src/transformers"; // Import your custom transformer
+
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      transformers: [fooTransformer],
+      foo: {
+        customFooExtension: ".custom-foo", // Custom option for your transformer
+      },
+    },
+  ],
 });
 ```
 
