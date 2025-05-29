@@ -46,7 +46,7 @@ export function mkdistLoader(
   const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
 
   /**
-   * mkdist compatbile JS loader that adds declaration file output for also for `.js` files.
+   * mkdist compatible JS loader that adds declaration file output `.js` files also
    */
   const jsLoader = async (
     input: InputFile,
