@@ -21,10 +21,7 @@ type MkdistLoaderOptions = {
   declaration?: boolean;
 };
 
-type MkdistLoaderContext = Omit<
-  TransformerContext,
-  "transformFile" | "options"
-> & {
+type MkdistLoaderContext = {
   loadFile: (input: InputFile) => MaybePromise<MkdistOutputFile[]>;
   options: MkdistLoaderOptions;
 };
@@ -106,7 +103,6 @@ export function mkdistLoader(
 
   return async (input, context: TransformerContext) => {
     const mkdistContext: MkdistLoaderContext = {
-      ...context,
       loadFile: async (inputFile: InputFile): Promise<MkdistOutputFile[]> => {
         const dtsOutput = (await jsLoader(inputFile)) || [];
         const output = await context.transformFile(inputFile);
