@@ -97,7 +97,63 @@ export default defineBuildConfig({
 
 ## Transformers
 
-For transform entries, you can use the `transformers` option to specify custom transformers or modify the order of the default transformers.
+### Built-in transformers
+
+#### `oxc` - TypeScript/JSX/TSX transformer
+
+The `oxc` transformer handles TypeScript and JSX/TSX file transformations using the [oxc-transform](https://www.npmjs.com/package/oxc-transform) package under the hood.
+
+Configure the `oxc` transformer using the `oxc` option in your build configuration:
+
+```ts
+import { defineBuildConfig } from "obuild";
+
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      oxc: {
+        // Enable minification and sourcemaps
+        minify: {
+          sourcemap: true,
+        },
+      },
+    },
+  ],
+});
+```
+
+#### `vue` - Vue SFC transformer
+
+The `vue` transformer processes Vue Single File Components (SFCs) using the [vue-sfc-transformer](https://github.com/nuxt-contrib/vue-sfc-transformer) package.
+
+You can configure the `vue` transformer with the `vue` option in your build config.
+
+> [!NOTE]
+> TypeScript declaration (`.d.ts`) generation for Vue SFCs is not available in the current version of obuild. This feature will be added in a future release.
+
+```ts
+import { defineBuildConfig } from "obuild";
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      vue: {
+        // Disable TypeScript declaration generation for Vue SFCs
+        dts: false,
+      },
+    },
+  ],
+});
+```
+
+### Using custom transformers
+
+For transform entries, use the `transformers` option to specify custom transformers or modify the execution order of default transformers.
 
 ```ts
 import { defineBuildConfig } from "obuild";
@@ -140,7 +196,7 @@ export default defineBuildConfig({
 
 ### Composing a custom transformer
 
-You can create a custom transformer by implementing the `Transformer` interface. Here's an example of how to create a custom transformer that processes files with a specific extension and adds a custom option to the transformer context options:
+Create custom transformers by implementing the `Transformer` interface. Here's an example that processes files with a specific extension and adds custom configuration options:
 
 ```ts
 // src/transformers/foo.ts
@@ -177,7 +233,7 @@ export const fooTransformer: Transformer = async (
 };
 ```
 
-Then you can use it in your build config:
+Use your custom transformer in the build configuration:
 
 ```ts
 import { defineBuildConfig } from "obuild";
