@@ -53,7 +53,7 @@ const transformConfig: Partial<TransformConfig> = {
   },
   ".js": {
     language: "js",
-    extension: ".mjs",
+    extension: ".js",
   },
   ".mjs": {
     language: "js",
@@ -61,7 +61,7 @@ const transformConfig: Partial<TransformConfig> = {
   },
   ".cjs": {
     language: "js",
-    extension: ".mjs",
+    extension: ".cjs",
   },
 };
 
