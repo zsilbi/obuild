@@ -26,8 +26,7 @@ export async function transformDir(
 
   const transformer = createTransformer(entry.transformers, entry);
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
-
-  const entryPromises: Promise<OutputFile[]>[] = inputFileNames.map(
+  const transformPromises: Promise<OutputFile[]>[] = inputFileNames.map(
     async (inputFileName) => {
       const inputFilePath = join(entry.input, inputFileName);
 
@@ -42,7 +41,7 @@ export async function transformDir(
     },
   );
 
-  const outputFiles = await Promise.all(entryPromises).then((results) =>
+  const outputFiles = await Promise.all(transformPromises).then((results) =>
     results.flat(),
   );
 
