@@ -7,9 +7,8 @@ import type {
 } from "rolldown";
 
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
-import { Transformer, TransformerName } from "./transformers/index.ts";
-import type { ResolveOptions } from "exsolve";
-import { OxcTransformerOptions } from "./transformers/oxc.ts";
+import type { Transformer, TransformerName } from "./transformers/index.ts";
+import type { OxcTransformerOptions } from "./transformers/oxc.ts";
 
 export interface BuildContext {
   pkgDir: string;
@@ -76,13 +75,6 @@ export type TransformEntry = _BuildEntry & {
    * List of transformers to invoke.
    */
   transformers?: Array<TransformerName | Transformer>;
-
-  /**
-   * Options passed to exsolve for module resolution.
-   *
-   * See [exsolve](https://github.com/unjs/exsolve) for more details.
-   */
-  resolve?: Omit<ResolveOptions, "from">;
 
   /**
    * Options for the `oxc` transformer.
