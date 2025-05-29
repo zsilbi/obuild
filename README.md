@@ -182,7 +182,7 @@ export default defineBuildConfig({
               }
 
               const output: OutputFile[] = [];
-              // ...do your transformation logic here and and them to the output array
+              // ...do your transformation logic here and add the processed files to the output array
               return output;
             },
           ],
@@ -228,7 +228,7 @@ export const fooTransformer: Transformer = async (
   }
 
   const output: OutputFile[] = [];
-  // ...do your transformation logic here and and them to the output array
+  // ...do your transformation logic here and add the processed files to the output array
   return output;
 };
 ```
