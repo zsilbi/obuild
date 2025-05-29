@@ -105,19 +105,15 @@ export const oxcTransformer: Transformer = async (
   );
 
   if (config.transform === true) {
-    const transformed = oxcTransform.transform(
-      srcPath,
-      code.contents,
-      {
-        ...options?.oxc?.transform,
-        ...sourceOptions,
-        cwd: dirname(srcPath),
-        typescript: {
-          declaration: { stripInternal: true },
-          ...options.oxc?.transform?.typescript,
-        },
+    const transformed = oxcTransform.transform(srcPath, code.contents, {
+      ...options?.oxc?.transform,
+      ...sourceOptions,
+      cwd: dirname(srcPath),
+      typescript: {
+        declaration: { stripInternal: true },
+        ...options.oxc?.transform?.typescript,
       },
-    );
+    });
 
     if (config.declaration && transformed.declaration) {
       output.push({
