@@ -149,12 +149,14 @@ import type {
   OutputFile,
   Transformer,
   TransformerContext,
-  TransformerOptions
+  TransformerOptions,
 } from "obuild/transformers";
 
 declare module "obuild/transformers" {
   export interface TransformerOptions {
-    customFooExtension?: string; // Custom option for your transformer
+    foo?: {
+      customFooExtension?: string; // Custom option for your transformer
+    };
   }
 }
 
@@ -179,7 +181,7 @@ Then you can use it in your build config:
 
 ```ts
 import { defineBuildConfig } from "obuild";
-import { fooTransformer } from "./src/transformers"; // Import your custom transformer
+import { fooTransformer } from "./src/transformers/foo.ts"; // Import your custom transformer
 
 export default defineBuildConfig({
   entries: [
