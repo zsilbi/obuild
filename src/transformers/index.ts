@@ -12,6 +12,7 @@ import type {
   TransformFile,
 } from "./types.ts";
 
+export type * from "./types.ts";
 export { mkdistLoader } from "./mkdist.ts";
 
 const transformers: Record<TransformerName, Transformer> = {
