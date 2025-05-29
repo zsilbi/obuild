@@ -2,16 +2,18 @@ import { consola } from "consola";
 import { oxcTransformer, type OxcTransformerOptions } from "./oxc.ts";
 import type { BuildContext } from "../../types.ts";
 import type { ResolveOptions } from "exsolve";
+import { vueTransformer } from "./vue.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
 const transformers: Record<TransformerName, Transformer> = {
   oxc: oxcTransformer,
+  vue: vueTransformer,
 };
 
-const defaultTransformers: Transformer[] = [oxcTransformer];
+const defaultTransformers: Transformer[] = [oxcTransformer, vueTransformer];
 
-export type TransformerName = "oxc" | (string & {});
+export type TransformerName = "oxc" | "vue" | (string & {});
 
 export interface TransformerOptions extends OxcTransformerOptions {
   build: BuildContext;
@@ -24,6 +26,12 @@ export interface CreateTransformerOptions extends TransformerOptions {
 
 export interface TransformerContext {
   transformFile: TransformFile;
+  /**
+   * For compatibility with `mkdist` loaders
+   *
+   * @deprecated Use `transformFile()` instead
+   */
+  loadFile: TransformFile;
   options: TransformerOptions;
 }
 
@@ -88,6 +96,7 @@ export function resolveTransformers(
 
 export function createTransformer(options: CreateTransformerOptions): {
   transformFile: TransformFile;
+  loadFile: TransformFile;
 } {
   const transformers = resolveTransformers([
     // Provided transformers have higher priority
@@ -100,6 +109,7 @@ export function createTransformer(options: CreateTransformerOptions): {
   ): Promise<OutputFile[]> {
     const context: TransformerContext = {
       transformFile,
+      loadFile: transformFile,
       options,
     };
 
@@ -122,5 +132,6 @@ export function createTransformer(options: CreateTransformerOptions): {
 
   return {
     transformFile,
+    loadFile: transformFile,
   };
 }
