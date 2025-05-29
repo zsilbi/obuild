@@ -7,13 +7,13 @@ import { dirname, extname, join } from "node:path";
 import { glob } from "tinyglobby";
 import { fmtPath } from "../utils.ts";
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
-import { createTransformer, type InputFile } from "./transformers/index.ts";
+import { createTransformer } from "./transformers/index.ts";
 
 /**
  * Transform all files in a directory using oxc-transform.
  */
 export async function transformDir(
-  ctx: BuildContext,
+  context: BuildContext,
   entry: TransformEntry,
 ): Promise<void> {
   if (entry.stub) {
@@ -25,30 +25,23 @@ export async function transformDir(
   }
 
   const transformer = createTransformer({
-    build: ctx,
+    build: context,
     ...entry,
   });
-  const entryNames = await glob("**/*.*", { cwd: entry.input });
+  const inputFileNames = await glob("**/*.*", { cwd: entry.input });
 
-  const entryPromises: Promise<string[]>[] = entryNames.map(
-    async (entryName) => {
-      const entryPath = join(entry.input, entryName);
-      const ext = extname(entryPath);
+  const entryPromises: Promise<string[]>[] = inputFileNames.map(
+    async (inputFileName) => {
+      const inputFilePath = join(entry.input, inputFileName);
 
-      const inputFile: InputFile = {
-        path: entryName,
-        extension: ext,
-        srcPath: entryPath,
+      const outputFiles = await transformer.transformFile({
+        path: inputFileName,
+        extension: extname(inputFilePath),
+        srcPath: inputFilePath,
         getContents() {
-          return readFile(entryPath, "utf8");
+          return readFile(inputFilePath, "utf8");
         },
-      };
-
-      const outputFiles = await transformer.transformFile(inputFile);
-
-      if (outputFiles.length === 0) {
-        throw new Error("Unexpected empty output from transformer");
-      }
+      });
 
       const outputPromises: Promise<string>[] = outputFiles
         .filter((outputFile) => !outputFile.skip)

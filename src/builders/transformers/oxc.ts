@@ -85,16 +85,19 @@ export const oxcTransformer: Transformer = async (
   }
 
   const output: OutputFile[] = [];
-  const codeOutputFile: OutputFile = {
+
+  const code: OutputFile = {
     path: replaceExtension(input.path, config.extension),
     srcPath,
     extension: config.extension,
   };
+
   const sourceOptions: ExternalOxcParserOptions = {
     lang: config.language,
     sourceType: "module",
   };
-  const sourceText = rewriteSpecifiers(
+
+  code.contents = rewriteSpecifiers(
     srcPath,
     await input.getContents(),
     context,
@@ -102,15 +105,19 @@ export const oxcTransformer: Transformer = async (
   );
 
   if (config.transform === true) {
-    const transformed = oxcTransform.transform(srcPath, sourceText, {
-      ...options?.oxc?.transform,
-      ...sourceOptions,
-      cwd: dirname(srcPath),
-      typescript: {
-        declaration: { stripInternal: true },
-        ...options.oxc?.transform?.typescript,
+    const transformed = oxcTransform.transform(
+      srcPath,
+      code.contents,
+      {
+        ...options?.oxc?.transform,
+        ...sourceOptions,
+        cwd: dirname(srcPath),
+        typescript: {
+          declaration: { stripInternal: true },
+          ...options.oxc?.transform?.typescript,
+        },
       },
-    });
+    );
 
     if (config.declaration && transformed.declaration) {
       output.push({
@@ -128,7 +135,7 @@ export const oxcTransformer: Transformer = async (
     if (transformErrors.length > 0) {
       await writeFile(
         "build-dump.ts",
-        `/** Error dump for ${input.srcPath} */\n\n` + sourceText,
+        `/** Error dump for ${input.srcPath} */\n\n` + code.contents,
         "utf8",
       );
       throw new Error(
@@ -139,20 +146,18 @@ export const oxcTransformer: Transformer = async (
       );
     }
 
-    codeOutputFile.contents = transformed.code;
-  } else {
-    codeOutputFile.contents = sourceText;
+    code.contents = transformed.code;
   }
 
-  output.push(codeOutputFile);
+  output.push(code);
 
   if (options.oxc?.minify) {
     // skip the original file if minifying
-    codeOutputFile.skip = true;
+    code.skip = true;
 
     const minifyResult = minify(
       srcPath,
-      codeOutputFile.contents || sourceText,
+      code.contents,
       options.oxc?.minify === true ? {} : options.oxc?.minify,
     );
 
@@ -173,7 +178,7 @@ export const oxcTransformer: Transformer = async (
 
     output.push({
       srcPath,
-      path: codeOutputFile.path,
+      path: code.path,
       extension: config.extension,
       contents: minifyResult.code,
     });
