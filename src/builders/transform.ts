@@ -63,7 +63,7 @@ export async function transformDir(
       dtsOutputFile.skip = true;
 
       consola.warn(
-        `Generating a declaration file for "${dtsOutputFile.path}" is currently not supported.`,
+        `Generating a declaration file "${dtsOutputFile.path}" is currently not supported.`,
       );
     }
   }
