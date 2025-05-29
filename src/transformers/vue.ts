@@ -1,10 +1,7 @@
 import consola from "consola";
-import {
-  type InputFile,
-  type Transformer,
-  type TransformerContext,
-} from "./index.ts";
 import { mkdistLoader } from "./mkdist.ts";
+
+import type { InputFile, Transformer, TransformerContext } from "./types.ts";
 
 export interface VueTransformerOptions {
   vue?: {

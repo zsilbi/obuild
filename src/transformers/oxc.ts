@@ -1,19 +1,17 @@
 import { pathToFileURL } from "node:url";
 import { basename, dirname, extname, relative } from "node:path";
 import { writeFile } from "node:fs/promises";
-import { resolveModulePath, type ResolveOptions } from "exsolve";
+import { resolveModulePath } from "exsolve";
 import MagicString from "magic-string";
-import oxcTransform, {
-  type TransformOptions as ExternalOxcTransformOptions,
-} from "oxc-transform";
-import oxcParser, {
-  type ParserOptions as ExternalOxcParserOptions,
-} from "oxc-parser";
-import {
-  minify,
-  type MinifyOptions as ExternalOxcMinifyOptions,
-} from "oxc-minify";
-import type { OutputFile, Transformer, TransformResult } from "./index.ts";
+import oxcTransform from "oxc-transform";
+import oxcParser from "oxc-parser";
+import { minify } from "oxc-minify";
+
+import type { ResolveOptions } from "exsolve";
+import type { TransformOptions as ExternalOxcTransformOptions } from "oxc-transform";
+import type { ParserOptions as ExternalOxcParserOptions } from "oxc-parser";
+import type { MinifyOptions as ExternalOxcMinifyOptions } from "oxc-minify";
+import type { OutputFile, Transformer, TransformResult } from "./types.ts";
 
 type Extension = `.${string}`;
 

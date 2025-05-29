@@ -7,7 +7,7 @@ import type {
 } from "rolldown";
 
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
-import type { Transformer, TransformerName } from "./transformers/index.ts";
+import type { Transformer, TransformerName } from "./transformers/types.ts";
 import type { OxcTransformerOptions } from "./transformers/oxc.ts";
 
 export interface BuildContext {

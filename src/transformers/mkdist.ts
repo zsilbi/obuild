@@ -3,7 +3,7 @@ import type {
   OutputFile,
   Transformer,
   TransformerContext,
-} from "./index.ts";
+} from "./types.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
