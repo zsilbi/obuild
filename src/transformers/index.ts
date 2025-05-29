@@ -1,8 +1,6 @@
 import { consola } from "consola";
 import { oxcTransformer, type OxcTransformerOptions } from "./oxc.ts";
-import type { BuildContext } from "../../types.ts";
-import type { ResolveOptions } from "exsolve";
-import { vueTransformer } from "./vue.ts";
+import { vueTransformer, VueTransformerOptions } from "./vue.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -15,29 +13,36 @@ const defaultTransformers: Transformer[] = [oxcTransformer, vueTransformer];
 
 export type TransformerName = "oxc" | "vue" | (string & {});
 
-export interface TransformerOptions extends OxcTransformerOptions {
-  build: BuildContext;
-  resolve?: Omit<ResolveOptions, "from">;
-}
+export interface TransformerOptions
+  extends OxcTransformerOptions,
+    VueTransformerOptions {}
 
-export interface CreateTransformerOptions extends TransformerOptions {
-  transformers?: Array<TransformerName | Transformer>;
-}
-
-export interface TransformerContext {
+export interface TransformerContext<TOptions = TransformerOptions> {
   transformFile: TransformFile;
+
   /**
    * For compatibility with `mkdist` loaders
    *
    * @deprecated Use `transformFile()` instead
    */
   loadFile: TransformFile;
-  options: TransformerOptions;
+
+  /**
+   * Options passed to the transformer, such as `resolve` options for module resolution.
+   */
+  options: TOptions;
 }
 
-export type Transformer = (
+/**
+ * Function type for a transformer that processes an input file and returns an array of output files.
+ *
+ * @param input - The input file to transform.
+ * @param context - The context for the transformation, including options and methods to transform files.
+ * @return A promise that resolves to an array of output files or undefined if the transformation is not applicable.
+ */
+export type Transformer<TOptions = TransformerOptions> = (
   input: InputFile,
-  context: TransformerContext,
+  context: TransformerContext<TOptions>,
 ) => MaybePromise<TransformResult>;
 
 export interface InputFile {
@@ -45,14 +50,17 @@ export interface InputFile {
    * Relative path to `outDir`
    */
   path: string;
+
   /**
    * File extension, e.g. `.ts`, `.mjs`, `.jsx`, `.d.mts`
    */
   extension: string;
+
   /**
    * Absolute source path of the file
    */
   srcPath?: string;
+
   /**
    * Loads the raw contents of the file
    */
@@ -64,30 +72,37 @@ export interface OutputFile {
    * Relative path to `outDir`
    */
   path: string;
+
   /**
    * File extension, e.g. `.js`, `.mjs`, `.jsx`, `.d.mts`
    */
   extension?: string;
+
   /**
    * Absolute source path of the file
    */
   srcPath?: string;
+
   /**
    * Contents of the file, if available
    */
   contents?: string;
+
   /**
    * The output file is a declaration file (e.g. `.d.mts`)
    */
   declaration?: boolean;
+
   /**
    * The output file is a source map (e.g. `.js.map`)
    */
   sourceMap?: boolean;
+
   /**
    * Whether the file is raw (not modified from the input)
    */
   raw?: boolean;
+
   /**
    * Set to `true` to skip writing this file to the output directory.
    */
@@ -96,9 +111,15 @@ export interface OutputFile {
 
 export type TransformResult = OutputFile[] | undefined;
 
-export type TransformFile = (input: InputFile) => MaybePromise<OutputFile[]>;
+/**
+ * Function to transform a file using the provided transformers.
+ *
+ * @param input - The input file to transform.
+ * @returns A promise that resolves to an array of output files.
+ */
+type TransformFile = (input: InputFile) => MaybePromise<OutputFile[]>;
 
-export function resolveTransformer(
+function resolveTransformer(
   transformer: TransformerName | Transformer,
 ): Transformer | undefined {
   if (typeof transformer === "string") {
@@ -108,7 +129,7 @@ export function resolveTransformer(
   return transformer;
 }
 
-export function resolveTransformers(
+function resolveTransformers(
   transformers: Array<TransformerName | Transformer>,
 ): Transformer[] {
   return transformers
@@ -124,13 +145,25 @@ export function resolveTransformers(
     .filter((transformer) => transformer !== undefined);
 }
 
-export function createTransformer(options: CreateTransformerOptions): {
+/**
+ *
+ * @param transformers - List of transformers to use. Can be a list of transformer names (e.g. "oxc", "vue") or transformer functions.
+ * @param options - Options to pass to the transformers, such as `resolve` options for module resolution.
+ * @returns An object with a `transformFile` method to transform files.
+ */
+export function createTransformer(
+  transformers?: Array<TransformerName | Transformer>,
+  options: TransformerOptions = {},
+): {
   transformFile: TransformFile;
+  /**
+   * @deprecated Use `transformFile()` instead
+   */
   loadFile: TransformFile;
 } {
-  const transformers = resolveTransformers([
+  const resolvedTransformers = resolveTransformers([
     // Provided transformers have higher priority
-    ...(options.transformers || []),
+    ...(transformers || []),
     ...defaultTransformers,
   ]);
 
@@ -143,7 +176,7 @@ export function createTransformer(options: CreateTransformerOptions): {
       options,
     };
 
-    for (const transformer of transformers) {
+    for (const transformer of resolvedTransformers) {
       const outputs = await transformer(input, context);
 
       if (outputs?.length) {

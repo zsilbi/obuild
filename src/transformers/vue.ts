@@ -1,9 +1,14 @@
 import consola from "consola";
 import type { InputFile, Transformer, TransformerContext } from "./index.ts";
 
-let cachedVueTransformer: Transformer | undefined;
+export interface VueTransformerOptions {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  vue?: {};
+}
 
-export const vueTransformer: Transformer = async (
+let cachedVueTransformer: Transformer<VueTransformerOptions> | undefined;
+
+export const vueTransformer: Transformer<VueTransformerOptions> = async (
   inputFile: InputFile,
   context: TransformerContext,
 ) => {

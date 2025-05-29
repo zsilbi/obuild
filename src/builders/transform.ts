@@ -7,7 +7,7 @@ import { dirname, extname, join } from "node:path";
 import { glob } from "tinyglobby";
 import { fmtPath } from "../utils.ts";
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
-import { createTransformer } from "./transformers/index.ts";
+import { createTransformer } from "../transformers/index.ts";
 
 /**
  * Transform all files in a directory using oxc-transform.
@@ -24,10 +24,7 @@ export async function transformDir(
     return;
   }
 
-  const transformer = createTransformer({
-    build: context,
-    ...entry,
-  });
+  const transformer = createTransformer(entry.transformers, entry);
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
 
   const entryPromises: Promise<string[]>[] = inputFileNames.map(

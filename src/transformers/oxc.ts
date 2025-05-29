@@ -1,7 +1,7 @@
 import { pathToFileURL } from "node:url";
 import { dirname, extname, relative } from "node:path";
 import { writeFile } from "node:fs/promises";
-import { resolveModulePath } from "exsolve";
+import { resolveModulePath, ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform, {
   type TransformOptions as ExternalOxcTransformOptions,
@@ -13,12 +13,7 @@ import {
   minify,
   type MinifyOptions as ExternalOxcMinifyOptions,
 } from "oxc-minify";
-import type {
-  OutputFile,
-  Transformer,
-  TransformerContext,
-  TransformResult,
-} from "./index.ts";
+import type { OutputFile, Transformer, TransformResult } from "./index.ts";
 
 const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
 
@@ -67,12 +62,30 @@ const transformConfig: Partial<TransformConfig> = {
 
 export interface OxcTransformerOptions {
   oxc?: {
+    /**
+     * Options for module resolution.
+     *
+     * See [exsolve](https://github.com/unjs/exsolve) for more details.
+     */
+    resolve?: Omit<ResolveOptions, "from">;
+
+    /**
+     * Options passed to oxc-transform.
+     *
+     * See [oxc-transform](https://www.npmjs.com/package/oxc-transform) for more details.
+     */
     transform?: ExternalOxcTransformOptions;
+
+    /**
+     * Minify the output using oxc-minify.
+     *
+     * Defaults to `false` if not provided.
+     */
     minify?: boolean | ExternalOxcMinifyOptions;
   };
 }
 
-export const oxcTransformer: Transformer = async (
+export const oxcTransformer: Transformer<OxcTransformerOptions> = async (
   input,
   context,
 ): Promise<TransformResult> => {
@@ -97,12 +110,10 @@ export const oxcTransformer: Transformer = async (
     sourceType: "module",
   };
 
-  code.contents = rewriteSpecifiers(
-    srcPath,
-    await input.getContents(),
-    context,
-    sourceOptions,
-  );
+  code.contents = rewriteSpecifiers(srcPath, await input.getContents(), {
+    ...sourceOptions,
+    ...options?.oxc?.resolve,
+  });
 
   if (config.transform === true) {
     const transformed = oxcTransform.transform(srcPath, code.contents, {
@@ -200,8 +211,9 @@ function replaceExtension(path: string, target?: Extension): string {
 function rewriteSpecifiers(
   filePath: string,
   code: string,
-  context: TransformerContext,
-  options: ExternalOxcParserOptions,
+  options?: ExternalOxcParserOptions & {
+    resolve?: ResolveOptions;
+  },
 ): string {
   const parsed = oxcParser.parseSync(filePath, code, options);
 
@@ -230,7 +242,7 @@ function rewriteSpecifiers(
     updatedStarts.add(req.start);
     const resolvedAbsolute = resolveModulePath(moduleId, {
       from: pathToFileURL(filePath),
-      extensions: context.options.resolve?.extensions ?? [
+      extensions: options?.resolve?.extensions ?? [
         ".tsx",
         ".ts",
         ".jsx",
@@ -239,7 +251,7 @@ function rewriteSpecifiers(
         ".cjs",
         ".json",
       ],
-      suffixes: context.options.resolve?.suffixes ?? ["", "/index"],
+      suffixes: options?.resolve?.suffixes ?? ["", "/index"],
     });
     const newId = relative(
       dirname(filePath),
