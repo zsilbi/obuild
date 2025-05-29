@@ -1,7 +1,7 @@
 import { pathToFileURL } from "node:url";
 import { dirname, extname, relative } from "node:path";
 import { writeFile } from "node:fs/promises";
-import { resolveModulePath, ResolveOptions } from "exsolve";
+import { resolveModulePath, type ResolveOptions } from "exsolve";
 import MagicString from "magic-string";
 import oxcTransform, {
   type TransformOptions as ExternalOxcTransformOptions,

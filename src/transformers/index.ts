@@ -1,6 +1,6 @@
 import { consola } from "consola";
 import { oxcTransformer, type OxcTransformerOptions } from "./oxc.ts";
-import { vueTransformer, VueTransformerOptions } from "./vue.ts";
+import { vueTransformer, type VueTransformerOptions } from "./vue.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
