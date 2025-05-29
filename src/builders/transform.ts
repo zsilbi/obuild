@@ -7,7 +7,8 @@ import { basename, dirname, extname, join } from "node:path";
 import { glob } from "tinyglobby";
 import { fmtPath } from "../utils.ts";
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
-import { createTransformer, type OutputFile } from "../transformers/index.ts";
+import { createTransformer } from "../transformers/index.ts";
+import type { OutputFile } from "../transformers/types.ts";
 
 /**
  * Transform all files in a directory using oxc-transform.
