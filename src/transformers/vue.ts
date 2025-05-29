@@ -6,9 +6,9 @@ export interface VueTransformerOptions {
   vue?: {};
 }
 
-let cachedVueTransformer: Transformer<VueTransformerOptions> | undefined;
+let cachedVueTransformer: Transformer | undefined;
 
-export const vueTransformer: Transformer<VueTransformerOptions> = async (
+export const vueTransformer: Transformer = async (
   inputFile: InputFile,
   context: TransformerContext,
 ) => {

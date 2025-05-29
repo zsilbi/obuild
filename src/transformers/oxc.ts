@@ -85,7 +85,7 @@ export interface OxcTransformerOptions {
   };
 }
 
-export const oxcTransformer: Transformer<OxcTransformerOptions> = async (
+export const oxcTransformer: Transformer = async (
   input,
   context,
 ): Promise<TransformResult> => {

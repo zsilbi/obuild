@@ -17,7 +17,7 @@ export interface TransformerOptions
   extends OxcTransformerOptions,
     VueTransformerOptions {}
 
-export interface TransformerContext<TOptions = TransformerOptions> {
+export interface TransformerContext {
   transformFile: TransformFile;
 
   /**
@@ -30,7 +30,7 @@ export interface TransformerContext<TOptions = TransformerOptions> {
   /**
    * Options passed to the transformer, such as `resolve` options for module resolution.
    */
-  options: TOptions;
+  options: TransformerOptions;
 }
 
 /**
@@ -40,9 +40,9 @@ export interface TransformerContext<TOptions = TransformerOptions> {
  * @param context - The context for the transformation, including options and methods to transform files.
  * @return A promise that resolves to an array of output files or undefined if the transformation is not applicable.
  */
-export type Transformer<TOptions = TransformerOptions> = (
+export type Transformer = (
   input: InputFile,
-  context: TransformerContext<TOptions>,
+  context: TransformerContext,
 ) => MaybePromise<TransformResult>;
 
 export interface InputFile {
