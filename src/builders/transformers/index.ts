@@ -45,8 +45,17 @@ export interface InputFile {
    * Relative path to `outDir`
    */
   path: string;
+  /**
+   * File extension, e.g. `.ts`, `.mjs`, `.jsx`, `.d.mts`
+   */
   extension: string;
+  /**
+   * Absolute source path of the file
+   */
   srcPath?: string;
+  /**
+   * Loads the raw contents of the file
+   */
   getContents: () => MaybePromise<string>;
 }
 
@@ -55,12 +64,33 @@ export interface OutputFile {
    * Relative path to `outDir`
    */
   path: string;
+  /**
+   * File extension, e.g. `.js`, `.mjs`, `.jsx`, `.d.mts`
+   */
   extension?: string;
+  /**
+   * Absolute source path of the file
+   */
   srcPath?: string;
+  /**
+   * Contents of the file, if available
+   */
   contents?: string;
+  /**
+   * The output file is a declaration file (e.g. `.d.mts`)
+   */
   declaration?: boolean;
+  /**
+   * The output file is a source map (e.g. `.js.map`)
+   */
   sourceMap?: boolean;
+  /**
+   * Whether the file is raw (not modified from the input)
+   */
   raw?: boolean;
+  /**
+   * Set to `true` to skip writing this file to the output directory.
+   */
   skip?: boolean;
 }
 
