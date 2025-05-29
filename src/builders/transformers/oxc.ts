@@ -89,8 +89,6 @@ export const oxcTransformer: Transformer = async (
     path: replaceExtension(input.path, config.extension),
     srcPath,
     extension: config.extension,
-    declaration: config.declaration !== undefined,
-    raw: config.transform === false,
   };
   const sourceOptions: ExternalOxcParserOptions = {
     lang: config.language,
@@ -119,7 +117,7 @@ export const oxcTransformer: Transformer = async (
         srcPath,
         contents: transformed.declaration,
         declaration: true,
-        path: input.path.replace(KNOWN_EXT_RE, config.declaration),
+        path: replaceExtension(input.path, config.declaration),
       });
     }
 
@@ -128,7 +126,6 @@ export const oxcTransformer: Transformer = async (
     );
 
     if (transformErrors.length > 0) {
-      // console.log(sourceText);
       await writeFile(
         "build-dump.ts",
         `/** Error dump for ${input.srcPath} */\n\n` + sourceText,
@@ -143,6 +140,8 @@ export const oxcTransformer: Transformer = async (
     }
 
     codeOutputFile.contents = transformed.code;
+  } else {
+    codeOutputFile.contents = sourceText;
   }
 
   output.push(codeOutputFile);
