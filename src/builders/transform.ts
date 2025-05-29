@@ -78,7 +78,7 @@ export async function transformDir(
 
       if (outputFile.raw) {
         if (outputFile.srcPath === undefined) {
-          throw new TypeError("Raw output files must have a `srcPath`");
+          throw new TypeError("`srcPath` can't be undefined for raw files.");
         }
 
         code = await readFile(outputFile.srcPath, "utf8");
