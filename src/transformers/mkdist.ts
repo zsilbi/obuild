@@ -97,7 +97,7 @@ export function mkdistLoader(
     return {
       ...output,
       declaration:
-        output.declaration === true || output.declaration === "generate",
+        output.declaration === "generate" ? true : output.declaration,
     };
   };
 
