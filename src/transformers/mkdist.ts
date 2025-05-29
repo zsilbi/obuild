@@ -12,15 +12,6 @@ type MkdistOutputFile = Omit<OutputFile, "declaration"> & {
   declaration?: boolean;
 };
 
-type MkdistLoaderContext = Omit<TransformerContext, "transformFile"> & {
-  loadFile: (input: InputFile) => MaybePromise<MkdistOutputFile[]>;
-};
-
-type MkdistLoader = (
-  input: InputFile,
-  context: MkdistLoaderContext,
-) => MaybePromise<MkdistOutputFile[] | undefined>;
-
 type MkdistLoaderOptions = {
   /**
    * Declaration generation.
@@ -30,16 +21,29 @@ type MkdistLoaderOptions = {
   declaration?: boolean;
 };
 
+type MkdistLoaderContext = Omit<
+  TransformerContext,
+  "transformFile" | "options"
+> & {
+  loadFile: (input: InputFile) => MaybePromise<MkdistOutputFile[]>;
+  options: MkdistLoaderOptions;
+};
+
+type MkdistLoader = (
+  input: InputFile,
+  context: MkdistLoaderContext,
+) => MaybePromise<MkdistOutputFile[] | undefined>;
+
 /**
  * Creates a transformer that uses a mkdist loader for compatibility.
  *
  * @param loader - The mkdist loader function to use.
- * @param options - Additional options for the mkdist loader.
+ * @param loaderOptions - Additional options for the mkdist loader.
  * @returns A transformer that can be used in the transformation process.
  */
 export function mkdistLoader(
   loader: MkdistLoader,
-  options: MkdistLoaderOptions,
+  loaderOptions: MkdistLoaderOptions,
 ): Transformer {
   const DECLARATION_RE = /\.d\.[cm]?ts$/;
   const CM_LETTER_RE = /(?<=\.)(c|m)(?=[jt]s$)/;
@@ -52,7 +56,7 @@ export function mkdistLoader(
     input: InputFile,
   ): Promise<MkdistOutputFile[] | undefined> => {
     if (
-      options.declaration === false ||
+      loaderOptions.declaration === false ||
       !KNOWN_EXT_RE.test(input.path) ||
       DECLARATION_RE.test(input.path) ||
       input.srcPath?.match(DECLARATION_RE)
@@ -111,6 +115,7 @@ export function mkdistLoader(
           toMkdistOutputFile(element),
         );
       },
+      options: loaderOptions,
     };
 
     const output = await loader(input, mkdistContext);
