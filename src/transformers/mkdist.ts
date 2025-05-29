@@ -77,9 +77,9 @@ export function mkdistLoader(
     ];
   };
 
-  const fromMkdistOutputFile: (
-    output: MkdistOutputFile,
-  ) => Promise<OutputFile> = async (output) => {
+  const fromMkdistOutputFile: (output: MkdistOutputFile) => OutputFile = (
+    output,
+  ) => {
     if (
       output.declaration === true &&
       output.skip !== true &&
@@ -120,6 +120,6 @@ export function mkdistLoader(
 
     const output = await loader(input, mkdistContext);
 
-    return Promise.all(output?.map(fromMkdistOutputFile) || []);
+    return output?.map(fromMkdistOutputFile) || [];
   };
 }
