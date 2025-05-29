@@ -41,7 +41,6 @@ const transformConfig: Partial<TransformConfig> = {
   ".jsx": {
     transform: true,
     language: "jsx",
-    extension: ".jsx",
   },
   ".js": {},
   ".mjs": {},
