@@ -30,7 +30,7 @@ type MkdistLoaderContext = {
   options: MkdistLoaderOptions;
 };
 
-type MkdistLoader = (
+export type MkdistLoader = (
   input: InputFile,
   context: MkdistLoaderContext,
 ) => MaybePromise<MkdistOutputFile[] | undefined>;
