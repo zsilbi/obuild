@@ -1,3 +1,4 @@
+import consola from "consola";
 import type {
   InputFile,
   OutputFile,
@@ -7,7 +8,10 @@ import type {
 
 type MaybePromise<T> = T | Promise<T>;
 
-type MkdistOutputFile = Omit<OutputFile, "declaration"> & {
+type MkdistOutputFile = Omit<
+  OutputFile,
+  "declaration" | "sourceMap" | "minified"
+> & {
   errors?: Error[];
   declaration?: boolean;
 };
@@ -77,6 +81,15 @@ export function mkdistLoader(
   const fromMkdistOutputFile: (output: MkdistOutputFile) => OutputFile = (
     output,
   ) => {
+    if (output.errors && output.errors.length > 0) {
+      consola.error(
+        `Errors while processing "${output.path}" using mkdist loader:`,
+      );
+      for (const error of output.errors) {
+        consola.error(error);
+      }
+    }
+
     if (
       output.declaration === true &&
       output.skip !== true &&
