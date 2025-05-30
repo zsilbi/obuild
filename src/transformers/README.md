@@ -88,7 +88,6 @@ export default defineBuildConfig({
             },
           ],
         },
-        // The default transformers will be invoked after after "vue" and your custom transformer.
       ],
     },
   ],

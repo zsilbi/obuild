@@ -52,16 +52,12 @@ function resolveTransformers(
  * @returns An object with a `transformFile` method to transform files.
  */
 export function createTransformer(
-  transformers?: Array<TransformerName | Transformer>,
+  transformers: Array<TransformerName | Transformer> = defaultTransformers,
   options: TransformerOptions = {},
 ): {
   transformFile: TransformFile;
 } {
-  const resolvedTransformers = resolveTransformers([
-    // Provided transformers have higher priority
-    ...(transformers || []),
-    ...defaultTransformers,
-  ]);
+  const resolvedTransformers = resolveTransformers(transformers);
 
   const transformFile = async function (
     input: InputFile,
