@@ -87,15 +87,15 @@ export const TsxComponent = () => {
 ",
   ],
   [
-    "min/modules/js-module.mjs",
+    "min/modules/js-module.js",
     "export function jsModule(){return`js-module`}",
   ],
   [
-    "min/modules/js-module.mjs.map",
-    "{"mappings":"AAAA,OAAO,SAAS,UAAW,CACzB,MAAO,WACR","names":[],"sources":["js-module.src.mjs"],"sourcesContent":["export function jsModule() {\n  return \"js-module\";\n}\n"],"version":3,"file":"modules/js-module.mjs"}",
+    "min/modules/js-module.js.map",
+    "{"mappings":"AAAA,OAAO,SAAS,UAAW,CACzB,MAAO,WACR","names":[],"sources":["js-module.src.js"],"sourcesContent":["export function jsModule() {\n  return \"js-module\";\n}\n"],"version":3,"file":"modules/js-module.js"}",
   ],
   [
-    "min/modules/js-module.src.mjs",
+    "min/modules/js-module.src.js",
     "export function jsModule() {
   return "js-module";
 }
@@ -210,7 +210,7 @@ const msg = ref(1);
 export { tsModule } from "./modules/ts-module.mjs";
 export { TsxComponent } from "./components/tsx.mjs";
 // @ts-expect-error - JS test file
-export { jsModule } from "./modules/js-module.mjs";
+export { jsModule } from "./modules/js-module.js";
 // @ts-expect-error - JSX test file
 export { JsxComponent } from "./components/jsx.mjs";
 declare const _default: string;
@@ -224,14 +224,14 @@ export default _default;
 export { tsModule } from "./modules/ts-module.mjs";
 export { TsxComponent } from "./components/tsx.mjs";
 // @ts-expect-error - JS test file
-export { jsModule } from "./modules/js-module.mjs";
+export { jsModule } from "./modules/js-module.js";
 // @ts-expect-error - JSX test file
 export { JsxComponent } from "./components/jsx.mjs";
 export default "default export";
 ",
   ],
   [
-    "runtime/modules/js-module.mjs",
+    "runtime/modules/js-module.js",
     "export function jsModule() {
   return "js-module";
 }

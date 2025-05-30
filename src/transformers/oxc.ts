@@ -94,9 +94,7 @@ const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
     language: "jsx",
     outputExtension: ".mjs",
   },
-  ".js": {
-    outputExtension: ".mjs",
-  },
+  ".js": {},
   ".mjs": {},
   ".cjs": {},
 };
