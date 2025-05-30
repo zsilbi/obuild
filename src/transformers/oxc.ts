@@ -76,18 +76,27 @@ const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
     language: "ts",
     outputExtension: ".mjs",
   },
+  ".mts": {
+    transform: true,
+    declaration: true,
+    language: "ts",
+    outputExtension: ".mjs",
+  },
   ".tsx": {
     transform: true,
     declaration: true,
     language: "tsx",
-    outputExtension: ".jsx",
+    outputExtension: ".mjs",
   },
   ".jsx": {
     transform: true,
     declaration: false,
     language: "jsx",
+    outputExtension: ".mjs",
   },
-  ".js": {},
+  ".js": {
+    outputExtension: ".mjs",
+  },
   ".mjs": {},
   ".cjs": {},
 };
