@@ -91,6 +91,11 @@ export interface OutputFile {
   sourceMap?: boolean;
 
   /**
+   * If the file is minified, this should be set to `true`.
+   */
+  minified?: boolean;
+
+  /**
    * Whether the file is raw (not modified from the input)
    */
   raw?: boolean;

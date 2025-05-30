@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { basename, dirname, extname, relative } from "node:path";
+import { basename, dirname, extname, join, relative } from "node:path";
 import { writeFile } from "node:fs/promises";
 import { resolveModulePath } from "exsolve";
 import MagicString from "magic-string";
@@ -7,45 +7,18 @@ import oxcTransform from "oxc-transform";
 import oxcParser from "oxc-parser";
 import { minify as oxcMinify } from "oxc-minify";
 
-import type { ResolveOptions } from "exsolve";
+import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { TransformOptions as ExternalOxcTransformOptions } from "oxc-transform";
 import type { ParserOptions as ExternalOxcParserOptions } from "oxc-parser";
 import type { MinifyOptions as ExternalOxcMinifyOptions } from "oxc-minify";
-import type { OutputFile, Transformer, TransformResult } from "./types.ts";
 
-type Extension = `.${string}`;
-
-type TransformConfig = Record<
-  string,
-  {
-    transform?: boolean;
-    language?: ExternalOxcParserOptions["lang"];
-    extension?: Extension;
-    declaration?: Extension | false;
-  }
->;
-
-const transformConfig: Partial<TransformConfig> = {
-  ".ts": {
-    transform: true,
-    language: "ts",
-    extension: ".mjs",
-    declaration: ".d.mts",
-  },
-  ".tsx": {
-    transform: true,
-    language: "tsx",
-    extension: ".jsx",
-    declaration: ".d.mts",
-  },
-  ".jsx": {
-    transform: true,
-    language: "jsx",
-  },
-  ".js": {},
-  ".mjs": {},
-  ".cjs": {},
-};
+import type {
+  InputFile,
+  OutputFile,
+  Transformer,
+  TransformerContext,
+  TransformResult,
+} from "./types.ts";
 
 export interface OxcTransformerOptions {
   oxc?: {
@@ -54,7 +27,7 @@ export interface OxcTransformerOptions {
      *
      * See [exsolve](https://github.com/unjs/exsolve) for more details.
      */
-    resolve?: Omit<ResolveOptions, "from">;
+    resolve?: Omit<ExsolveOptions, "from">;
 
     /**
      * Options passed to oxc-transform.
@@ -72,80 +45,171 @@ export interface OxcTransformerOptions {
   };
 }
 
-type MinifiableFile = OutputFile & {
+type TransformableFile = OutputFile & {
   contents: string;
-  srcPath: string;
   extension: string;
+};
+
+type SourceMapFile = OutputFile & {
+  sourceMap: true;
+};
+
+type DeclarationFile = OutputFile & {
+  declaration: true;
+};
+
+type MinifiedFile = OutputFile & {
+  minified: true;
+};
+
+type ExtensionConfig = {
+  transform?: boolean;
+  declaration?: boolean;
+  language?: ExternalOxcParserOptions["lang"];
+  outputExtension?: `.${string}`;
+};
+
+const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
+  ".ts": {
+    transform: true,
+    declaration: true,
+    language: "ts",
+    outputExtension: ".mjs",
+  },
+  ".tsx": {
+    transform: true,
+    declaration: true,
+    language: "tsx",
+    outputExtension: ".jsx",
+  },
+  ".jsx": {
+    transform: true,
+    declaration: false,
+    language: "jsx",
+  },
+  ".js": {},
+  ".mjs": {},
+  ".cjs": {},
 };
 
 export const oxcTransformer: Transformer = async (
   input,
   context,
 ): Promise<TransformResult> => {
-  const { extension = extname(input.path), srcPath } = input;
-  const { options } = context;
-  const fileTransformConfig = transformConfig[extension];
+  const inputExtension = input.extension || extname(input.path);
+  const extensionConfig = extensionConfigs[inputExtension];
 
-  if (srcPath === undefined || fileTransformConfig === undefined) {
+  if (extensionConfig === undefined) {
     return undefined;
   }
 
-  const code: MinifiableFile = {
+  const options = resolveOptions(input, context, extensionConfig);
+  const codeFile: TransformableFile = {
     path: input.path,
-    srcPath,
-    extension: fileTransformConfig.extension || extension,
+    srcPath: input.srcPath,
+    extension: extensionConfig.outputExtension || inputExtension,
     contents: await input.getContents(),
   };
-  const output: OutputFile[] = [code];
-  const minifyOptions = options.oxc?.minify === true ? {} : options.oxc?.minify;
 
-  if (!fileTransformConfig.transform) {
-    if (minifyOptions) {
-      output.push(...minify(code, minifyOptions));
-      code.skip = true; // Skip the original file if minifying
+  if (!extensionConfig.transform) {
+    if (options.minify) {
+      return minify(codeFile, options.minify);
     }
 
-    return output;
+    return [codeFile];
   }
 
-  const sourceOptions: ExternalOxcParserOptions = {
-    lang: fileTransformConfig.language,
+  const [transformedFile, ...declarationFiles] = await transform(
+    rewriteSpecifiers(codeFile, options),
+    options.transform,
+  );
+
+  if (options.minify) {
+    const [minifiedFile, ...sourceMapFiles] = minify(
+      transformedFile,
+      options.minify,
+    );
+
+    return [minifiedFile, ...sourceMapFiles, ...declarationFiles];
+  }
+
+  return [transformedFile, ...declarationFiles];
+};
+
+function resolveOptions(
+  input: InputFile,
+  context: TransformerContext,
+  config: ExtensionConfig,
+) {
+  const { oxc: options } = context.options;
+
+  const resolve: ExsolveOptions = {
+    ...options?.resolve,
+    extensions: options?.resolve?.extensions ?? [
+      ".tsx",
+      ".ts",
+      ".jsx",
+      ".js",
+      ".mjs",
+      ".cjs",
+      ".json",
+    ],
+    suffixes: options?.resolve?.suffixes ?? ["", "/index"],
+  };
+
+  const parser: ExternalOxcParserOptions = {
+    lang: config.language,
     sourceType: "module",
   };
 
-  code.contents = rewriteSpecifiers(srcPath, code.contents, {
-    ...sourceOptions,
-    ...options?.oxc?.resolve,
-  });
-
-  const transformed = oxcTransform.transform(srcPath, code.contents, {
-    ...options?.oxc?.transform,
-    ...sourceOptions,
-    cwd: dirname(srcPath),
+  const transform: ExternalOxcTransformOptions = {
+    ...options?.transform,
+    ...parser,
+    cwd: input.srcPath ? dirname(input.srcPath) : undefined,
     typescript: {
-      declaration: { stripInternal: true },
-      ...options.oxc?.transform?.typescript,
+      declaration: {
+        // @todo - Should we make this also the default for the bundler?
+        stripInternal: true,
+      },
+      ...options?.transform?.typescript,
+      ...(config.declaration === false ? { declaration: undefined } : {}),
     },
-  });
+  };
 
-  if (fileTransformConfig.declaration && transformed.declaration) {
-    output.push({
-      srcPath,
-      contents: transformed.declaration,
-      declaration: true,
-      path: input.path,
-      extension: fileTransformConfig.declaration,
-    });
-  }
+  const minify: ExternalOxcMinifyOptions | false | undefined =
+    options?.minify === true ? {} : options?.minify;
 
-  const transformErrors = transformed.errors.filter(
+  return {
+    resolve,
+    parser,
+    transform,
+    minify,
+  };
+}
+
+async function transform(
+  input: Readonly<TransformableFile>,
+  options: ExternalOxcTransformOptions,
+): Promise<[TransformableFile] | [TransformableFile, DeclarationFile]> {
+  const transformResult = oxcTransform.transform(
+    input.path,
+    input.contents,
+    options,
+  );
+
+  const transformedFile = {
+    ...input,
+    contents: transformResult.code,
+  };
+
+  const transformErrors = transformResult.errors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
   );
 
   if (transformErrors.length > 0) {
     await writeFile(
       "build-dump.ts",
-      `/** Error dump for ${input.srcPath} */\n\n` + code.contents,
+      `/** Error dump for ${input.srcPath} */\n\n` + input.contents,
       "utf8",
     );
     throw new Error(
@@ -156,73 +220,100 @@ export const oxcTransformer: Transformer = async (
     );
   }
 
-  code.contents = transformed.code;
-
-  if (minifyOptions) {
-    output.push(...minify(code, minifyOptions));
-    code.skip = true; // Skip the original file if minifying
+  if (!transformResult.declaration) {
+    return [transformedFile];
   }
 
-  return output;
-};
+  const declarationFile: DeclarationFile = {
+    srcPath: input.srcPath,
+    contents: transformResult.declaration,
+    declaration: true,
+    path: input.path,
+    extension: ".d.mts",
+  };
+
+  return [transformedFile, declarationFile];
+}
 
 function minify(
-  output: MinifiableFile,
+  input: Readonly<TransformableFile>,
   options?: ExternalOxcMinifyOptions,
-): OutputFile[] {
-  const minifyOutput: OutputFile[] = [];
-  const minifyResult = oxcMinify(output.srcPath, output.contents, options);
+): [MinifiedFile] | [MinifiedFile, OutputFile, SourceMapFile] {
+  const { code: minifedCode, map: sourceMap } = oxcMinify(
+    input.path,
+    input.contents,
+    options,
+  );
 
-  if (minifyResult.map) {
-    // Convert absolute paths in the source map to relative paths
-    minifyResult.map.sources = minifyResult.map.sources.map((source) => {
-      return relative(dirname(output.path), source);
-    });
+  const minifiedFile: MinifiedFile = {
+    ...input,
+    minified: true,
+    contents: minifedCode,
+  };
 
-    minifyOutput.push({
-      srcPath: output.srcPath,
-      path: output.path,
-      extension: `${output.extension}.map`,
-      sourceMap: true,
-      contents: JSON.stringify(minifyResult.map),
-    });
+  if (!sourceMap) {
+    return [minifiedFile];
   }
 
-  minifyOutput.push({
-    ...output,
-    skip: undefined,
-    contents: minifyResult.code,
+  // Create a new file with the `.src` extension prefix for the source map to use as the source file
+  const sourceFile: OutputFile = {
+    ...input,
+    extension: `.src${input.extension}`,
+  };
+
+  sourceMap.file = replaceExtension(input.path);
+  sourceMap.sources = sourceMap.sources.map((source) => {
+    return replaceExtension(source, sourceFile.extension);
   });
 
-  return minifyOutput;
+  const sourceMapFile: SourceMapFile = {
+    srcPath: input.srcPath,
+    path: input.path,
+    extension: `${input.extension}.map`,
+    sourceMap: true,
+    contents: JSON.stringify(sourceMap),
+  };
+
+  return [minifiedFile, sourceFile, sourceMapFile];
+}
+
+function replaceExtension(path: string, extension?: string): string {
+  if (extension === undefined) {
+    const config = extensionConfigs[extname(path)];
+
+    if (config?.outputExtension === undefined) {
+      return path;
+    }
+
+    extension = config.outputExtension;
+  }
+
+  return join(dirname(path), basename(path, extname(path))) + extension;
 }
 
 function rewriteSpecifiers(
-  filePath: string,
-  code: string,
-  options?: ExternalOxcParserOptions & {
-    resolve?: ResolveOptions;
+  file: Readonly<TransformableFile>,
+  options?: {
+    parser?: ExternalOxcParserOptions;
+    resolve?: ExsolveOptions;
   },
-): string {
-  const parsed = oxcParser.parseSync(filePath, code, options);
+): TransformableFile {
+  const { srcPath } = file;
+
+  if (srcPath === undefined) {
+    // Skip rewriting if srcPath is not available
+    return { ...file };
+  }
+
+  const parsed = oxcParser.parseSync(file.path, file.contents, options?.parser);
 
   if (parsed.errors.length > 0) {
-    throw new Error(`Errors while parsing ${filePath}:`, {
+    throw new Error(`Errors while parsing ${file.path}:`, {
       cause: parsed.errors,
     });
   }
 
-  function replaceExtension(path: string): string {
-    const config = transformConfig[extname(path)];
-
-    if (config === undefined) {
-      return path;
-    }
-
-    return basename(path, extname(path)) + config.extension;
-  }
-
-  const magicString = new MagicString(code);
+  const magicString = new MagicString(file.contents);
 
   // Rewrite relative imports
   const updatedStarts = new Set<number>();
@@ -240,20 +331,11 @@ function rewriteSpecifiers(
     }
     updatedStarts.add(req.start);
     const resolvedAbsolute = resolveModulePath(moduleId, {
-      from: pathToFileURL(filePath),
-      extensions: options?.resolve?.extensions ?? [
-        ".tsx",
-        ".ts",
-        ".jsx",
-        ".js",
-        ".mjs",
-        ".cjs",
-        ".json",
-      ],
-      suffixes: options?.resolve?.suffixes ?? ["", "/index"],
+      ...options?.resolve,
+      from: pathToFileURL(srcPath),
     });
     const newId = relative(
-      dirname(filePath),
+      dirname(srcPath),
       replaceExtension(resolvedAbsolute),
     );
     magicString.remove(req.start, req.end);
@@ -275,5 +357,8 @@ function rewriteSpecifiers(
     }
   }
 
-  return magicString.toString();
+  return {
+    ...file,
+    contents: magicString.toString(),
+  };
 }
