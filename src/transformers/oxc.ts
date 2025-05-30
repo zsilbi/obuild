@@ -191,22 +191,17 @@ async function transform(
   input: Readonly<TransformableFile>,
   options: ExternalOxcTransformOptions,
 ): Promise<[TransformableFile] | [TransformableFile, DeclarationFile]> {
-  const transformResult = oxcTransform.transform(
+  const result = oxcTransform.transform(
     input.path,
     input.contents,
     options,
   );
 
-  const transformedFile = {
-    ...input,
-    contents: transformResult.code,
-  };
-
-  const transformErrors = transformResult.errors.filter(
+  const errors = result.errors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
   );
 
-  if (transformErrors.length > 0) {
+  if (errors.length > 0) {
     await writeFile(
       "build-dump.ts",
       `/** Error dump for ${input.srcPath} */\n\n` + input.contents,
@@ -215,18 +210,23 @@ async function transform(
     throw new Error(
       `Errors while transforming ${input.srcPath}: (hint: check build-dump.ts)`,
       {
-        cause: transformErrors,
+        cause: errors,
       },
     );
   }
 
-  if (!transformResult.declaration) {
+  const transformedFile = {
+    ...input,
+    contents: result.code,
+  };
+
+  if (!result.declaration) {
     return [transformedFile];
   }
 
   const declarationFile: DeclarationFile = {
     srcPath: input.srcPath,
-    contents: transformResult.declaration,
+    contents: result.declaration,
     declaration: true,
     path: input.path,
     extension: ".d.mts",
