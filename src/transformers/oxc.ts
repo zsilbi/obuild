@@ -90,7 +90,7 @@ const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
   },
   ".jsx": {
     transform: true,
-    declaration: false,
+    declaration: true,
     language: "jsx",
     outputExtension: ".mjs",
   },

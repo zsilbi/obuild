@@ -31,6 +31,11 @@ var src_default = "default export";
 export { src_default as default, test };",
   ],
   [
+    "min/components/jsx.d.mts",
+    "export declare const JsxComponent: unknown;
+",
+  ],
+  [
     "min/components/jsx.mjs",
     "import{jsx as _jsx,jsxs as _jsxs}from"react/jsx-runtime";export const JsxComponent=()=>_jsxs(`div`,{className:`comment`,children:[_jsx(`h2`,{className:`commentAuthor`,children:this.props.author}),this.props.children]});",
   ],
@@ -129,6 +134,11 @@ export const TsxComponent = () => {
     "export function tsModule() {
 	return "js-module";
 }
+",
+  ],
+  [
+    "runtime/components/jsx.d.mts",
+    "export declare const JsxComponent: unknown;
 ",
   ],
   [
