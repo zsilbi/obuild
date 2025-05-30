@@ -92,15 +92,22 @@ const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
   ".cjs": {},
 };
 
+const DECLARATION_RE = /\.d\.[cm]?ts$/;
+
 export const oxcTransformer: Transformer = async (
   input,
   context,
 ): Promise<TransformResult> => {
   const inputExtension = input.extension || extname(input.path);
+
+  if (DECLARATION_RE.test(inputExtension)) {
+    return;
+  }
+
   const extensionConfig = extensionConfigs[inputExtension];
 
   if (extensionConfig === undefined) {
-    return undefined;
+    return;
   }
 
   const options = resolveOptions(input, context, extensionConfig);
