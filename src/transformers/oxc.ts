@@ -191,11 +191,7 @@ async function transform(
   input: Readonly<TransformableFile>,
   options: ExternalOxcTransformOptions,
 ): Promise<[TransformableFile] | [TransformableFile, DeclarationFile]> {
-  const result = oxcTransform.transform(
-    input.path,
-    input.contents,
-    options,
-  );
+  const result = oxcTransform.transform(input.path, input.contents, options);
 
   const errors = result.errors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
