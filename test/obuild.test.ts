@@ -57,13 +57,23 @@ describe("obuild", () => {
         "cli.mjs",
         "index.d.mts",
         "index.mjs",
-        "min/js-module.mjs",
-        "min/js-module.mjs.map",
-        "min/js-module.src.mjs",
-        "min/ts-module.d.mts",
-        "min/ts-module.mjs",
-        "min/ts-module.mjs.map",
-        "min/ts-module.src.mjs",
+        "min/components/jsx.jsx",
+        "min/components/jsx.jsx.map",
+        "min/components/jsx.src.jsx",
+        "min/components/tsx.d.mts",
+        "min/components/tsx.jsx",
+        "min/components/tsx.jsx.map",
+        "min/components/tsx.src.jsx",
+        "min/modules/js-module.js",
+        "min/modules/js-module.js.map",
+        "min/modules/js-module.src.js",
+        "min/modules/mjs-module.mjs",
+        "min/modules/mjs-module.mjs.map",
+        "min/modules/mjs-module.src.mjs",
+        "min/modules/ts-module.d.mts",
+        "min/modules/ts-module.mjs",
+        "min/modules/ts-module.mjs.map",
+        "min/modules/ts-module.src.mjs",
         "runtime/components/jsx.jsx",
         "runtime/components/tsx.d.mts",
         "runtime/components/tsx.jsx",
@@ -80,6 +90,14 @@ describe("obuild", () => {
         "utils.mjs",
       ]
     `);
+
+    const output = await Promise.all(
+      distFiles.map(async (file) => {
+        return [file, await readFile(new URL(file, distDir), "utf8")];
+      }),
+    );
+
+    await expect(output).toMatchFileSnapshot("./snapshots/output.snap");
   });
 
   test("validate dist entries", async () => {
