@@ -110,7 +110,7 @@ export const oxcTransformer: Transformer = async (
   if (DECLARATION_RE.test(input.path)) {
     return;
   }
-  
+
   const inputExtension = input.extension || extname(input.path);
   const extensionConfig = extensionConfigs[inputExtension];
 
