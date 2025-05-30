@@ -117,7 +117,10 @@ export function mkdistLoader(
   return async (input, context: TransformerContext) => {
     const mkdistContext: MkdistLoaderContext = {
       loadFile: async (inputFile: InputFile): Promise<MkdistOutputFile[]> => {
+        // @todo - This should only run if `oxc` loader is present in the context
+        // In mkdist, delcarattions are only generated when the `jsLoader` is also used
         const dtsOutput = (await jsLoader(inputFile)) || [];
+
         const output = await context.transformFile(inputFile);
 
         return [
