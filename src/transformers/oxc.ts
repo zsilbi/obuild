@@ -258,7 +258,7 @@ function minify(
 
   sourceMap.file = replaceExtension(input.path);
   sourceMap.sources = sourceMap.sources.map((source) => {
-    return replaceExtension(source, sourceFile.extension);
+    return replaceExtension(basename(source), sourceFile.extension);
   });
 
   const sourceMapFile: SourceMapFile = {
