@@ -1,4 +1,4 @@
-import { statSync } from "node:fs"; // @todo - Use oxc-parser?
+import { statSync } from "node:fs";
 import { resolve } from "pathe";
 import type { CompilerHost, CompilerOptions, EmitResult } from "typescript";
 import type { TSConfig } from "pkg-types";

@@ -85,7 +85,6 @@ export async function transformDir(
       } satisfies TSConfig["compilerOptions"],
     );
 
-    // @todo - Support generating declaration files
     const vfs = new Map(
       dtsOutputFiles.map((o) => [o.srcPath, o.contents || ""]),
     );

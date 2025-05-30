@@ -94,7 +94,6 @@ export async function build(config: BuildConfig): Promise<void> {
 }
 
 // --- utils ---
-// @todo: use pathe??
 function normalizePath(path: string | URL | undefined, resolveFrom?: string) {
   return typeof path === "string" && isAbsolute(path)
     ? path
