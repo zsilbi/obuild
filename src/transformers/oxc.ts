@@ -192,7 +192,6 @@ async function transform(
   options: ExternalOxcTransformOptions,
 ): Promise<[TransformableFile] | [TransformableFile, DeclarationFile]> {
   const result = oxcTransform.transform(input.path, input.contents, options);
-
   const errors = result.errors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
   );
@@ -234,7 +233,7 @@ async function transform(
 function minify(
   input: Readonly<TransformableFile>,
   options?: ExternalOxcMinifyOptions,
-): [MinifiedFile] | [MinifiedFile, OutputFile, SourceMapFile] {
+): [MinifiedFile] | [MinifiedFile, TransformableFile, SourceMapFile] {
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,
     input.contents,
@@ -252,7 +251,7 @@ function minify(
   }
 
   // Create a new file with the `.src` extension prefix for the source map to use as the source file
-  const sourceFile: OutputFile = {
+  const sourceFile: TransformableFile = {
     ...input,
     extension: `.src${input.extension}`,
   };
