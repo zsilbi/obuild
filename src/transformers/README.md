@@ -49,6 +49,10 @@ export default defineBuildConfig({
 });
 ```
 
+## `sass` - SASS transformer
+
+The `sass` transformer compiles `*.sass` and `*.scss` files into CSS using the [sass](https://www.npmjs.com/package/sass) package.
+
 ## `postcss` - PostCSS transformer
 
 The `postcss` transformer applies PostCSS transformations to your CSS files using the [postcss-transformer](https://www.npmjs.com/package/postcss) package.
