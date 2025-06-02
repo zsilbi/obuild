@@ -4,7 +4,12 @@ import type { VueTransformerOptions } from "./vue.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 
-export type TransformerName = "oxc" | "vue" | (string & {});
+export type TransformerName =
+  | "oxc"
+  | "vue"
+  | "sass"
+  | "postcss"
+  | (string & {});
 
 export interface TransformerOptions
   extends OxcTransformerOptions,
