@@ -5,7 +5,7 @@ import { defu } from "defu";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
 import { colors as c } from "consola/utils";
-import type { TSConfig } from "pkg-types";
+import { readTSConfig, type TSConfig } from "pkg-types";
 
 import { makeExecutable, SHEBANG_RE } from "./plugins/shebang.ts";
 import { createTransformer } from "../transformers/index.ts";
@@ -16,6 +16,7 @@ import type { BuildContext, TransformEntry } from "../types.ts";
 import {
   getDeclarations,
   normalizeCompilerOptions,
+  type DeclarationOptions,
   type DeclarationOutput,
 } from "./utils/dts.ts";
 
@@ -63,27 +64,11 @@ export async function transformDir(
   ) as Array<OutputFile & { srcPath: string }>;
 
   if (dtsOutputFiles.length > 0) {
-    const tsConfig: TSConfig = {};
-
-    // Read and normalise TypeScript compiler options for emitting declarations
-    if (tsConfig.compilerOptions) {
-      tsConfig.compilerOptions = await normalizeCompilerOptions(
-        tsConfig.compilerOptions,
-      );
-    }
-    tsConfig.compilerOptions = defu(
-      { noEmit: false } satisfies TSConfig["compilerOptions"],
-      tsConfig.compilerOptions,
-      {
-        allowJs: true,
-        declaration: true,
-        skipLibCheck: true,
-        strictNullChecks: true,
-        emitDeclarationOnly: true,
-        allowImportingTsExtensions: true,
-        allowNonTsExtensions: true,
-      } satisfies TSConfig["compilerOptions"],
-    );
+    const declarationOptions: DeclarationOptions = {
+      ...entry.declaration,
+      rootDir: context.pkgDir,
+      typescript: await resolveTSConfig(entry),
+    };
 
     const vfs = new Map(
       dtsOutputFiles.map((o) => [o.srcPath, o.contents || ""]),
@@ -91,13 +76,7 @@ export async function transformDir(
 
     const declarations: DeclarationOutput = Object.create(null);
     for (const dtsGenerator of [getVueDeclarations, getDeclarations]) {
-      Object.assign(
-        declarations,
-        await dtsGenerator(vfs, {
-          rootDir: context.pkgDir,
-          typescript: tsConfig,
-        }),
-      );
+      Object.assign(declarations, await dtsGenerator(vfs, declarationOptions));
     }
 
     for (const output of dtsOutputFiles) {
@@ -161,4 +140,40 @@ export async function transformDir(
       .map((f) => c.dim(fmtPath(f)))
       .join("\n\n")}`,
   );
+}
+
+async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
+  // Read the TypeScript configuration from tsconfig.json
+  const packageTsConfig = await readTSConfig();
+
+  // Override the TypeScript configuration with the entry's declaration options
+  const tsConfig: TSConfig = defu(
+    entry.declaration?.typescript || {},
+    packageTsConfig,
+  );
+
+  if (tsConfig.compilerOptions) {
+    tsConfig.compilerOptions = await normalizeCompilerOptions(
+      tsConfig.compilerOptions,
+    );
+  }
+
+  // Ensure the TypeScript configuration has the necessary defaults
+  tsConfig.compilerOptions = defu(
+    {
+      noEmit: false,
+    } satisfies TSConfig["compilerOptions"],
+    tsConfig.compilerOptions,
+    {
+      allowJs: true,
+      declaration: true,
+      skipLibCheck: true,
+      strictNullChecks: true,
+      emitDeclarationOnly: true,
+      allowImportingTsExtensions: true,
+      allowNonTsExtensions: true,
+    } satisfies TSConfig["compilerOptions"],
+  );
+
+  return tsConfig;
 }

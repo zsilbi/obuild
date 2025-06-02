@@ -8,8 +8,12 @@ import type {
 
 import type { PackageJson } from "pkg-types";
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
-import type { Transformer, TransformerName } from "./transformers/types.ts";
-import type { OxcTransformerOptions } from "./transformers/oxc.ts";
+import type {
+  Transformer,
+  TransformerName,
+  TransformerOptions,
+} from "./transformers/types.ts";
+import type { DeclarationOptions } from "./builders/utils/dts.ts";
 
 export interface BuildContext {
   pkgDir: string;
@@ -80,7 +84,20 @@ export type TransformEntry = _BuildEntry & {
   /**
    * Options for the `oxc` transformer.
    */
-  oxc?: OxcTransformerOptions["oxc"];
+  oxc?: TransformerOptions["oxc"];
+
+  /**
+   * Options for the `vue` transformer.
+   */
+  vue?: TransformerOptions["vue"];
+
+  /**
+   * Post-transform declaration generation options.
+   *
+   * NOTE: This has no effect on the built-in `oxc` transformer.
+   * You can configure that in the `oxc` transform options.
+   */
+  declaration?: Omit<DeclarationOptions, "rootDir">;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;
