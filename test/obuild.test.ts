@@ -34,6 +34,28 @@ describe("obuild", () => {
             },
           },
         },
+        {
+          type: "transform",
+          input: "src/dts-only",
+          outDir: "dist/dts-only",
+          transformers: [
+            async (input) => {
+              if (input.extension !== ".ts") {
+                return undefined;
+              }
+
+              return [
+                {
+                  path: input.path,
+                  extension: ".d.mts",
+                  srcPath: input.srcPath,
+                  contents: await input.getContents(),
+                  declaration: true,
+                },
+              ];
+            },
+          ],
+        },
       ],
     });
   }, 10_000);
