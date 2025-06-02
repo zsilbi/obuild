@@ -113,8 +113,7 @@ export const oxcTransformer: Transformer = async (
     return;
   }
 
-  const inputExtension = input.extension || extname(input.path);
-  const extensionConfig = extensionConfigs[inputExtension];
+  const extensionConfig = extensionConfigs[input.extension];
 
   if (extensionConfig === undefined) {
     return;
@@ -124,7 +123,7 @@ export const oxcTransformer: Transformer = async (
   const codeFile: TransformableFile = {
     path: input.path,
     srcPath: input.srcPath,
-    extension: extensionConfig.outputExtension || inputExtension,
+    extension: extensionConfig.outputExtension || input.extension,
     contents: await input.getContents(),
     type: "code",
   };
@@ -291,18 +290,20 @@ function minify(
   return [minifiedFile, sourceFile, sourceMapFile];
 }
 
-function replaceExtension(path: string, extension?: string): string {
-  if (extension === undefined) {
+function replaceExtension(path: string, targetExtension?: string): string {
+  const sourceExtension = extname(path);
+
+  if (targetExtension === undefined) {
     const config = extensionConfigs[extname(path)];
 
     if (config?.outputExtension === undefined) {
       return path;
     }
 
-    extension = config.outputExtension;
+    targetExtension = config.outputExtension;
   }
 
-  return join(dirname(path), basename(path, extname(path))) + extension;
+  return join(dirname(path), basename(path, sourceExtension)) + targetExtension;
 }
 
 function rewriteSpecifiers(
