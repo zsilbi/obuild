@@ -6,6 +6,8 @@ import {
   type DeclarationOptions,
 } from "./dts.ts";
 import type { CreateProgramOptions } from "typescript";
+import { readPackageJSON } from "pkg-types";
+import consola from "consola";
 
 const SFC_EXT_RE = /\.vue\.m?[jt]s$/;
 
@@ -18,6 +20,13 @@ export async function getVueDeclarations(
   const originFiles = Object.values(fileMapping);
 
   if (originFiles.length === 0) {
+    return;
+  }
+
+  const pkgInfo = await readPackageJSON("vue-tsc").catch(() => {});
+
+  if (!pkgInfo?.version) {
+    consola.warn("Please install `vue-tsc` to generate Vue SFC declarations.");
     return;
   }
 
