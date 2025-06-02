@@ -75,6 +75,8 @@ describe("obuild", () => {
         "min/modules/ts-module.mjs",
         "min/modules/ts-module.mjs.map",
         "min/modules/ts-module.src.mjs",
+        "runtime/assets/demo.css",
+        "runtime/assets/nested.css",
         "runtime/components/jsx.d.mts",
         "runtime/components/jsx.mjs",
         "runtime/components/tsx.d.mts",

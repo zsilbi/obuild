@@ -59,7 +59,9 @@
     "changelogen": "^0.6.1",
     "eslint": "^9.28.0",
     "eslint-config-unjs": "^0.4.2",
+    "modern-normalize": "^3.0.1",
     "prettier": "^3.5.3",
+    "sass": "^1.89.1",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4",
     "vue": "^3.5.16",
@@ -67,12 +69,16 @@
     "vue-tsc": "^2.2.10"
   },
   "peerDependencies": {
+    "sass": "^1.85.0",
     "typescript": ">=5.7.3",
     "vue": "^3.5.13",
     "vue-sfc-transformer": "^0.1.1",
     "vue-tsc": "^2.2.0"
   },
   "peerDependenciesMeta": {
+    "sass": {
+      "optional": true
+    },
     "typescript": {
       "optional": true
     },
