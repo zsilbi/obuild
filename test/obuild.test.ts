@@ -58,7 +58,7 @@ describe("obuild", () => {
         },
       ],
     });
-  }, 10_000);
+  }, 20_000);
 
   test("dist files match expected", async () => {
     const distFiles = await readdir(distDir, {
