@@ -85,6 +85,7 @@ export default defineBuildConfig({
       // vue: {},
       // postcss: {},
       // transformers: ["oxc", "vue", "sass", "postcss"]
+      // declaration: {}
     },
   ],
   hooks: {
