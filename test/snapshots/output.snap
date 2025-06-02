@@ -385,6 +385,12 @@ const msg = ref(1);
 <style scoped>
 #main .foo{color:--var-red}
 </style>
+
+<style>
+.orange {
+  color: #f60;
+}
+</style>
 ",
   ],
   [

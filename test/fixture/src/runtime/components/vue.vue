@@ -19,3 +19,11 @@ const msg: Ref<number> = ref(1);
   }
 }
 </style>
+
+<style lang="scss">
+$orange: #f60;
+
+.orange {
+  color: $orange;
+}
+</style>
