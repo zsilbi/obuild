@@ -81,6 +81,8 @@ export async function transformDir(
 
     for (const output of dtsOutputFiles) {
       const result = declarations[output.srcPath];
+
+      output.type = "declaration";
       output.contents = result?.contents || "";
 
       if (result.errors) {
