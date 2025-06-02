@@ -1,6 +1,7 @@
-import { Role, User } from "./a-types"; // No extension
+import { User } from "./a-types"; // No extension
 import { UserID } from "./b-types.js"; // .js extension
 import { Status } from "./c-types.ts"; // .ts extension
+import { Role } from "./dir"; // Directory import
 
 // Classes
 export class UserManager {

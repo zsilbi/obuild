@@ -12,7 +12,7 @@ console.log("hello world");
 //#endregion",
   ],
   [
-    "dts-only/a-types.d.mts",
+    "dts/a-types.d.mts",
     "import { UserID } from "./b-types.mjs";
 import { Status } from "./c-types.mjs";
 export interface User {
@@ -27,7 +27,27 @@ export interface Profile {
     age: number;
     interests: string[];
 }
-export declare enum Role {
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts/b-types.d.mts",
+    "export type UserID = string | number;
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts/c-types.d.mts",
+    "export type Status = "active" | "inactive" | "pending";
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts/dir/index.d.mts",
+    "export declare enum Role {
     Admin = "ADMIN",
     User = "USER",
     Guest = "GUEST"
@@ -37,24 +57,11 @@ export default _default;
 ",
   ],
   [
-    "dts-only/b-types.d.mts",
-    "export type UserID = string | number;
-declare const _default: {};
-export default _default;
-",
-  ],
-  [
-    "dts-only/c-types.d.mts",
-    "export type Status = "active" | "inactive" | "pending";
-declare const _default: {};
-export default _default;
-",
-  ],
-  [
-    "dts-only/module.d.mts",
-    "import { Role, User } from "./a-types.mjs";
+    "dts/module.d.mts",
+    "import { User } from "./a-types.mjs";
 import { UserID } from "./b-types.mjs";
 import { Status } from "./c-types.mjs";
+import { Role } from "./dir/index.mjs";
 export declare class UserManager {
     private users;
     addUser(user: User): void;
