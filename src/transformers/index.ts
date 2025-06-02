@@ -11,6 +11,7 @@ import type {
   TransformerOptions,
   TransformFile,
 } from "./types.ts";
+import { postcssTransformer } from "./postcss.ts";
 
 export type * from "./types.ts";
 export { mkdistLoader } from "./mkdist.ts";
@@ -18,9 +19,14 @@ export { mkdistLoader } from "./mkdist.ts";
 const transformers: Record<TransformerName, Transformer> = {
   oxc: oxcTransformer,
   vue: vueTransformer,
+  postcss: postcssTransformer,
 };
 
-const defaultTransformers: Transformer[] = [oxcTransformer, vueTransformer];
+const defaultTransformers: Transformer[] = [
+  oxcTransformer,
+  vueTransformer,
+  postcssTransformer,
+];
 
 function resolveTransformer(
   transformer: TransformerName | Transformer,

@@ -1,4 +1,5 @@
 import type { OxcTransformerOptions } from "./oxc.ts";
+import type { PostcssTransformerOptions } from "./postcss.ts";
 import type { VueTransformerOptions } from "./vue.ts";
 
 type MaybePromise<T> = T | Promise<T>;
@@ -7,7 +8,8 @@ export type TransformerName = "oxc" | "vue" | (string & {});
 
 export interface TransformerOptions
   extends OxcTransformerOptions,
-    VueTransformerOptions {}
+    VueTransformerOptions,
+    PostcssTransformerOptions {}
 
 export interface TransformerContext {
   transformFile: TransformFile;

@@ -92,6 +92,11 @@ export type TransformEntry = _BuildEntry & {
   vue?: TransformerOptions["vue"];
 
   /**
+   * Options for the `postcss` transformer.
+   */
+  postcss?: TransformerOptions["postcss"];
+
+  /**
    * Post-transform declaration generation options.
    *
    * NOTE: This has no effect on the built-in `oxc` transformer.

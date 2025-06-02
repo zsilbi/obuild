@@ -7,7 +7,7 @@ The `oxc` transformer handles TypeScript and JSX/TSX file transformations using 
 Configure the `oxc` transformer using the `oxc` option in your build configuration:
 
 ```ts
-import { defineBuildConfig } from "obuild";
+import { defineBuildConfig } from "obuild/config";
 
 export default defineBuildConfig({
   entries: [
@@ -33,7 +33,7 @@ The `vue` transformer processes Vue Single File Components (SFCs) using the [vue
 You can configure the `vue` transformer with the `vue` option in your build config.
 
 ```ts
-import { defineBuildConfig } from "obuild";
+import { defineBuildConfig } from "obuild/config";
 export default defineBuildConfig({
   entries: [
     {
@@ -49,12 +49,35 @@ export default defineBuildConfig({
 });
 ```
 
+## `postcss` - PostCSS transformer
+
+The `postcss` transformer applies PostCSS transformations to your CSS files using the [postcss-transformer](https://www.npmjs.com/package/postcss) package.
+
+You can configure the `postcss` transformer with the `postcss` option in your build config:
+
+```ts
+import { defineBuildConfig } from "obuild/config";
+
+export default defineBuildConfig({
+  entries: [
+    {
+      type: "transform",
+      input: "./src/runtime",
+      outDir: "./dist/runtime",
+      postcss: {
+        // Options for PostCSS
+      },
+    },
+  ],
+});
+```
+
 ## Custom transformers
 
 For transform entries, use the `transformers` option to specify custom transformers or modify the execution order of default transformers.
 
 ```ts
-import { defineBuildConfig } from "obuild";
+import { defineBuildConfig } from "obuild/config";
 import type {
   InputFile,
   OutputFile,
@@ -133,7 +156,7 @@ export const fooTransformer: Transformer = async (
 Use your custom transformer in the build configuration:
 
 ```ts
-import { defineBuildConfig } from "obuild";
+import { defineBuildConfig } from "obuild/config";
 import { fooTransformer } from "./src/transformers/foo.ts"; // Import your custom transformer
 
 export default defineBuildConfig({
