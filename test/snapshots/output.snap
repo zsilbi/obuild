@@ -27,22 +27,16 @@ export interface Profile {
     age: number;
     interests: string[];
 }
-declare const _default: {};
-export default _default;
 ",
   ],
   [
     "dts/b-types.d.mts",
     "export type UserID = string | number;
-declare const _default: {};
-export default _default;
 ",
   ],
   [
     "dts/c-types.d.mts",
     "export type Status = "active" | "inactive" | "pending";
-declare const _default: {};
-export default _default;
 ",
   ],
   [
@@ -62,6 +56,10 @@ export default _default;
 import { UserID } from "./b-types.mjs";
 import { Status } from "./c-types.mjs";
 import { Role } from "./dir/index.mjs";
+export type A = typeof import("./a-types.mjs");
+export type B = typeof import("./b-types.mjs");
+export type C = typeof import("./c-types.mjs");
+export type Dir = typeof import("./dir/index.mjs");
 export declare class UserManager {
     private users;
     addUser(user: User): void;

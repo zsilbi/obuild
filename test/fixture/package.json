@@ -5,6 +5,7 @@
     "./cli": "./dist/cli.mjs",
     "./runtime/**": "./dist/runtime/**.mjs"
   },
+  "type": "module",
   "scripts": {
     "build": "obuild",
     "prepack": "pnpm build"

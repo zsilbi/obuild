@@ -1,5 +1,5 @@
-import { UserID } from "./b-types";
-import { Status } from "./c-types";
+import { UserID } from "./b-types.js";
+import { Status } from "./c-types.ts";
 
 // Interfaces
 export interface User {
@@ -15,5 +15,3 @@ export interface Profile {
   age: number;
   interests: string[];
 }
-
-export default {};

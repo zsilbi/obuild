@@ -1,7 +1,16 @@
+// @ts-expect-error - Testing module resolution with different import styles
 import { User } from "./a-types"; // No extension
 import { UserID } from "./b-types.js"; // .js extension
 import { Status } from "./c-types.ts"; // .ts extension
+// @ts-expect-error
 import { Role } from "./dir"; // Directory import
+
+// @ts-expect-error
+export type A = typeof import("./a-types");
+export type B = typeof import("./b-types.js");
+export type C = typeof import("./c-types.ts");
+// @ts-expect-error
+export type Dir = typeof import("./dir");
 
 // Classes
 export class UserManager {
