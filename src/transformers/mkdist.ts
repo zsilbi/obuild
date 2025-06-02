@@ -42,9 +42,9 @@ export function mkdistLoader(
   loader: MkdistLoader,
   loaderOptions: MkdistLoaderOptions,
 ): Transformer {
-  const DECLARATION_RE = /\.d\.[cm]?ts$/;
-  const CM_LETTER_RE = /(?<=\.)(c|m)(?=[jt]s$)/;
-  const KNOWN_EXT_RE = /\.(c|m)?[jt]sx?$/;
+  const DECLARATION_RE = /\.d\.m?ts$/;
+  const M_LETTER_RE = /(?<=\.)(m)(?=[jt]s$)/;
+  const KNOWN_EXT_RE = /\.m?[jt]sx?$/;
 
   /**
    * mkdist compatible JS loader that adds declaration file output for `.js` files also
@@ -61,14 +61,14 @@ export function mkdistLoader(
       return;
     }
 
-    const cm = input.srcPath?.match(CM_LETTER_RE)?.[0] || "";
+    const m = input.srcPath?.match(M_LETTER_RE)?.[0] || "";
 
     return [
       {
         contents: await input.getContents(),
         srcPath: input.srcPath,
         path: input.path,
-        extension: `.d.${cm}ts`,
+        extension: `.d.${m}ts`,
         declaration: true,
       },
     ];

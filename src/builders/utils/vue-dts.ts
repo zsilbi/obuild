@@ -7,7 +7,7 @@ import {
 } from "./dts.ts";
 import type { CreateProgramOptions } from "typescript";
 
-const SFC_EXT_RE = /\.vue\.[cm]?[jt]s$/;
+const SFC_EXT_RE = /\.vue\.m?[jt]s$/;
 
 export async function getVueDeclarations(
   vfs: Map<string, string>,

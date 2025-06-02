@@ -1,28 +1,6 @@
-// Type aliases
-export type UserID = string | number;
-export type Status = "active" | "inactive" | "pending";
-
-// Interfaces
-export interface User {
-  id: UserID;
-  name: string;
-  email: string;
-  status: Status;
-  profile?: Profile;
-}
-
-export interface Profile {
-  bio: string;
-  age: number;
-  interests: string[];
-}
-
-// Enums
-export enum Role {
-  Admin = "ADMIN",
-  User = "USER",
-  Guest = "GUEST",
-}
+import { Role, User } from "./a-types"; // No extension
+import { UserID } from "./b-types.js"; // .js extension
+import { Status } from "./c-types.ts"; // .ts extension
 
 // Classes
 export class UserManager {

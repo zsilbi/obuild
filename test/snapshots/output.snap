@@ -12,9 +12,9 @@ console.log("hello world");
 //#endregion",
   ],
   [
-    "dts-only/ts-module.d.mts",
-    "export type UserID = string | number;
-export type Status = "active" | "inactive" | "pending";
+    "dts-only/a-types.d.mts",
+    "import { UserID } from "./b-types.mjs";
+import { Status } from "./c-types.mjs";
 export interface User {
     id: UserID;
     name: string;
@@ -32,6 +32,29 @@ export declare enum Role {
     User = "USER",
     Guest = "GUEST"
 }
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts-only/b-types.d.mts",
+    "export type UserID = string | number;
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts-only/c-types.d.mts",
+    "export type Status = "active" | "inactive" | "pending";
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts-only/module.d.mts",
+    "import { Role, User } from "./a-types.mjs";
+import { UserID } from "./b-types.mjs";
+import { Status } from "./c-types.mjs";
 export declare class UserManager {
     private users;
     addUser(user: User): void;

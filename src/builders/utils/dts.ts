@@ -52,8 +52,8 @@ export async function getDeclarations(
   return output;
 }
 
-const JS_EXT_RE = /\.(m|c)?(ts|js)$/;
-const JSX_EXT_RE = /\.(m|c)?(ts|js)x?$/;
+const JS_EXT_RE = /\.(m)?(ts|js)$/;
+const JSX_EXT_RE = /\.(m)?(ts|js)x?$/;
 const RELATIVE_RE = /^\.{1,2}[/\\]/;
 
 export async function extractDeclarations(
@@ -65,6 +65,7 @@ export async function extractDeclarations(
 
   for (const filename of inputFiles) {
     const dtsFilename = filename.replace(JSX_EXT_RE, ".d.$1ts");
+
     let contents = vfs.get(dtsFilename) || "";
     if (opts?.addRelativeDeclarationExtensions) {
       const {
@@ -74,7 +75,8 @@ export async function extractDeclarations(
         findTypeExports,
       } = await import("mlly");
 
-      const ext = filename.match(JS_EXT_RE)?.[0].replace(/ts$/, "js") || ".js";
+      const ext = filename.match(JS_EXT_RE)?.[0].replace(/ts$/, "js") || ".mjs";
+
       const imports = findStaticImports(contents);
       const exports = findExports(contents);
       const typeExports = findTypeExports(contents);
@@ -120,7 +122,12 @@ export async function extractDeclarations(
         // add file extension for relative paths (`.js` will match the `.d.ts` extension we emit)
         contents = contents.replace(
           spec.code,
-          spec.code.replace(spec.specifier, specifier + ext),
+          spec.code.replace(
+            spec.specifier,
+            JS_EXT_RE.test(specifier)
+              ? specifier.replace(JS_EXT_RE, "") + ext // Avoid concatenating existing extensions
+              : specifier + ext,
+          ),
         );
       }
     }

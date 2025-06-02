@@ -38,6 +38,9 @@ describe("obuild", () => {
           type: "transform",
           input: "src/dts-only",
           outDir: "dist/dts-only",
+          declaration: {
+            addRelativeDeclarationExtensions: true,
+          },
           transformers: [
             async (input) => {
               if (input.extension !== ".ts") {
@@ -77,7 +80,10 @@ describe("obuild", () => {
       [
         "cli.d.mts",
         "cli.mjs",
-        "dts-only/ts-module.d.mts",
+        "dts-only/a-types.d.mts",
+        "dts-only/b-types.d.mts",
+        "dts-only/c-types.d.mts",
+        "dts-only/module.d.mts",
         "index.d.mts",
         "index.mjs",
         "min/components/jsx.d.mts",

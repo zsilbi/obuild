@@ -76,7 +76,8 @@ export interface OutputFile {
   srcPath?: string;
 
   /**
-   * Contents of the file, if available
+   * Contents of the file, if available.
+   * If `declaration` is `true`, this will be used as the source for generating declarations.
    */
   contents?: string;
 
@@ -98,6 +99,7 @@ export interface OutputFile {
 
   /**
    * Generate declaration files after the transformations.
+   * When set to `true`, the `contents` field will be used as source.
    */
   declaration?: boolean;
 

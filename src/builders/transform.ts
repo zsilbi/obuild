@@ -64,6 +64,15 @@ export async function transformDir(
   ) as Array<OutputFile & { srcPath: string }>;
 
   if (dtsOutputFiles.length > 0) {
+    for (const output of dtsOutputFiles) {
+      if (output.extension !== ".d.mts") {
+        continue;
+      }
+
+      // If the desired extension is `.d.mts` the input files must be `.mts`
+      output.srcPath = output.srcPath.replace(/\.ts$/, ".mts");
+    }
+
     const declarationOptions: DeclarationOptions = {
       ...entry.declaration,
       rootDir: context.pkgDir,
