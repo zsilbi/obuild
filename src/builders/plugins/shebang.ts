@@ -4,7 +4,7 @@ import { promises as fsp } from "node:fs";
 import { resolve } from "node:path";
 import type { Plugin } from "rolldown";
 
-export const SHEBANG_RE: RegExp = /^#![^\n]*/;
+const SHEBANG_RE: RegExp = /^#![^\n]*/;
 
 export function shebangPlugin(): Plugin {
   return {
