@@ -77,6 +77,7 @@ describe("obuild", () => {
       [
         "cli.d.mts",
         "cli.mjs",
+        "dts-only/ts-module.d.mts",
         "index.d.mts",
         "index.mjs",
         "min/components/jsx.d.mts",

@@ -12,6 +12,47 @@ console.log("hello world");
 //#endregion",
   ],
   [
+    "dts-only/ts-module.d.mts",
+    "export type UserID = string | number;
+export type Status = "active" | "inactive" | "pending";
+export interface User {
+    id: UserID;
+    name: string;
+    email: string;
+    status: Status;
+    profile?: Profile;
+}
+export interface Profile {
+    bio: string;
+    age: number;
+    interests: string[];
+}
+export declare enum Role {
+    Admin = "ADMIN",
+    User = "USER",
+    Guest = "GUEST"
+}
+export declare class UserManager {
+    private users;
+    addUser(user: User): void;
+    getUser(id: UserID): User | undefined;
+    getAllUsers(): User[];
+}
+export declare function createUser(name: string, email: string, status?: Status): User;
+export declare function isActive(user: User): boolean;
+export declare const DEFAULT_STATUS: Status;
+export declare const ROLES: Role[];
+export type ApiResponse<T> = {
+    data: T;
+    error?: string;
+};
+export declare namespace Utils {
+    function capitalize(str: string): string;
+    function isEmail(email: string): boolean;
+}
+",
+  ],
+  [
     "index.d.mts",
     "//#region src/index.d.ts
 declare function test(): string;
