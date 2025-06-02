@@ -128,7 +128,7 @@ import type {
   InputFile,
   OutputFile,
   Transformer,
-  TransformerContext
+  TransformerContext,
 } from "obuild/transformers";
 
 declare module "obuild/transformers" {
