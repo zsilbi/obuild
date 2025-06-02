@@ -23,13 +23,6 @@ describe("obuild", () => {
           type: "transform",
           input: "src/runtime",
           outDir: "dist/runtime",
-          declaration: {
-            typescript: {
-              compilerOptions: {
-                isolatedDeclarations: false,
-              },
-            },
-          },
         },
         {
           type: "transform",

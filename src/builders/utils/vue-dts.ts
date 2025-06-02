@@ -31,7 +31,11 @@ export async function getVueDeclarations(
   const volarTs: typeof import("@volar/typescript") =
     requireFromVueTsc("@volar/typescript");
 
-  const compilerOptions = opts?.typescript?.compilerOptions || {};
+  const compilerOptions = {
+    ...opts?.typescript?.compilerOptions,
+    isolatedDeclarations: false, // Not supported
+  };
+
   const tsHost = ts.createCompilerHost(compilerOptions);
   tsHost.writeFile = (filename, content) => {
     vfs.set(filename, content);
