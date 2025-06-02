@@ -41,7 +41,7 @@ export default defineBuildConfig({
       input: "./src/runtime",
       outDir: "./dist/runtime",
       vue: {
-        // Disable TypeScript declaration generation for Vue SFCs
+        // Disable TypeScript declarations for Vue SFCs
         dts: false,
       },
     },
@@ -55,7 +55,7 @@ The `sass` transformer compiles `*.sass` and `*.scss` files into CSS using the [
 
 ## `postcss` - PostCSS transformer
 
-The `postcss` transformer applies PostCSS transformations to your CSS files using the [postcss-transformer](https://www.npmjs.com/package/postcss) package.
+The `postcss` transformer applies PostCSS transformations to your CSS files using the [postcss](https://www.npmjs.com/package/postcss) package.
 
 You can configure the `postcss` transformer with the `postcss` option in your build config:
 
@@ -128,8 +128,7 @@ import type {
   InputFile,
   OutputFile,
   Transformer,
-  TransformerContext,
-  TransformerOptions,
+  TransformerContext
 } from "obuild/transformers";
 
 declare module "obuild/transformers" {

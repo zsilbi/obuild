@@ -82,7 +82,9 @@ export default defineBuildConfig({
       outDir: "./dist/runtime",
       // stub: false,
       // oxc: {},
-      // transformers: []
+      // vue: {},
+      // postcss: {},
+      // transformers: ["oxc", "vue", "sass", "postcss"]
     },
   ],
   hooks: {
