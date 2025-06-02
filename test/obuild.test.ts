@@ -13,36 +13,30 @@ describe("obuild", () => {
     await rm(distDir, { recursive: true, force: true });
   });
 
-  test(
-    "build fixture",
-    async () => {
-      await build({
-        cwd: fixtureDir,
-        entries: [
-          { type: "bundle", input: ["src/index", "src/cli"] },
-          "src/utils.ts",
-          {
-            type: "transform",
-            input: "src/runtime",
-            outDir: "dist/runtime",
-          },
-          {
-            type: "transform",
-            input: "src/min",
-            outDir: "dist/min",
-            oxc: {
-              minify: {
-                sourcemap: true,
-              },
+  test("build fixture", async () => {
+    await build({
+      cwd: fixtureDir,
+      entries: [
+        { type: "bundle", input: ["src/index", "src/cli"] },
+        "src/utils.ts",
+        {
+          type: "transform",
+          input: "src/runtime",
+          outDir: "dist/runtime",
+        },
+        {
+          type: "transform",
+          input: "src/min",
+          outDir: "dist/min",
+          oxc: {
+            minify: {
+              sourcemap: true,
             },
           },
-        ],
-      });
-    },
-    {
-      timeout: 10_000,
-    },
-  );
+        },
+      ],
+    });
+  }, 10_000);
 
   test("dist files match expected", async () => {
     const distFiles = await readdir(distDir, {
