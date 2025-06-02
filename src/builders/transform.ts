@@ -61,7 +61,7 @@ export async function transformDir(
   }
 
   const dtsOutputFiles = outputFiles.filter(
-    (output) => !output.skip && output.declaration === "generate",
+    (output) => !output.skip && output.declaration === true,
   );
 
   if (dtsOutputFiles.length > 0) {

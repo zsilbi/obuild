@@ -79,21 +79,20 @@ export interface OutputFile {
   skip?: boolean;
 
   /**
-   * The file is a declaration file (e.g. `.d.mts`)
-   *
-   * If `"generate"` is set, the transformer will generate a declaration file from the source file.
+   * Type of the output file, which can be one of:
    */
-  declaration?: boolean | "generate";
+  type?:
+    | "code"
+    | "minified"
+    | "declaration"
+    | "source"
+    | "source-map"
+    | "asset";
 
   /**
-   * The file is a source map (e.g. `.js.map`)
+   * Generate declaration files after the transformations.
    */
-  sourceMap?: boolean;
-
-  /**
-   * If the file is minified, this should be set to `true`.
-   */
-  minified?: boolean;
+  declaration?: boolean;
 
   /**
    * Whether the file is raw (not modified from the input)

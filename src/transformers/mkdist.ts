@@ -8,12 +8,8 @@ import type {
 
 type MaybePromise<T> = T | Promise<T>;
 
-type MkdistOutputFile = Omit<
-  OutputFile,
-  "declaration" | "sourceMap" | "minified"
-> & {
+type MkdistOutputFile = Omit<OutputFile, "type"> & {
   errors?: Error[];
-  declaration?: boolean;
 };
 
 type MkdistLoaderOptions = {
@@ -90,41 +86,16 @@ export function mkdistLoader(
       }
     }
 
-    if (
-      output.declaration === true &&
-      output.skip !== true &&
-      !DECLARATION_RE.test(output.path)
-    ) {
-      return {
-        ...output,
-        declaration: "generate",
-      };
-    }
-
     return output;
-  };
-
-  const toMkdistOutputFile: (output: OutputFile) => MkdistOutputFile = (
-    output,
-  ) => {
-    return {
-      ...output,
-      declaration:
-        output.declaration === "generate" ? true : output.declaration,
-    };
   };
 
   return async (input, context: TransformerContext) => {
     const mkdistContext: MkdistLoaderContext = {
       loadFile: async (inputFile: InputFile): Promise<MkdistOutputFile[]> => {
         const dtsOutput = (await jsLoader(inputFile)) || [];
-
         const output = await context.transformFile(inputFile);
 
-        return [
-          ...dtsOutput,
-          ...output.map((file) => toMkdistOutputFile(file)),
-        ];
+        return [...dtsOutput, ...output];
       },
       options: loaderOptions,
     };

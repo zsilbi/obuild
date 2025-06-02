@@ -50,16 +50,20 @@ type TransformableFile = OutputFile & {
   extension: string;
 };
 
+type SourceFile = OutputFile & {
+  type: "source";
+};
+
 type SourceMapFile = OutputFile & {
-  sourceMap: true;
+  type: "source-map";
 };
 
 type DeclarationFile = OutputFile & {
-  declaration: true;
+  type: "declaration";
 };
 
 type MinifiedFile = OutputFile & {
-  minified: true;
+  type: "minified";
 };
 
 type ExtensionConfig = {
@@ -122,6 +126,7 @@ export const oxcTransformer: Transformer = async (
     srcPath: input.srcPath,
     extension: extensionConfig.outputExtension || inputExtension,
     contents: await input.getContents(),
+    type: "code",
   };
 
   if (!extensionConfig.transform) {
@@ -235,9 +240,9 @@ async function transform(
   const declarationFile: DeclarationFile = {
     srcPath: input.srcPath,
     contents: result.declaration,
-    declaration: true,
     path: input.path,
     extension: ".d.mts",
+    type: "declaration",
   };
 
   return [transformedFile, declarationFile];
@@ -246,7 +251,7 @@ async function transform(
 function minify(
   input: Readonly<TransformableFile>,
   options?: ExternalOxcMinifyOptions,
-): [MinifiedFile] | [MinifiedFile, TransformableFile, SourceMapFile] {
+): [MinifiedFile] | [MinifiedFile, SourceFile, SourceMapFile] {
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,
     input.contents,
@@ -255,7 +260,7 @@ function minify(
 
   const minifiedFile: MinifiedFile = {
     ...input,
-    minified: true,
+    type: "minified",
     contents: minifedCode,
   };
 
@@ -264,8 +269,9 @@ function minify(
   }
 
   // Create a new file with the `.src` extension prefix for the source map to use as the source file
-  const sourceFile: TransformableFile = {
+  const sourceFile: SourceFile = {
     ...input,
+    type: "source",
     extension: `.src${input.extension}`,
   };
 
@@ -278,7 +284,7 @@ function minify(
     srcPath: input.srcPath,
     path: input.path,
     extension: `${input.extension}.map`,
-    sourceMap: true,
+    type: "source-map",
     contents: JSON.stringify(sourceMap),
   };
 
