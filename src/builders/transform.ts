@@ -1,5 +1,5 @@
 import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
-import { basename, dirname, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "pathe";
 
 import { defu } from "defu";
 import { consola } from "consola";

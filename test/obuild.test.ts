@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll } from "vitest";
-import { join, relative } from "node:path";
+import { join, relative } from "pathe";
 import { fileURLToPath } from "node:url";
 
 import { build } from "../src/build.ts";

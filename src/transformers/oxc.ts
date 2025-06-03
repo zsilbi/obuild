@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { basename, dirname, extname, join, relative } from "node:path";
+import { basename, dirname, extname, join, relative } from "pathe";
 import { writeFile } from "node:fs/promises";
 import { resolveModulePath } from "exsolve";
 import MagicString from "magic-string";
