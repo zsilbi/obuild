@@ -44,11 +44,6 @@ interface File {
   path: string;
 
   /**
-   * File extension, e.g. `.ts`, `.mjs`, `.jsx`, `.d.mts`
-   */
-  extension: string;
-
-  /**
    * Absolute source path of the file
    */
   srcPath?: string;
@@ -56,12 +51,22 @@ interface File {
 
 export interface InputFile extends File {
   /**
+   * File extension, e.g. `.ts`, `.mjs`, `.jsx`, `.d.mts`
+   */
+  extension: string;
+
+  /**
    * Loads the raw contents of the file
    */
   getContents: () => MaybePromise<string>;
 }
 
 export interface OutputFile extends File {
+  /**
+   * File extension, e.g. `.ts`, `.mjs`, `.jsx`, `.d.mts`
+   */
+  extension?: string;
+
   /**
    * Contents of the file, if available.
    * If `declaration` is `true`, this will be used as the source for generating declarations.
