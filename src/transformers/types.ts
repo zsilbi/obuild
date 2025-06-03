@@ -37,7 +37,7 @@ export type Transformer = (
   context: TransformerContext,
 ) => MaybePromise<TransformResult>;
 
-export interface InputFile {
+interface File {
   /**
    * Relative path to `outDir`
    */
@@ -52,29 +52,16 @@ export interface InputFile {
    * Absolute source path of the file
    */
   srcPath?: string;
+}
 
+export interface InputFile extends File {
   /**
    * Loads the raw contents of the file
    */
   getContents: () => MaybePromise<string>;
 }
 
-export interface OutputFile {
-  /**
-   * Relative path to `outDir`
-   */
-  path: string;
-
-  /**
-   * File extension, e.g. `.js`, `.mjs`, `.jsx`, `.d.mts`
-   */
-  extension?: string;
-
-  /**
-   * Absolute source path of the file
-   */
-  srcPath?: string;
-
+export interface OutputFile extends File {
   /**
    * Contents of the file, if available.
    * If `declaration` is `true`, this will be used as the source for generating declarations.
@@ -104,7 +91,8 @@ export interface OutputFile {
   declaration?: boolean;
 
   /**
-   * Whether the file is raw (not modified from the input)
+   * Indicates if the file is unmodified from the input.
+   * When true, the file contents are ignored and copied directly from the source.
    */
   raw?: boolean;
 }
