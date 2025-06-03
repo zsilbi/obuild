@@ -133,6 +133,8 @@ export const oxcTransformer: Transformer = async (
       return minify(codeFile, options.minify);
     }
 
+    codeFile.raw = true;
+
     return [codeFile];
   }
 
@@ -146,7 +148,7 @@ export const oxcTransformer: Transformer = async (
       transformedFile,
       options.minify,
     );
-
+    
     return [minifiedFile, ...sourceMapFiles, ...declarationFiles];
   }
 
