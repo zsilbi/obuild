@@ -104,13 +104,8 @@ export async function transformDir(
       output.type = "declaration";
       output.contents = result?.contents || "";
 
-      if (result.errors) {
+      if (result?.errors) {
         output.skip = true;
-
-        consola.warn(
-          `\n${c.yellow("[transform] ")}${c.dim(fmtPath(output.srcPath))}:\n` +
-            result.errors.map((e) => `  - ${e}`).join("\n"),
-        );
       }
     }
   }
