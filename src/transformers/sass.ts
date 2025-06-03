@@ -15,7 +15,6 @@ export const sassTransformer: Transformer = async (input: InputFile) => {
   if (basename(input.srcPath).startsWith("_")) {
     return [
       {
-        contents: "",
         path: input.path,
         skip: true,
         type: "asset",

@@ -39,7 +39,7 @@ export const postcssTransformer: Transformer = async (
 ) => {
   const options = ctx.options;
 
-  if (options.postcss === false || ![".css"].includes(input.extension)) {
+  if (options.postcss === false || input.extension !== ".css") {
     return;
   }
 
