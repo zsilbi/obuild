@@ -132,34 +132,31 @@ export async function transformDir(
   const outputPromises: Promise<string>[] = outputFiles
     .filter((outputFile) => !outputFile.skip)
     .map(async (outputFile) => {
-      const contents = outputFile.contents || "";
-      const outputFilePath = join(entry.outDir!, outputFile.path);
+      const { path, raw, contents = "" } = outputFile;
+      const outPath = join(entry.outDir!, path);
 
-      await mkdir(dirname(outputFilePath), { recursive: true });
+      await mkdir(dirname(outPath), { recursive: true });
 
       let shebangFound: boolean;
 
-      if (outputFile.raw) {
-        if (outputFile.srcPath === undefined) {
-          throw new TypeError("`srcPath` can't be undefined for raw files.");
-        }
+      if (raw) {
+        const srcPath = outputFile.srcPath || join(entry.input, path);
 
         [shebangFound] = await Promise.all([
           // Avoid loading possibly large raw file contents into memory
-          hasFileShebang(outputFile.srcPath),
-          copyFile(outputFile.srcPath, outputFilePath),
+          hasFileShebang(srcPath),
+          copyFile(srcPath, outPath),
         ]);
       } else {
         shebangFound = hasShebang(contents);
-
-        await writeFile(outputFilePath, contents, "utf8");
+        await writeFile(outPath, contents, "utf8");
       }
 
       if (shebangFound) {
-        await makeExecutable(outputFilePath);
+        await makeExecutable(outPath);
       }
 
-      return outputFilePath;
+      return outPath;
     });
 
   const writtenFiles = await Promise.all(outputPromises);
