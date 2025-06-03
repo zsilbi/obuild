@@ -1,4 +1,10 @@
-import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { basename, dirname, extname, join } from "pathe";
 
 import { defu } from "defu";
@@ -7,16 +13,16 @@ import { glob } from "tinyglobby";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
 
-import {
-  copyAndMakeExecutableIfShebang,
-  hasShebang,
-  makeExecutable,
-} from "./plugins/shebang.ts";
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./utils/vue-dts.ts";
 import { fmtPath } from "../utils.ts";
 import type { OutputFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
+import {
+  hasFileShebang,
+  hasShebang,
+  makeExecutable,
+} from "./plugins/shebang.ts";
 import {
   getDeclarations,
   normalizeCompilerOptions,
@@ -131,23 +137,25 @@ export async function transformDir(
 
       await mkdir(dirname(outputFilePath), { recursive: true });
 
+      let shebangFound: boolean;
+
       if (outputFile.raw) {
         if (outputFile.srcPath === undefined) {
           throw new TypeError("`srcPath` can't be undefined for raw files.");
         }
 
-        // Avoid reading possibly large raw files into memory
-        await copyAndMakeExecutableIfShebang(
-          outputFile.srcPath,
-          outputFilePath,
-        );
+        [shebangFound] = await Promise.all([
+          // Avoid loading possibly large raw file contents into memory
+          hasFileShebang(outputFile.srcPath),
+          copyFile(outputFile.srcPath, outputFilePath),
+        ]);
+      } else {
+        shebangFound = hasShebang(contents);
 
-        return outputFilePath;
+        await writeFile(outputFilePath, contents, "utf8");
       }
 
-      await writeFile(outputFilePath, contents, "utf8");
-
-      if (hasShebang(contents)) {
+      if (shebangFound) {
         await makeExecutable(outputFilePath);
       }
 
