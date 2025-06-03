@@ -19,6 +19,7 @@ describe("obuild", () => {
       entries: [
         { type: "bundle", input: ["src/index", "src/cli"] },
         "src/utils.ts",
+        "src/raw/:dist/raw",
         {
           type: "transform",
           input: "src/runtime",
@@ -105,6 +106,7 @@ describe("obuild", () => {
         "min/modules/ts-module.mjs",
         "min/modules/ts-module.mjs.map",
         "min/modules/ts-module.src.mjs",
+        "raw/cli.mjs",
         "runtime/assets/demo.css",
         "runtime/assets/nested.css",
         "runtime/components/jsx.d.mts",
@@ -156,6 +158,12 @@ describe("obuild", () => {
 
   test("cli shebang is executable", async () => {
     const cliPath = new URL("cli.mjs", distDir);
+    const stats = await stat(cliPath);
+    expect(stats.mode & 0o111).toBe(0o111); // Check if executable
+  });
+
+  test("raw cli shebang is executable", async () => {
+    const cliPath = new URL("cli.mjs", `${distDir}raw/`);
     const stats = await stat(cliPath);
     expect(stats.mode & 0o111).toBe(0o111); // Check if executable
   });

@@ -7,7 +7,11 @@ import { glob } from "tinyglobby";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
 
-import { hasShebang, makeExecutable } from "./plugins/shebang.ts";
+import {
+  copyAndMakeExecutableIfShebang,
+  hasShebang,
+  makeExecutable,
+} from "./plugins/shebang.ts";
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./utils/vue-dts.ts";
 import { fmtPath } from "../utils.ts";
@@ -122,7 +126,7 @@ export async function transformDir(
   const outputPromises: Promise<string>[] = outputFiles
     .filter((outputFile) => !outputFile.skip)
     .map(async (outputFile) => {
-      let contents = outputFile.contents || "";
+      const contents = outputFile.contents || "";
       const outputFilePath = join(entry.outDir!, outputFile.path);
 
       await mkdir(dirname(outputFilePath), { recursive: true });
@@ -132,7 +136,13 @@ export async function transformDir(
           throw new TypeError("`srcPath` can't be undefined for raw files.");
         }
 
-        contents = await readFile(outputFile.srcPath, "utf8");
+        // Avoid reading possibly large raw files into memory
+        await copyAndMakeExecutableIfShebang(
+          outputFile.srcPath,
+          outputFilePath,
+        );
+
+        return outputFilePath;
       }
 
       await writeFile(outputFilePath, contents, "utf8");

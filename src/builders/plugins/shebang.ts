@@ -23,6 +23,34 @@ export function shebangPlugin(): Plugin {
   };
 }
 
+/**
+ * Copies a file from `sourcePath` to `outPath` and makes it executable if it contains a shebang.
+ *
+ * @param sourcePath - Path to the source file
+ * @param outPath - Path to the output file
+ * @param bytes - Number of bytes to read from the start of the file to check for a shebang
+ */
+export async function copyAndMakeExecutableIfShebang(
+  sourcePath: string,
+  outPath: string,
+  bytes: number = 256,
+): Promise<void> {
+  const fd = await fsp.open(sourcePath, "r");
+  let shebangFound = false;
+  try {
+    const { buffer, bytesRead } = await fd.read(Buffer.alloc(bytes), 0, bytes);
+    shebangFound = hasShebang(buffer.subarray(0, bytesRead).toString());
+  } finally {
+    await fd.close();
+  }
+
+  await fsp.copyFile(sourcePath, outPath);
+
+  if (shebangFound) {
+    await makeExecutable(outPath);
+  }
+}
+
 export function hasShebang(code: string): boolean {
   return SHEBANG_RE.test(code);
 }

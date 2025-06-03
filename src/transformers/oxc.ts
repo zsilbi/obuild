@@ -148,7 +148,7 @@ export const oxcTransformer: Transformer = async (
       transformedFile,
       options.minify,
     );
-    
+
     return [minifiedFile, ...sourceMapFiles, ...declarationFiles];
   }
 

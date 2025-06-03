@@ -206,6 +206,13 @@ export const TsxComponent = () => {
 ",
   ],
   [
+    "raw/cli.mjs",
+    "#!/usr/bin/env node
+
+console.log("hello world");
+",
+  ],
+  [
     "runtime/assets/demo.css",
     "/*! modern-normalize v3.0.1 | MIT License | https://github.com/sindresorhus/modern-normalize */
 /*
