@@ -10,6 +10,7 @@
     "composite": true,
     "allowImportingTsExtensions": true,
     "isolatedDeclarations": true,
+    "verbatimModuleSyntax": true,
     "jsx": "preserve"
   },
   "include": ["src", "test"]

@@ -13,8 +13,8 @@ console.log("hello world");
   ],
   [
     "dts/a-types.d.mts",
-    "import { UserID } from "./b-types.mjs";
-import { Status } from "./c-types.mjs";
+    "import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
 export interface User {
     id: UserID;
     name: string;
@@ -52,9 +52,9 @@ export default _default;
   ],
   [
     "dts/module.d.mts",
-    "import { User } from "./a-types.mjs";
-import { UserID } from "./b-types.mjs";
-import { Status } from "./c-types.mjs";
+    "import type { User } from "./a-types.mjs";
+import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
 import { Role } from "./dir/index.mjs";
 export type A = typeof import("./a-types.mjs");
 export type B = typeof import("./b-types.mjs");

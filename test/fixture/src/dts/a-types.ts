@@ -1,5 +1,5 @@
-import { UserID } from "./b-types.js";
-import { Status } from "./c-types.ts";
+import type { UserID } from "./b-types.js";
+import type { Status } from "./c-types.ts";
 
 // Interfaces
 export interface User {

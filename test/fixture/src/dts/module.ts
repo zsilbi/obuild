@@ -1,7 +1,7 @@
 // @ts-expect-error - Testing module resolution with different import styles
-import { User } from "./a-types"; // No extension
-import { UserID } from "./b-types.js"; // .js extension
-import { Status } from "./c-types.ts"; // .ts extension
+import type { User } from "./a-types"; // No extension
+import type { UserID } from "./b-types.js"; // .js extension
+import type { Status } from "./c-types.ts"; // .ts extension
 // @ts-expect-error
 import { Role } from "./dir"; // Directory import
 

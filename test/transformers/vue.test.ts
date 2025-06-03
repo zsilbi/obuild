@@ -2,9 +2,9 @@ import { describe, test, expect } from "vitest";
 
 import {
   vueTransformer,
-  VueTransformerOptions,
+  type VueTransformerOptions,
 } from "../../src/transformers/vue.ts";
-import { InputFile } from "../../src/transformers/types.ts";
+import type { InputFile } from "../../src/transformers/types.ts";
 
 describe("Vue transformer", () => {
   const vueTransform = async (
