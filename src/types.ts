@@ -8,12 +8,12 @@ import type {
 
 import type { PackageJson } from "pkg-types";
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
+import type { DeclarationOptions } from "./builders/declarations/dts.ts";
 import type {
   Transformer,
   TransformerName,
   TransformerOptions,
 } from "./transformers/types.ts";
-import type { DeclarationOptions } from "./builders/utils/dts.ts";
 
 export interface BuildContext {
   pkgDir: string;

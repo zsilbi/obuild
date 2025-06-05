@@ -7,8 +7,10 @@ import { fmtPath } from "../utils.ts";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
-import { getVueDeclarations } from "./utils/vue-dts.ts";
-import { getDeclarations, normalizeCompilerOptions } from "./utils/dts.ts";
+import { getVueDeclarations } from "./declarations/vue-dts.ts";
+
+import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
+import type { BuildContext, TransformEntry } from "../types.ts";
 
 import {
   hasFileShebang,
@@ -16,9 +18,12 @@ import {
   makeExecutable,
 } from "./plugins/shebang.ts";
 
-import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
-import type { BuildContext, TransformEntry } from "../types.ts";
-import type { DeclarationOptions, DeclarationOutput } from "./utils/dts.ts";
+import {
+  getDeclarations,
+  normalizeCompilerOptions,
+  type DeclarationOutput,
+  type DeclarationOptions,
+} from "./declarations/dts.ts";
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
