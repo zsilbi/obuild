@@ -63,17 +63,21 @@ function resolveTransformers(
 export function createTransformer(options: CreateTransformerOptions): {
   transformFile: TransformFile;
 } {
-  const resolvedTransformers = resolveTransformers(
-    options.transformers || defaultTransformers,
-  );
+  const {
+    transformers = defaultTransformers,
+    tsConfig,
+    ...transformerOptions
+  } = options;
+
+  const resolvedTransformers = resolveTransformers(transformers);
 
   const transformFile = async function (
     input: InputFile,
   ): Promise<OutputFile[]> {
     const context: TransformerContext = {
       transformFile,
-      options,
-      tsConfig: options.tsConfig,
+      tsConfig,
+      options: transformerOptions,
     };
 
     for (const transformer of resolvedTransformers) {
