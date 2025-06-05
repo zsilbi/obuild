@@ -12,7 +12,7 @@ import type {
   MinifiedSourceMapFile,
   ProcessableFile,
   SourceMapFile,
-  TransformSourceMapFile,
+  TransformedSourceMapFile,
 } from "./types.ts";
 
 export function replaceExtension(
@@ -107,7 +107,7 @@ export function rewriteSpecifiers(
 }
 
 export function mergeSourceMapFiles(
-  transformedSourceMapFile?: Readonly<TransformSourceMapFile>,
+  transformedSourceMapFile?: Readonly<TransformedSourceMapFile>,
   minifiedSourceMapFile?: Readonly<MinifiedSourceMapFile>,
 ): SourceMapFile | undefined {
   if (!transformedSourceMapFile) {

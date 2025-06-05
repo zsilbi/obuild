@@ -19,7 +19,7 @@ export interface MinifiedFile extends ProcessableFile {
   type: "minified";
 }
 
-export interface TransformSourceMapFile extends SourceMapFile {
+export interface TransformedSourceMapFile extends SourceMapFile {
   origin: "transformed";
 }
 
