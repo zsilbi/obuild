@@ -75,12 +75,17 @@ async function processFile(
     return minify(file, options.minify);
   }
 
-  const [transformedFile, declarationFile, transformedSourceMapFile] =
-    await transform(rewriteSpecifiers(file, options), options.transform);
+  const transformOutput = await transform(
+    rewriteSpecifiers(file, options),
+    options.transform,
+  );
 
   if (!options.minify) {
-    return [transformedFile, declarationFile, transformedSourceMapFile];
+    return transformOutput;
   }
+
+  const [transformedFile, declarationFile, transformedSourceMapFile] =
+    transformOutput;
 
   const [minifiedFile, minifiedSourceMapFile] = await minify(
     transformedFile,
@@ -92,5 +97,5 @@ async function processFile(
     minifiedSourceMapFile,
   );
 
-  return [minifiedFile, mergedSourceMapFile, declarationFile];
+  return [minifiedFile, declarationFile, mergedSourceMapFile];
 }
