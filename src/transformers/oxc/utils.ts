@@ -107,8 +107,8 @@ export function rewriteSpecifiers(
 }
 
 export function mergeSourceMapFiles(
-  transformedSourceMapFile?: Readonly<TransformedSourceMapFile>,
-  minifiedSourceMapFile?: Readonly<MinifiedSourceMapFile>,
+  transformedSourceMapFile: Readonly<TransformedSourceMapFile> | undefined,
+  minifiedSourceMapFile: Readonly<MinifiedSourceMapFile> | undefined,
 ): SourceMapFile | undefined {
   if (!transformedSourceMapFile) {
     return minifiedSourceMapFile;
