@@ -5,9 +5,10 @@ import MagicString from "magic-string";
 import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
 
-import type { ProcessableFile } from "./types.ts";
+import type { ProcessableFile, SourceMapFile } from "./types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
+import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
 export function replaceExtension(
   path: string,
@@ -97,5 +98,34 @@ export function rewriteSpecifiers(
   return {
     ...file,
     contents: magicString.toString(),
+  };
+}
+
+export function mergeSourceMapFiles(
+  transformSourceMapFile?: SourceMapFile,
+  minifiedSourceMapFile?: SourceMapFile,
+): SourceMapFile | undefined {
+  if (!transformSourceMapFile) {
+    return minifiedSourceMapFile;
+  }
+
+  if (!minifiedSourceMapFile) {
+    return transformSourceMapFile;
+  }
+
+  // The source map is based on the minified code
+  const generator = SourceMapGenerator.fromSourceMap(
+    new SourceMapConsumer(minifiedSourceMapFile.map),
+  );
+
+  // Apply the transformed source map to the minified map
+  generator.applySourceMap(new SourceMapConsumer(transformSourceMapFile.map));
+
+  return {
+    ...transformSourceMapFile,
+    map: {
+      ...generator.toJSON(),
+      file: basename(replaceExtension(minifiedSourceMapFile.path)),
+    },
   };
 }

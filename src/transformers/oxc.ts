@@ -5,7 +5,7 @@ import {
 } from "./oxc/config.ts";
 import { transform } from "./oxc/transform.ts";
 import { minify } from "./oxc/minify.ts";
-import { rewriteSpecifiers } from "./oxc/utils.ts";
+import { mergeSourceMapFiles, rewriteSpecifiers } from "./oxc/utils.ts";
 
 import type { OutputFile, Transformer, TransformResult } from "./types.ts";
 import type { ProcessOptions, ProcessableFile } from "./oxc/types.ts";
@@ -85,8 +85,12 @@ async function processFile(
   const [minifiedFile, sourceMapFile] = await minify(
     transformedFile,
     options.minify,
-    transformSourceMapFile,
   );
 
-  return [minifiedFile, sourceMapFile, declarationFile];
+  const mergedSourceMapFile = mergeSourceMapFiles(
+    transformSourceMapFile,
+    sourceMapFile,
+  );
+
+  return [minifiedFile, mergedSourceMapFile, declarationFile];
 }

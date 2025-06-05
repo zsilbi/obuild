@@ -110,7 +110,7 @@ export { src_default as default, test };",
   ],
   [
     "min/components/jsx.mjs.map",
-    "{"version":3,"sources":["../../../../src/min/components/jsx.jsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAC/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","sourcesContent":["export const JsxComponent = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"],"file":"jsx.mjs"}",
+    "{"version":3,"sources":["../../../../src/min/components/jsx.jsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAC/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","file":"jsx.mjs","sourcesContent":["export const JsxComponent = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"]}",
   ],
   [
     "min/components/tsx.d.mts",
@@ -124,7 +124,7 @@ export declare const TsxComponent: any;
   ],
   [
     "min/components/tsx.mjs.map",
-    "{"version":3,"sources":["../../../../src/min/components/tsx.tsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAE/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","sourcesContent":["// @ts-nocheck\nexport const TsxComponent: any = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"],"file":"tsx.mjs"}",
+    "{"version":3,"sources":["../../../../src/min/components/tsx.tsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAE/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","file":"tsx.mjs","sourcesContent":["// @ts-nocheck\nexport const TsxComponent: any = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"]}",
   ],
   [
     "min/modules/js-module.js",
@@ -153,7 +153,7 @@ export declare const TsxComponent: any;
   ],
   [
     "min/modules/ts-module.mjs.map",
-    "{"version":3,"sources":["../../../../src/min/modules/ts-module.ts"],"names":[],"mappings":"AAAA,OAAO,SAAS,UAAW,CAC1B,MAAO,WACP","sourcesContent":["export function tsModule(): string {\n  return \"ts-module\";\n}\n"],"file":"ts-module.mjs"}",
+    "{"version":3,"sources":["../../../../src/min/modules/ts-module.ts"],"names":[],"mappings":"AAAA,OAAO,SAAS,UAAW,CAC1B,MAAO,WACP","file":"ts-module.mjs","sourcesContent":["export function tsModule(): string {\n  return \"ts-module\";\n}\n"]}",
   ],
   [
     "raw/cli.mjs",

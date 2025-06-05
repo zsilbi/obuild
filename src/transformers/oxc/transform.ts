@@ -64,11 +64,6 @@ export async function transform(
     return [transformedFile, declarationFile];
   }
 
-  const transformedFileName = replaceExtension(
-    basename(input.path),
-    input.extension,
-  );
-
   const sourceMapFile: SourceMapFile = {
     srcPath: input.srcPath,
     path: input.path,
@@ -76,7 +71,7 @@ export async function transform(
     type: "source-map",
     map: {
       ...sourceMap,
-      file: transformedFileName,
+      file: replaceExtension(basename(input.path), input.extension),
       version: String(sourceMap.version),
     },
   };
