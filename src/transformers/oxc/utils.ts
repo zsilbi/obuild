@@ -1,14 +1,14 @@
+import MagicString from "magic-string";
 import { pathToFileURL } from "node:url";
 import { basename, dirname, extname, join, relative } from "pathe";
 import { sourceConfig } from "./config.ts";
-import MagicString from "magic-string";
 import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
+import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
 import type { ProcessableFile, SourceMapFile } from "./types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
-import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
 export function replaceExtension(
   path: string,
@@ -102,8 +102,8 @@ export function rewriteSpecifiers(
 }
 
 export function mergeSourceMapFiles(
-  transformSourceMapFile?: SourceMapFile,
-  minifiedSourceMapFile?: SourceMapFile,
+  transformSourceMapFile?: Readonly<SourceMapFile>,
+  minifiedSourceMapFile?: Readonly<SourceMapFile>,
 ): SourceMapFile | undefined {
   if (!transformSourceMapFile) {
     return minifiedSourceMapFile;

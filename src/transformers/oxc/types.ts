@@ -1,9 +1,10 @@
 import type { OutputFile } from "../types.ts";
-export type { SourceMapFile } from "../types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
+
+export type { SourceMapFile } from "../types.ts";
 
 export type ProcessableFile = OutputFile & {
   contents: string;
