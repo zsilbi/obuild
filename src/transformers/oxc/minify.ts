@@ -4,14 +4,10 @@ import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 import { minify as oxcMinify } from "oxc-minify";
 
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
-import type {
-  MinifiedFile,
-  SourceMapFile,
-  TransformableFile,
-} from "./types.ts";
+import type { MinifiedFile, SourceMapFile, ProcessableFile } from "./types.ts";
 
 export async function minify(
-  input: Readonly<TransformableFile>,
+  input: Readonly<ProcessableFile>,
   options?: OxcMinifyOptions,
   transformSourceMapFile?: Readonly<SourceMapFile>,
 ): Promise<[MinifiedFile] | [MinifiedFile, SourceMapFile]> {

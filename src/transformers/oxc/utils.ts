@@ -5,7 +5,7 @@ import MagicString from "magic-string";
 import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
 
-import type { TransformableFile } from "./types.ts";
+import type { ProcessableFile } from "./types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
 
@@ -29,12 +29,12 @@ export function replaceExtension(
 }
 
 export function rewriteSpecifiers(
-  file: Readonly<TransformableFile>,
+  file: Readonly<ProcessableFile>,
   options?: {
     parser?: OxcParserOptions;
     resolve?: ExsolveOptions;
   },
-): TransformableFile {
+): ProcessableFile {
   const { srcPath } = file;
 
   if (srcPath === undefined) {

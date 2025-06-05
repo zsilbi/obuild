@@ -7,16 +7,16 @@ import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type {
   DeclarationFile,
   SourceMapFile,
-  TransformableFile,
+  ProcessableFile,
 } from "./types.ts";
 
 export async function transform(
-  input: Readonly<TransformableFile>,
+  input: Readonly<ProcessableFile>,
   options?: OxcTransformOptions,
 ): Promise<
-  | [TransformableFile]
-  | [TransformableFile, DeclarationFile]
-  | [TransformableFile, DeclarationFile, SourceMapFile]
+  | [ProcessableFile]
+  | [ProcessableFile, DeclarationFile]
+  | [ProcessableFile, DeclarationFile, SourceMapFile]
 > {
   const {
     code: transformedCode,

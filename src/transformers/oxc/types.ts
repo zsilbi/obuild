@@ -5,16 +5,16 @@ import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
 
-export type TransformableFile = OutputFile & {
+export type ProcessableFile = OutputFile & {
   contents: string;
   extension: string;
 };
 
-export type DeclarationFile = TransformableFile & {
+export type DeclarationFile = ProcessableFile & {
   type: "declaration";
 };
 
-export type MinifiedFile = TransformableFile & {
+export type MinifiedFile = ProcessableFile & {
   type: "minified";
 };
 

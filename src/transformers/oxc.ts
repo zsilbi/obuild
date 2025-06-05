@@ -8,7 +8,7 @@ import { minify } from "./oxc/minify.ts";
 import { rewriteSpecifiers } from "./oxc/utils.ts";
 
 import type { OutputFile, Transformer, TransformResult } from "./types.ts";
-import type { ProcessOptions, TransformableFile } from "./oxc/types.ts";
+import type { ProcessOptions, ProcessableFile } from "./oxc/types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
@@ -64,7 +64,7 @@ export const oxcTransformer: Transformer = async (
 };
 
 async function processFile(
-  file: TransformableFile,
+  file: Readonly<ProcessableFile>,
   options: ProcessOptions,
 ): Promise<Array<OutputFile | undefined>> {
   if (!options.sourceConfig.transform) {
