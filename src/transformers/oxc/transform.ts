@@ -3,16 +3,16 @@ import { basename } from "pathe";
 import { replaceExtension } from "./utils.ts";
 import { transform as oxcTransform } from "oxc-transform";
 
-import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type {
   DeclarationFile,
   ProcessableFile,
+  ProcessOptions,
   TransformedSourceMapFile,
 } from "./types.ts";
 
 export async function transform(
   input: Readonly<ProcessableFile>,
-  options?: OxcTransformOptions,
+  options?: ProcessOptions["transform"],
 ): Promise<
   | [ProcessableFile]
   | [ProcessableFile, DeclarationFile]

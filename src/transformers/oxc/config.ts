@@ -76,18 +76,18 @@ export function resolveProcessOptions(
     sourcemap,
   };
 
-  const minify: OxcMinifyOptions | false =
+  const minify: OxcMinifyOptions | undefined =
     options?.minify === true
       ? { sourcemap }
       : options?.minify
         ? { ...options?.minify, sourcemap }
-        : false;
+        : undefined;
 
   return {
     resolve,
     parser,
     transform,
     minify,
-    sourceConfig: sourceConfig,
+    sourceConfig,
   };
 }

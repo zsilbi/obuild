@@ -34,7 +34,7 @@ export interface OxcTransformerOptions {
      *
      * Defaults to `false` if not provided.
      */
-    minify?: boolean | OxcMinifyOptions;
+    minify?: OxcMinifyOptions | boolean;
   };
 }
 

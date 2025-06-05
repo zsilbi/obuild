@@ -2,16 +2,16 @@ import { basename } from "pathe";
 import { replaceExtension } from "./utils.ts";
 import { minify as oxcMinify } from "oxc-minify";
 
-import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
 import type {
   MinifiedFile,
   ProcessableFile,
   MinifiedSourceMapFile,
+  ProcessOptions,
 } from "./types.ts";
 
 export async function minify(
   input: Readonly<ProcessableFile>,
-  options?: OxcMinifyOptions,
+  options?: ProcessOptions["minify"],
 ): Promise<[MinifiedFile] | [MinifiedFile, MinifiedSourceMapFile]> {
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,

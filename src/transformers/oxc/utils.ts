@@ -6,11 +6,10 @@ import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
 import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
-import type { ResolveOptions as ExsolveOptions } from "exsolve";
-import type { ParserOptions as OxcParserOptions } from "oxc-parser";
 import type {
   MinifiedSourceMapFile,
   ProcessableFile,
+  ProcessOptions,
   SourceMapFile,
   TransformedSourceMapFile,
 } from "./types.ts";
@@ -36,10 +35,7 @@ export function replaceExtension(
 
 export function rewriteSpecifiers(
   file: Readonly<ProcessableFile>,
-  options?: {
-    parser?: OxcParserOptions;
-    resolve?: ExsolveOptions;
-  },
+  options?: Pick<ProcessOptions, "resolve" | "parser">,
 ): ProcessableFile {
   const { srcPath } = file;
 
