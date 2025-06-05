@@ -29,7 +29,7 @@ export const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
   ".cjs": {},
 };
 
-export const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
+const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
 
 /**
  * @param input - The input file to process.
@@ -42,7 +42,7 @@ export function resolveProcessOptions(
 ): ProcessOptions | undefined {
   const processSourceConfig = sourceConfig[input.extension];
 
-  if (DECLARATION_RE.test(input.path) || processSourceConfig === undefined) {
+  if (processSourceConfig === undefined || DECLARATION_RE.test(input.path)) {
     return;
   }
 
