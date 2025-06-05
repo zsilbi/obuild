@@ -1,0 +1,101 @@
+import { pathToFileURL } from "node:url";
+import { basename, dirname, extname, join, relative } from "pathe";
+import { sourceConfig } from "./config.ts";
+import MagicString from "magic-string";
+import { resolveModulePath } from "exsolve";
+import { parseSync as oxcParse } from "oxc-parser";
+
+import type { TransformableFile } from "./types.ts";
+import type { ResolveOptions as ExsolveOptions } from "exsolve";
+import type { ParserOptions as OxcParserOptions } from "oxc-parser";
+
+export function replaceExtension(
+  path: string,
+  targetExtension?: string,
+): string {
+  const sourceExtension = extname(path);
+
+  if (targetExtension === undefined) {
+    const config = sourceConfig[sourceExtension];
+
+    if (config?.extension === undefined) {
+      return path;
+    }
+
+    targetExtension = config.extension;
+  }
+
+  return join(dirname(path), basename(path, sourceExtension)) + targetExtension;
+}
+
+export function rewriteSpecifiers(
+  file: Readonly<TransformableFile>,
+  options?: {
+    parser?: OxcParserOptions;
+    resolve?: ExsolveOptions;
+  },
+): TransformableFile {
+  const { srcPath } = file;
+
+  if (srcPath === undefined) {
+    // Skip rewriting if srcPath is not available
+    return { ...file };
+  }
+
+  const parsed = oxcParse(file.path, file.contents, options?.parser);
+
+  if (parsed.errors.length > 0) {
+    throw new Error(`Errors while parsing ${file.path}:`, {
+      cause: parsed.errors,
+    });
+  }
+
+  const magicString = new MagicString(file.contents);
+
+  // Rewrite relative imports
+  const updatedStarts = new Set<number>();
+  const rewriteSpecifier = (req: {
+    value: string;
+    start: number;
+    end: number;
+  }) => {
+    const moduleId = req.value;
+    if (!moduleId.startsWith(".")) {
+      return;
+    }
+    if (updatedStarts.has(req.start)) {
+      return; // prevent double rewritings
+    }
+    updatedStarts.add(req.start);
+    const resolvedAbsolute = resolveModulePath(moduleId, {
+      ...options?.resolve,
+      from: pathToFileURL(srcPath),
+    });
+    const newId = relative(
+      dirname(srcPath),
+      replaceExtension(resolvedAbsolute),
+    );
+    magicString.remove(req.start, req.end);
+    magicString.prependLeft(
+      req.start,
+      JSON.stringify(newId.startsWith(".") ? newId : `./${newId}`),
+    );
+  };
+
+  for (const staticImport of parsed.module.staticImports) {
+    rewriteSpecifier(staticImport.moduleRequest);
+  }
+
+  for (const staticExport of parsed.module.staticExports) {
+    for (const staticExportEntry of staticExport.entries) {
+      if (staticExportEntry.moduleRequest) {
+        rewriteSpecifier(staticExportEntry.moduleRequest);
+      }
+    }
+  }
+
+  return {
+    ...file,
+    contents: magicString.toString(),
+  };
+}
