@@ -10,6 +10,13 @@ import type {
   TransformedSourceMapFile,
 } from "./types.ts";
 
+/**
+ * Transforms the given input file using oxc-transform.
+ *
+ * @param input - The input file to transform.
+ * @param options - Optional transformation options.
+ * @returns An array containing the transformed file, and optionally a declaration file and a source map file.
+ */
 export async function transform(
   input: Readonly<ProcessableFile>,
   options?: ProcessOptions["transform"],

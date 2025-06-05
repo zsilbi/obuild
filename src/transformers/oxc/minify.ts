@@ -9,6 +9,13 @@ import type {
   ProcessOptions,
 } from "./types.ts";
 
+/**
+ * Minifies the given input file using oxc-minify.
+ *
+ * @param input - The input file to minify.
+ * @param options - Optional minification options.
+ * @returns An array containing the minified file and optionally a source map file.
+ */
 export async function minify(
   input: Readonly<ProcessableFile>,
   options?: ProcessOptions["minify"],

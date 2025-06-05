@@ -117,8 +117,8 @@ export async function transformDir(
  * Files marked with `declaration: true` will be processed.
  *
  * @param files - The output files to check. Files marked with `skip` or without a `srcPath` will be ignored.
- * @param context - The build context containing package directory and options.
- * @param entry - The transform entry containing declaration options and output directory.
+ * @param context - Build context
+ * @param entry - Transform entry
  * @returns A promise that resolves when declaration generation is complete.
  */
 async function generateDeclarations(
@@ -194,7 +194,7 @@ function renameFiles(files: OutputFile[]): void {
 /**
  * Rewrite source map sources to relative paths.
  *
- * @param files - The output files to process.
+ * @param files - The files to process.
  * @param entry - The transform entry containing the output directory.
  */
 function rewriteSourceMapSources(

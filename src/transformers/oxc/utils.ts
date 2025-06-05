@@ -14,6 +14,13 @@ import type {
   TransformedSourceMapFile,
 } from "./types.ts";
 
+/**
+ * Replaces the file extension of a given path with a target extension.
+ *
+ * @param path - The file path to modify.
+ * @param targetExtension - The target file extension to replace the current one with. If not provided, it will be determined based on the source extension.
+ * @returns The modified file path with the target extension.
+ */
 export function replaceExtension(
   path: string,
   targetExtension?: string,
@@ -29,6 +36,13 @@ export function replaceExtension(
   return join(dirname(path), basename(path, sourceExtension)) + targetExtension;
 }
 
+/**
+ * Rewrites relative import specifiers in the given file to absolute paths.
+ *
+ * @param file - The file to process.
+ * @param options - Optional options for resolving module paths and parsing.
+ * @returns A new file with rewritten specifiers for relative imports and exports. If the file does not have a `srcPath`, it will return the original file without modifications.
+ */
 export function rewriteSpecifiers(
   file: Readonly<ProcessableFile>,
   options?: Pick<ProcessOptions, "resolve" | "parser">,

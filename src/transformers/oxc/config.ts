@@ -9,6 +9,12 @@ import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
 
 const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
 
+/**
+ * Configuration for processing source files based on their extensions.
+ * Maps file extensions to their processing configurations, including transformation type and target extension.
+ *
+ * If a file extension is not listed, it will not be processed by the transformer/minifier.
+ */
 const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
   ".ts": {
     transform: "ts",
@@ -31,6 +37,12 @@ const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
   ".cjs": {},
 };
 
+/**
+ * Returns the target extension for a given source extension.
+ *
+ * @param sourceExtension - The source file extension to get the target extension for.
+ * @returns The target file extension for the given source extension, or undefined if not found.
+ */
 export function getTargetExtension(
   sourceExtension: string,
 ): string | undefined {
@@ -38,6 +50,8 @@ export function getTargetExtension(
 }
 
 /**
+ * Resolves the process options for a given input file based on its extension and the provided context.
+ *
  * @param input - The input file to process.
  * @param context - Transformer context
  * @returns ProcessOptions or undefined if the input file should not be processed.
