@@ -1,3 +1,3 @@
-export function tsModule() {
-  return "js-module";
+export function tsModule(): string {
+  return "ts-module";
 }

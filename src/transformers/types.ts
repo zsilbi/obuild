@@ -1,3 +1,4 @@
+import type { RawSourceMap } from "source-map-js";
 import type { OxcTransformerOptions } from "./oxc.ts";
 import type { PostcssTransformerOptions } from "./postcss.ts";
 import type { VueTransformerOptions } from "./vue.ts";
@@ -81,13 +82,7 @@ export interface OutputFile extends File {
   /**
    * Type of the output file, which can be one of:
    */
-  type?:
-    | "code"
-    | "minified"
-    | "declaration"
-    | "source"
-    | "source-map"
-    | "asset";
+  type?: "code" | "minified" | "declaration" | "source-map" | "asset";
 
   /**
    * Generate declaration files after the transformations.
@@ -100,6 +95,15 @@ export interface OutputFile extends File {
    * When true, the file contents are ignored and copied directly from the source.
    */
   raw?: boolean;
+}
+
+export interface SourceMapFile extends OutputFile {
+  type: "source-map";
+
+  /**
+   * The source map associated with the output file.
+   */
+  map: RawSourceMap;
 }
 
 export type TransformResult = OutputFile[] | undefined;

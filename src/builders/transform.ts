@@ -16,7 +16,7 @@ import { readTSConfig, type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./utils/vue-dts.ts";
 import { fmtPath } from "../utils.ts";
-import type { OutputFile } from "../transformers/types.ts";
+import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
 import {
   hasFileShebang,
@@ -29,6 +29,7 @@ import {
   type DeclarationOptions,
   type DeclarationOutput,
 } from "./utils/dts.ts";
+import { relative } from "node:path";
 
 /**
  * Transform all files in a directory using oxc-transform.
@@ -122,6 +123,18 @@ export async function transformDir(
       dirname(output.path),
       basename(output.path, originalExtension) + output.extension,
     );
+  }
+
+  const sourceMapFiles = outputFiles.filter(
+    (file): file is SourceMapFile => file?.type === "source-map",
+  );
+
+  // Rewrite source maps to relative paths and serialize them
+  for (const sourceMapFile of sourceMapFiles) {
+    sourceMapFile.map.sources = sourceMapFile.map.sources.map((source) => {
+      return relative(join(entry.outDir!, source), join(entry.input, source));
+    });
+    sourceMapFile.contents = JSON.stringify(sourceMapFile.map);
   }
 
   const outputPromises: Promise<string>[] = outputFiles

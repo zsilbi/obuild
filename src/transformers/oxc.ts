@@ -15,10 +15,12 @@ import type { MinifyOptions as ExternalOxcMinifyOptions } from "oxc-minify";
 import type {
   InputFile,
   OutputFile,
+  SourceMapFile,
   Transformer,
   TransformerContext,
   TransformResult,
 } from "./types.ts";
+import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
 export interface OxcTransformerOptions {
   oxc?: {
@@ -50,19 +52,11 @@ type TransformableFile = OutputFile & {
   extension: string;
 };
 
-type SourceFile = OutputFile & {
-  type: "source";
-};
-
-type SourceMapFile = OutputFile & {
-  type: "source-map";
-};
-
-type DeclarationFile = OutputFile & {
+type DeclarationFile = TransformableFile & {
   type: "declaration";
 };
 
-type MinifiedFile = OutputFile & {
+type MinifiedFile = TransformableFile & {
   type: "minified";
 };
 
@@ -71,6 +65,14 @@ type ExtensionConfig = {
   declaration?: boolean;
   language?: ExternalOxcParserOptions["lang"];
   outputExtension?: `.${string}`;
+};
+
+type ProcessOptions = {
+  resolve: ExsolveOptions;
+  parser: ExternalOxcParserOptions;
+  transform: ExternalOxcTransformOptions;
+  minify: ExternalOxcMinifyOptions | false | undefined;
+  extensionConfig: ExtensionConfig;
 };
 
 const extensionConfigs: Record<string, ExtensionConfig | undefined> = {
@@ -109,57 +111,60 @@ export const oxcTransformer: Transformer = async (
   input,
   context,
 ): Promise<TransformResult> => {
-  if (DECLARATION_RE.test(input.path)) {
-    return;
-  }
-
   const extensionConfig = extensionConfigs[input.extension];
 
-  if (extensionConfig === undefined) {
+  if (DECLARATION_RE.test(input.path) || extensionConfig === undefined) {
     return;
   }
 
-  const options = resolveOptions(input, context, extensionConfig);
-  const codeFile: TransformableFile = {
-    path: input.path,
-    srcPath: input.srcPath,
-    extension: extensionConfig.outputExtension || input.extension,
-    contents: await input.getContents(),
-    type: "code",
-  };
-
-  if (!extensionConfig.transform) {
-    if (options.minify) {
-      return minify(codeFile, options.minify);
-    }
-
-    codeFile.raw = true;
-
-    return [codeFile];
-  }
-
-  const [transformedFile, ...declarationFiles] = await transform(
-    rewriteSpecifiers(codeFile, options),
-    options.transform,
+  const options = resolveProcessOptions(input, context, extensionConfig);
+  const outputFiles = await processFile(
+    {
+      path: input.path,
+      srcPath: input.srcPath,
+      extension: extensionConfig.outputExtension || input.extension,
+      contents: await input.getContents(),
+      type: "code",
+    },
+    options,
   );
 
-  if (options.minify) {
-    const [minifiedFile, ...sourceMapFiles] = minify(
-      transformedFile,
-      options.minify,
-    );
-
-    return [minifiedFile, ...sourceMapFiles, ...declarationFiles];
-  }
-
-  return [transformedFile, ...declarationFiles];
+  return outputFiles.filter((file) => file !== undefined);
 };
 
-function resolveOptions(
+async function processFile(
+  file: TransformableFile,
+  options: ProcessOptions,
+): Promise<Array<OutputFile | undefined>> {
+  if (!options.extensionConfig.transform) {
+    if (!options.minify) {
+      return [{ ...file, raw: true }];
+    }
+
+    return minify(file, options.minify);
+  }
+
+  const [transformedFile, declarationFile, transformSourceMapFile] =
+    await transform(rewriteSpecifiers(file, options), options.transform);
+
+  if (!options.minify) {
+    return [transformedFile, declarationFile, transformSourceMapFile];
+  }
+
+  const [minifiedFile, sourceMapFile] = await minify(
+    transformedFile,
+    options.minify,
+    transformSourceMapFile,
+  );
+
+  return [minifiedFile, sourceMapFile, declarationFile];
+}
+
+function resolveProcessOptions(
   input: InputFile,
   context: TransformerContext,
-  config: ExtensionConfig,
-) {
+  extensionConfig: ExtensionConfig,
+): ProcessOptions {
   const { oxc: options } = context.options;
 
   const resolve: ExsolveOptions = {
@@ -177,9 +182,13 @@ function resolveOptions(
   };
 
   const parser: ExternalOxcParserOptions = {
-    lang: config.language,
+    lang: extensionConfig.language,
     sourceType: "module",
   };
+
+  const sourcemap =
+    (typeof options?.minify === "object" && options.minify.sourcemap) ||
+    options?.transform?.sourcemap;
 
   const transform: ExternalOxcTransformOptions = {
     ...options?.transform,
@@ -191,27 +200,45 @@ function resolveOptions(
         stripInternal: true,
       },
       ...options?.transform?.typescript,
-      ...(config.declaration === false ? { declaration: undefined } : {}),
+      ...(extensionConfig.declaration === false
+        ? { declaration: undefined }
+        : {}),
     },
+    sourcemap,
   };
 
   const minify: ExternalOxcMinifyOptions | false | undefined =
-    options?.minify === true ? {} : options?.minify;
+    options?.minify === true
+      ? { sourcemap }
+      : options?.minify === undefined
+        ? undefined
+        : { ...options?.minify, sourcemap };
 
   return {
     resolve,
     parser,
     transform,
     minify,
+    extensionConfig,
   };
 }
 
 async function transform(
   input: Readonly<TransformableFile>,
-  options: ExternalOxcTransformOptions,
-): Promise<[TransformableFile] | [TransformableFile, DeclarationFile]> {
-  const result = oxcTransform.transform(input.path, input.contents, options);
-  const errors = result.errors.filter(
+  options?: ExternalOxcTransformOptions,
+): Promise<
+  | [TransformableFile]
+  | [TransformableFile, DeclarationFile]
+  | [TransformableFile, DeclarationFile, SourceMapFile]
+> {
+  const {
+    code: transformedCode,
+    declaration,
+    map: sourceMap,
+    errors: transformErrors,
+  } = oxcTransform.transform(input.path, input.contents, options);
+
+  const errors = transformErrors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
   );
 
@@ -231,32 +258,57 @@ async function transform(
 
   const transformedFile = {
     ...input,
-    contents: result.code,
+    contents: transformedCode,
   };
 
-  if (!result.declaration) {
+  if (!declaration) {
     return [transformedFile];
   }
 
   const declarationFile: DeclarationFile = {
     srcPath: input.srcPath,
-    contents: result.declaration,
+    contents: declaration,
     path: input.path,
     extension: ".d.mts",
     type: "declaration",
   };
 
-  return [transformedFile, declarationFile];
+  if (!sourceMap) {
+    return [transformedFile, declarationFile];
+  }
+
+  const transformedFileName = replaceExtension(
+    basename(input.path),
+    input.extension,
+  );
+
+  const sourceMapFile: SourceMapFile = {
+    srcPath: input.srcPath,
+    path: input.path,
+    extension: `${input.extension}.map`,
+    type: "source-map",
+    map: {
+      ...sourceMap,
+      file: transformedFileName,
+      version: String(sourceMap.version),
+    },
+  };
+
+  return [transformedFile, declarationFile, sourceMapFile];
 }
 
-function minify(
+async function minify(
   input: Readonly<TransformableFile>,
   options?: ExternalOxcMinifyOptions,
-): [MinifiedFile] | [MinifiedFile, SourceFile, SourceMapFile] {
+  transformSourceMapFile?: Readonly<SourceMapFile>,
+): Promise<[MinifiedFile] | [MinifiedFile, SourceMapFile]> {
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,
     input.contents,
-    options,
+    {
+      ...options,
+      ...(transformSourceMapFile ? { sourcemap: true } : {}),
+    },
   );
 
   const minifiedFile: MinifiedFile = {
@@ -269,34 +321,51 @@ function minify(
     return [minifiedFile];
   }
 
-  // Create a new file with the `.src` extension prefix for the source map to use as the source file
-  const sourceFile: SourceFile = {
-    ...input,
-    type: "source",
-    extension: `.src${input.extension}`,
-  };
+  const minifiedFileName = basename(replaceExtension(input.path));
 
-  sourceMap.file = replaceExtension(input.path);
-  sourceMap.sources = sourceMap.sources.map((source) => {
-    return replaceExtension(basename(source), sourceFile.extension);
-  });
+  if (!transformSourceMapFile) {
+    const sourceMapFile: SourceMapFile = {
+      srcPath: input.srcPath,
+      path: input.path,
+      extension: `${input.extension}.map`,
+      type: "source-map",
+      map: {
+        ...sourceMap,
+        file: minifiedFileName,
+        version: String(sourceMap.version),
+      },
+    };
+
+    return [minifiedFile, sourceMapFile];
+  }
+
+  // The source map is based on the minified code
+  const generator = SourceMapGenerator.fromSourceMap(
+    new SourceMapConsumer({
+      ...sourceMap,
+      version: String(sourceMap.version),
+    }),
+  );
+
+  // Apply the transformed source map to the minified map
+  generator.applySourceMap(new SourceMapConsumer(transformSourceMapFile.map));
 
   const sourceMapFile: SourceMapFile = {
-    srcPath: input.srcPath,
-    path: input.path,
-    extension: `${input.extension}.map`,
-    type: "source-map",
-    contents: JSON.stringify(sourceMap),
+    ...transformSourceMapFile,
+    map: {
+      ...generator.toJSON(),
+      file: minifiedFileName,
+    },
   };
 
-  return [minifiedFile, sourceFile, sourceMapFile];
+  return [minifiedFile, sourceMapFile];
 }
 
 function replaceExtension(path: string, targetExtension?: string): string {
   const sourceExtension = extname(path);
 
   if (targetExtension === undefined) {
-    const config = extensionConfigs[extname(path)];
+    const config = extensionConfigs[sourceExtension];
 
     if (config?.outputExtension === undefined) {
       return path;
