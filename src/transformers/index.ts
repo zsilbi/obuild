@@ -15,7 +15,7 @@ import { postcssTransformer } from "./postcss.ts";
 import { sassTransformer } from "./sass.ts";
 
 export type * from "./types.ts";
-export { mkdistLoader } from "./mkdist.ts";
+export { mkdistLoader, type MkdistLoaderOptions } from "./mkdist.ts";
 
 const transformers: Record<TransformerName, Transformer> = {
   oxc: oxcTransformer,

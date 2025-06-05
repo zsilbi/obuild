@@ -12,14 +12,14 @@ type MkdistOutputFile = Omit<OutputFile, "type"> & {
   errors?: Error[];
 };
 
-type MkdistLoaderOptions = {
+export interface MkdistLoaderOptions {
   /**
    * Declaration generation.
    *
    * Set to `false` to disable.
    */
   declaration?: boolean;
-};
+}
 
 type MkdistLoaderContext = {
   loadFile: (input: InputFile) => MaybePromise<MkdistOutputFile[]>;
