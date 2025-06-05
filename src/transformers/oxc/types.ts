@@ -38,5 +38,4 @@ export type ProcessOptions = {
   transform: OxcTransformOptions;
   minify: OxcMinifyOptions | undefined;
   sourceConfig: ProcessSourceConfig;
-  dts: boolean | undefined;
 };

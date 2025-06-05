@@ -125,6 +125,5 @@ export function resolveProcessOptions(
     transform,
     minify,
     sourceConfig: processSourceConfig,
-    dts,
   };
 }
