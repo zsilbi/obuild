@@ -70,16 +70,8 @@ export async function transformDir(
     results.flat(),
   );
 
-  if (entry.dts === false) {
-    for (const outputFile of outputFiles) {
-      if (outputFile.type === "declaration") {
-        outputFile.skip = true; // Skip declaration files if dts is false
-      }
-    }
-  } else {
-    // Post transform declaration generation
-    await generateDeclarations(outputFiles, tsConfig, entry, context);
-  }
+  // Post transform declaration generation
+  await generateDeclarations(outputFiles, tsConfig, entry, context);
 
   // Rename files to their desired extensions
   renameFiles(outputFiles);
@@ -142,6 +134,18 @@ async function generateDeclarations(
   entry: TransformEntry,
   context: BuildContext,
 ): Promise<void> {
+  if (entry.dts === false) {
+    for (const file of files) {
+      if (file.type !== "declaration" || file.declaration !== true) {
+        continue;
+      }
+
+      file.skip = true;
+    }
+
+    return;
+  }
+
   const declarationFiles: Array<OutputFile & { srcPath: string }> = [];
 
   for (const file of files) {
