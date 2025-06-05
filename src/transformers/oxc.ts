@@ -1,8 +1,4 @@
-import {
-  sourceConfig,
-  resolveProcessOptions,
-  DECLARATION_RE,
-} from "./oxc/config.ts";
+import { resolveProcessOptions } from "./oxc/config.ts";
 import { transform } from "./oxc/transform.ts";
 import { minify } from "./oxc/minify.ts";
 import { mergeSourceMapFiles, rewriteSpecifiers } from "./oxc/utils.ts";
@@ -42,18 +38,17 @@ export const oxcTransformer: Transformer = async (
   input,
   context,
 ): Promise<TransformResult> => {
-  const extensionConfig = sourceConfig[input.extension];
+  const options = resolveProcessOptions(input, context);
 
-  if (extensionConfig === undefined || DECLARATION_RE.test(input.path)) {
+  if (options === undefined) {
     return;
   }
 
-  const options = resolveProcessOptions(input, context, extensionConfig);
   const outputFiles = await processFile(
     {
       path: input.path,
       srcPath: input.srcPath,
-      extension: extensionConfig.extension || input.extension,
+      extension: options.sourceConfig.extension || input.extension,
       contents: await input.getContents(),
       type: "code",
     },

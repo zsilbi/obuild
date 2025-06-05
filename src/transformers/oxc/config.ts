@@ -31,11 +31,21 @@ export const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
 
 export const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
 
+/**
+ * @param input - The input file to process.
+ * @param context - Transformer context
+ * @returns ProcessOptions or undefined if the input file should not be processed.
+ */
 export function resolveProcessOptions(
   input: InputFile,
   context: TransformerContext,
-  sourceConfig: ProcessSourceConfig,
-): ProcessOptions {
+): ProcessOptions | undefined {
+  const processSourceConfig = sourceConfig[input.extension];
+
+  if (DECLARATION_RE.test(input.path) || processSourceConfig === undefined) {
+    return;
+  }
+
   const { oxc: options } = context.options;
 
   const resolve: ExsolveOptions = {
@@ -53,7 +63,7 @@ export function resolveProcessOptions(
   };
 
   const parser: OxcParserOptions = {
-    lang: sourceConfig.transform,
+    lang: processSourceConfig.transform,
     sourceType: "module",
   };
 
@@ -88,6 +98,6 @@ export function resolveProcessOptions(
     parser,
     transform,
     minify,
-    sourceConfig,
+    sourceConfig: processSourceConfig,
   };
 }
