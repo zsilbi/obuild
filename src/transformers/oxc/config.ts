@@ -7,7 +7,9 @@ import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
 
-export const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
+const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
+
+const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
   ".ts": {
     transform: "ts",
     extension: ".mjs",
@@ -29,7 +31,11 @@ export const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
   ".cjs": {},
 };
 
-const DECLARATION_RE: RegExp = /\.d\.[cm]?ts$/;
+export function getTargetExtension(
+  sourceExtension: string,
+): string | undefined {
+  return sourceConfig[sourceExtension]?.extension;
+}
 
 /**
  * @param input - The input file to process.

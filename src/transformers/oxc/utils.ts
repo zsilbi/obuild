@@ -1,10 +1,10 @@
 import MagicString from "magic-string";
 import { pathToFileURL } from "node:url";
 import { basename, dirname, extname, join, relative } from "pathe";
-import { sourceConfig } from "./config.ts";
 import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
 import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
+import { getTargetExtension } from "./config.ts";
 
 import type {
   MinifiedSourceMapFile,
@@ -20,14 +20,10 @@ export function replaceExtension(
 ): string {
   const sourceExtension = extname(path);
 
+  targetExtension ??= getTargetExtension(sourceExtension);
+
   if (targetExtension === undefined) {
-    const config = sourceConfig[sourceExtension];
-
-    if (config?.extension === undefined) {
-      return path;
-    }
-
-    targetExtension = config.extension;
+    return path;
   }
 
   return join(dirname(path), basename(path, sourceExtension)) + targetExtension;
