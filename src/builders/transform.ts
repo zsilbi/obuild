@@ -3,7 +3,7 @@ import { promises as fsp } from "node:fs";
 import { defu } from "defu";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
-import { fmtPath } from "../utils.ts";
+import { fmtPath, normalizePath } from "../utils.ts";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
@@ -330,9 +330,5 @@ function resolveMapDir(entry: TransformEntry, context: BuildContext): string {
     return entry.outDir!;
   }
 
-  if (path.isAbsolute(entry.mapDir)) {
-    return entry.mapDir;
-  }
-
-  return path.resolve(context.pkgDir, entry.mapDir);
+  return normalizePath(entry.mapDir, context.pkgDir);
 }

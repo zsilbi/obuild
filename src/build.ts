@@ -5,14 +5,12 @@ import type {
   BundleEntry,
 } from "./types.ts";
 
-import { fileURLToPath } from "node:url";
-import { isAbsolute, resolve } from "pathe";
 import { rm } from "node:fs/promises";
 import { consola } from "consola";
 import { colors as c } from "consola/utils";
 import { rolldownBuild } from "./builders/bundle.ts";
 import { transformDir } from "./builders/transform.ts";
-import { fmtPath, analyzeDir } from "./utils.ts";
+import { fmtPath, analyzeDir, normalizePath } from "./utils.ts";
 import prettyBytes from "pretty-bytes";
 import { readPackageJSON } from "pkg-types";
 
@@ -91,13 +89,4 @@ export async function build(config: BuildConfig): Promise<void> {
   );
 
   consola.log(`\n✅ obuild finished in ${Date.now() - start}ms`);
-}
-
-// --- utils ---
-function normalizePath(path: string | URL | undefined, resolveFrom?: string) {
-  return typeof path === "string" && isAbsolute(path)
-    ? path
-    : path instanceof URL
-      ? fileURLToPath(path)
-      : resolve(resolveFrom || ".", path || ".");
 }
