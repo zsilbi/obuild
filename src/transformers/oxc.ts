@@ -44,7 +44,7 @@ export const oxcTransformer: Transformer = async (
 ): Promise<TransformResult> => {
   const extensionConfig = sourceConfig[input.extension];
 
-  if (DECLARATION_RE.test(input.path) || extensionConfig === undefined) {
+  if (extensionConfig === undefined || DECLARATION_RE.test(input.path)) {
     return;
   }
 
