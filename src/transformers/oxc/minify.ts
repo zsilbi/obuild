@@ -3,12 +3,16 @@ import { replaceExtension } from "./utils.ts";
 import { minify as oxcMinify } from "oxc-minify";
 
 import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
-import type { MinifiedFile, SourceMapFile, ProcessableFile } from "./types.ts";
+import type {
+  MinifiedFile,
+  ProcessableFile,
+  MinifiedSourceMapFile,
+} from "./types.ts";
 
 export async function minify(
   input: Readonly<ProcessableFile>,
   options?: OxcMinifyOptions,
-): Promise<[MinifiedFile] | [MinifiedFile, SourceMapFile]> {
+): Promise<[MinifiedFile] | [MinifiedFile, MinifiedSourceMapFile]> {
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,
     input.contents,
@@ -27,11 +31,12 @@ export async function minify(
     return [minifiedFile];
   }
 
-  const sourceMapFile: SourceMapFile = {
+  const sourceMapFile: MinifiedSourceMapFile = {
     srcPath: input.srcPath,
     path: input.path,
     extension: `${input.extension}.map`,
     type: "source-map",
+    origin: "minified",
     map: {
       ...sourceMap,
       file: basename(replaceExtension(input.path)),

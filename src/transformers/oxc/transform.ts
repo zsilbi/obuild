@@ -6,8 +6,8 @@ import { transform as oxcTransform } from "oxc-transform";
 import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type {
   DeclarationFile,
-  SourceMapFile,
   ProcessableFile,
+  TransformSourceMapFile,
 } from "./types.ts";
 
 export async function transform(
@@ -16,7 +16,7 @@ export async function transform(
 ): Promise<
   | [ProcessableFile]
   | [ProcessableFile, DeclarationFile]
-  | [ProcessableFile, DeclarationFile, SourceMapFile]
+  | [ProcessableFile, DeclarationFile, TransformSourceMapFile]
 > {
   const {
     code: transformedCode,
@@ -64,11 +64,12 @@ export async function transform(
     return [transformedFile, declarationFile];
   }
 
-  const sourceMapFile: SourceMapFile = {
+  const sourceMapFile: TransformSourceMapFile = {
     srcPath: input.srcPath,
     path: input.path,
     extension: `${input.extension}.map`,
     type: "source-map",
+    origin: "transformed",
     map: {
       ...sourceMap,
       file: replaceExtension(basename(input.path), input.extension),

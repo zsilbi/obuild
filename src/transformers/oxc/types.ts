@@ -1,4 +1,4 @@
-import type { OutputFile } from "../types.ts";
+import type { OutputFile, SourceMapFile } from "../types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { TransformOptions as OxcTransformOptions } from "oxc-transform";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
@@ -6,18 +6,26 @@ import type { MinifyOptions as OxcMinifyOptions } from "oxc-minify";
 
 export type { SourceMapFile } from "../types.ts";
 
-export type ProcessableFile = OutputFile & {
+export interface ProcessableFile extends OutputFile {
   contents: string;
   extension: string;
-};
+}
 
-export type DeclarationFile = ProcessableFile & {
+export interface DeclarationFile extends ProcessableFile {
   type: "declaration";
-};
+}
 
-export type MinifiedFile = ProcessableFile & {
+export interface MinifiedFile extends ProcessableFile {
   type: "minified";
-};
+}
+
+export interface TransformSourceMapFile extends SourceMapFile {
+  origin: "transformed";
+}
+
+export interface MinifiedSourceMapFile extends SourceMapFile {
+  origin: "minified";
+}
 
 export type ProcessSourceConfig = {
   transform?: OxcParserOptions["lang"];

@@ -6,9 +6,14 @@ import { resolveModulePath } from "exsolve";
 import { parseSync as oxcParse } from "oxc-parser";
 import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
 
-import type { ProcessableFile, SourceMapFile } from "./types.ts";
 import type { ResolveOptions as ExsolveOptions } from "exsolve";
 import type { ParserOptions as OxcParserOptions } from "oxc-parser";
+import type {
+  MinifiedSourceMapFile,
+  ProcessableFile,
+  SourceMapFile,
+  TransformSourceMapFile,
+} from "./types.ts";
 
 export function replaceExtension(
   path: string,
@@ -102,15 +107,15 @@ export function rewriteSpecifiers(
 }
 
 export function mergeSourceMapFiles(
-  transformSourceMapFile?: Readonly<SourceMapFile>,
-  minifiedSourceMapFile?: Readonly<SourceMapFile>,
+  transformedSourceMapFile?: Readonly<TransformSourceMapFile>,
+  minifiedSourceMapFile?: Readonly<MinifiedSourceMapFile>,
 ): SourceMapFile | undefined {
-  if (!transformSourceMapFile) {
+  if (!transformedSourceMapFile) {
     return minifiedSourceMapFile;
   }
 
   if (!minifiedSourceMapFile) {
-    return transformSourceMapFile;
+    return transformedSourceMapFile;
   }
 
   // The source map is based on the minified code
@@ -119,10 +124,10 @@ export function mergeSourceMapFiles(
   );
 
   // Apply the transformed source map to the minified map
-  generator.applySourceMap(new SourceMapConsumer(transformSourceMapFile.map));
+  generator.applySourceMap(new SourceMapConsumer(transformedSourceMapFile.map));
 
   return {
-    ...transformSourceMapFile,
+    ...transformedSourceMapFile,
     map: {
       ...generator.toJSON(),
       file: basename(replaceExtension(minifiedSourceMapFile.path)),

@@ -75,11 +75,11 @@ async function processFile(
     return minify(file, options.minify);
   }
 
-  const [transformedFile, declarationFile, transformSourceMapFile] =
+  const [transformedFile, declarationFile, transformedSourceMapFile] =
     await transform(rewriteSpecifiers(file, options), options.transform);
 
   if (!options.minify) {
-    return [transformedFile, declarationFile, transformSourceMapFile];
+    return [transformedFile, declarationFile, transformedSourceMapFile];
   }
 
   const [minifiedFile, minifiedSourceMapFile] = await minify(
@@ -88,7 +88,7 @@ async function processFile(
   );
 
   const mergedSourceMapFile = mergeSourceMapFiles(
-    transformSourceMapFile,
+    transformedSourceMapFile,
     minifiedSourceMapFile,
   );
 
