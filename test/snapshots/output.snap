@@ -1,0 +1,536 @@
+[
+  [
+    "cli.d.mts",
+    "export { };",
+  ],
+  [
+    "cli.mjs",
+    "#!/usr/bin/env node
+//#region src/cli.ts
+console.log("hello world");
+
+//#endregion",
+  ],
+  [
+    "dts/a-types.d.mts",
+    "import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
+export interface User {
+    id: UserID;
+    name: string;
+    email: string;
+    status: Status;
+    profile?: Profile;
+}
+export interface Profile {
+    bio: string;
+    age: number;
+    interests: string[];
+}
+",
+  ],
+  [
+    "dts/b-types.d.mts",
+    "export type UserID = string | number;
+",
+  ],
+  [
+    "dts/c-types.d.mts",
+    "export type Status = "active" | "inactive" | "pending";
+",
+  ],
+  [
+    "dts/dir/index.d.mts",
+    "export declare enum Role {
+    Admin = "ADMIN",
+    User = "USER",
+    Guest = "GUEST"
+}
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts/module.d.mts",
+    "import type { User } from "./a-types.mjs";
+import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
+import { Role } from "./dir/index.mjs";
+export type A = typeof import("./a-types.mjs");
+export type B = typeof import("./b-types.mjs");
+export type C = typeof import("./c-types.mjs");
+export type Dir = typeof import("./dir/index.mjs");
+export declare class UserManager {
+    private users;
+    addUser(user: User): void;
+    getUser(id: UserID): User | undefined;
+    getAllUsers(): User[];
+}
+export declare function createUser(name: string, email: string, status?: Status): User;
+export declare function isActive(user: User): boolean;
+export declare const DEFAULT_STATUS: Status;
+export declare const ROLES: Role[];
+export type ApiResponse<T> = {
+    data: T;
+    error?: string;
+};
+export declare namespace Utils {
+    function capitalize(str: string): string;
+    function isEmail(email: string): boolean;
+}
+",
+  ],
+  [
+    "index.d.mts",
+    "//#region src/index.d.ts
+declare function test(): string;
+declare const _default: string;
+//#endregion
+export { _default as default, test };",
+  ],
+  [
+    "index.mjs",
+    "//#region src/index.ts
+function test() {
+	return "test bundled";
+}
+var src_default = "default export";
+
+//#endregion
+export { src_default as default, test };",
+  ],
+  [
+    "min/components/jsx.d.mts",
+    "export declare const JsxComponent: unknown;
+",
+  ],
+  [
+    "min/components/jsx.mjs",
+    "import{jsx as _jsx,jsxs as _jsxs}from"react/jsx-runtime";export const JsxComponent=()=>_jsxs(`div`,{className:`comment`,children:[_jsx(`h2`,{className:`commentAuthor`,children:this.props.author}),this.props.children]});",
+  ],
+  [
+    "min/components/jsx.mjs.map",
+    "{"version":3,"sources":["../../../src/min/components/jsx.jsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAC/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","file":"../jsx.mjs","sourcesContent":["export const JsxComponent = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"]}",
+  ],
+  [
+    "min/components/tsx.d.mts",
+    "// @ts-nocheck
+export declare const TsxComponent: any;
+",
+  ],
+  [
+    "min/components/tsx.mjs",
+    "import{jsx as _jsx,jsxs as _jsxs}from"react/jsx-runtime";export const TsxComponent=()=>_jsxs(`div`,{className:`comment`,children:[_jsx(`h2`,{className:`commentAuthor`,children:this.props.author}),this.props.children]});",
+  ],
+  [
+    "min/components/tsx.mjs.map",
+    "{"version":3,"sources":["../../../src/min/components/tsx.tsx"],"names":[],"mappings":"AAAA,OAAS,OAAO,KAAM,QAAQ,UAAa,mBAAoB,CAE/D,OAAO,MAAM,aAAe,IACJ,MAAM,MAAO,CACnC,UAAW,UACX,SAAU,CAAiB,KAAK,KAAM,CACrC,UAAW,gBACX,SAAU,KAAK,MAAM,MACrB,EAAC,CAAE,KAAK,MAAM,QAAS,CACxB,EAAC","file":"../tsx.mjs","sourcesContent":["// @ts-nocheck\nexport const TsxComponent: any = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"]}",
+  ],
+  [
+    "min/modules/js-module.js",
+    "export function jsModule(){return`js-module`}",
+  ],
+  [
+    "min/modules/js-module.js.map",
+    "{"mappings":"AAAA,OAAO,SAAS,UAAW,CACzB,MAAO,WACR","names":[],"sources":["../../../src/min/modules/js-module.js"],"sourcesContent":["export function jsModule() {\n  return \"js-module\";\n}\n"],"version":"3","file":"js-module.js"}",
+  ],
+  [
+    "min/modules/mjs-module.mjs",
+    "export function mjsModule(){return`mjs-module`}",
+  ],
+  [
+    "min/modules/mjs-module.mjs.map",
+    "{"mappings":"AAAA,OAAO,SAAS,WAAY,CAC1B,MAAO,YACR","names":[],"sources":["../../../src/min/modules/mjs-module.mjs"],"sourcesContent":["export function mjsModule() {\n  return \"mjs-module\";\n}\n"],"version":"3","file":"mjs-module.mjs"}",
+  ],
+  [
+    "min/modules/ts-module.d.mts",
+    "export declare function tsModule(): string;
+",
+  ],
+  [
+    "min/modules/ts-module.mjs",
+    "export function tsModule(){return`ts-module`}",
+  ],
+  [
+    "min/modules/ts-module.mjs.map",
+    "{"version":3,"sources":["../../../src/min/modules/ts-module.ts"],"names":[],"mappings":"AAAA,OAAO,SAAS,UAAW,CAC1B,MAAO,WACP","file":"../ts-module.mjs","sourcesContent":["export function tsModule(): string {\n  return \"ts-module\";\n}\n"]}",
+  ],
+  [
+    "raw/cli.mjs",
+    "#!/usr/bin/env node
+
+console.log("hello world");
+",
+  ],
+  [
+    "runtime/assets/demo.css",
+    "/*! modern-normalize v3.0.1 | MIT License | https://github.com/sindresorhus/modern-normalize */
+/*
+Document
+========
+*/
+/**
+Use a better box model (opinionated).
+*/
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Improve consistency of default fonts in all browsers. (https://github.com/sindresorhus/modern-normalize/issues/3) */
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.15; /* 1. Correct the line height in all browsers. */
+  -webkit-text-size-adjust: 100%; /* 2. Prevent adjustments of font size after orientation changes in iOS. */
+  tab-size: 4; /* 3. Use a more readable tab size (opinionated). */
+}
+
+/*
+Sections
+========
+*/
+body {
+  margin: 0; /* Remove the margin in all browsers. */
+}
+
+/*
+Text-level semantics
+====================
+*/
+/**
+Add the correct font weight in Chrome and Safari.
+*/
+b,
+strong {
+  font-weight: bolder;
+}
+
+/**
+1. Improve consistency of default fonts in all browsers. (https://github.com/sindresorhus/modern-normalize/issues/3)
+2. Correct the odd 'em' font sizing in all browsers.
+*/
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/**
+Add the correct font size in all browsers.
+*/
+small {
+  font-size: 80%;
+}
+
+/**
+Prevent 'sub' and 'sup' elements from affecting the line height in all browsers.
+*/
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/*
+Tabular data
+============
+*/
+/**
+Correct table border color inheritance in Chrome and Safari. (https://issues.chromium.org/issues/40615503, https://bugs.webkit.org/show_bug.cgi?id=195016)
+*/
+table {
+  border-color: currentcolor;
+}
+
+/*
+Forms
+=====
+*/
+/**
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+*/
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+
+/**
+Correct the inability to style clickable types in iOS and Safari.
+*/
+button,
+[type=button],
+[type=reset],
+[type=submit] {
+  -webkit-appearance: button;
+}
+
+/**
+Remove the padding so developers are not caught out when they zero out 'fieldset' elements in all browsers.
+*/
+legend {
+  padding: 0;
+}
+
+/**
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+progress {
+  vertical-align: baseline;
+}
+
+/**
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+[type=search] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/**
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to 'inherit' in Safari.
+*/
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/*
+Interactive
+===========
+*/
+/*
+Add the correct display in Chrome and Safari.
+*/
+summary {
+  display: list-item;
+}
+
+.test {
+  color: green;
+}",
+  ],
+  [
+    "runtime/assets/nested.css",
+    "#main .foo{color:--var-red}",
+  ],
+  [
+    "runtime/components/jsx.d.mts",
+    "export declare const JsxComponent: unknown;
+",
+  ],
+  [
+    "runtime/components/jsx.mjs",
+    "import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export const JsxComponent = () => {
+	return /* @__PURE__ */ _jsxs("div", {
+		className: "comment",
+		children: [/* @__PURE__ */ _jsx("h2", {
+			className: "commentAuthor",
+			children: this.props.author
+		}), this.props.children]
+	});
+};
+",
+  ],
+  [
+    "runtime/components/jsx.mjs.map",
+    "{"mappings":";AAAA,OAAO,MAAM,eAAe,MAAM;AAChC,wBACE,MAAC;EAAI,WAAU;6BACb,KAAC;GAAG,WAAU;aAAiB,KAAK,MAAM;IAAY,EACrD,KAAK,MAAM;GACR;AAET","names":[],"sources":["../../../src/runtime/components/jsx.jsx"],"sourcesContent":["export const JsxComponent = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"],"version":"3","file":"jsx.mjs"}",
+  ],
+  [
+    "runtime/components/tsx.d.mts",
+    "// @ts-nocheck
+export declare const TsxComponent: any;
+",
+  ],
+  [
+    "runtime/components/tsx.mjs",
+    "import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+// @ts-nocheck
+export const TsxComponent = () => {
+	return /* @__PURE__ */ _jsxs("div", {
+		className: "comment",
+		children: [/* @__PURE__ */ _jsx("h2", {
+			className: "commentAuthor",
+			children: this.props.author
+		}), this.props.children]
+	});
+};
+",
+  ],
+  [
+    "runtime/components/tsx.mjs.map",
+    "{"mappings":";;AACA,OAAO,MAAMA,eAAoB,MAAM;AACrC,wBACE,MAAC;EAAI,WAAU;6BACb,KAAC;GAAG,WAAU;aAAiB,KAAK,MAAM;IAAY,EACrD,KAAK,MAAM;GACR;AAET","names":["TsxComponent: any"],"sources":["../../../src/runtime/components/tsx.tsx"],"sourcesContent":["// @ts-nocheck\nexport const TsxComponent: any = () => {\n  return (\n    <div className=\"comment\">\n      <h2 className=\"commentAuthor\">{this.props.author}</h2>\n      {this.props.children}\n    </div>\n  );\n};\n"],"version":"3","file":"tsx.mjs"}",
+  ],
+  [
+    "runtime/components/vue.vue",
+    "<template>
+  <div :data-test="toValue('hello')" />
+</template>
+
+<script>
+export default { name: "App" };
+</script>
+
+<script setup>
+import { toValue, ref } from "vue";
+defineProps({
+  msg: { type: String, required: true }
+});
+const msg = ref(1);
+</script>
+
+<style scoped>
+#main .foo{color:--var-red}
+</style>
+
+<style>
+.orange {
+  color: #f60;
+}
+</style>
+",
+  ],
+  [
+    "runtime/components/vue.vue.d.ts",
+    "declare const _default: import("vue").DefineComponent<{
+    msg: string;
+}, {}, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{
+    msg: string;
+}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, false, {}, any>;
+export default _default;
+",
+  ],
+  [
+    "runtime/index.d.mts",
+    "export { test } from "./test.mjs";
+// Module resolution test imports, using no extensions
+export { tsModule } from "./modules/ts-module.mjs";
+export { TsxComponent } from "./components/tsx.mjs";
+// @ts-expect-error - JS test file
+export { jsModule } from "./modules/js-module.js";
+// @ts-expect-error - JSX test file
+export { JsxComponent } from "./components/jsx.mjs";
+declare const _default: string;
+export default _default;
+",
+  ],
+  [
+    "runtime/index.mjs",
+    "export { test } from "./test.mjs";
+// Module resolution test imports, using no extensions
+export { tsModule } from "./modules/ts-module.mjs";
+export { TsxComponent } from "./components/tsx.mjs";
+// @ts-expect-error - JS test file
+export { jsModule } from "./modules/js-module.js";
+// @ts-expect-error - JSX test file
+export { JsxComponent } from "./components/jsx.mjs";
+export default "default export";
+",
+  ],
+  [
+    "runtime/index.mjs.map",
+    "{"mappings":"AAAA,SAAS,YAAY;;AAGrB,SAAS,gBAAgB;AAEzB,SAAS,oBAAoB;;AAG7B,SAAS,gBAAgB;;AAGzB,SAAS,oBAAoB;AAE7B,eAAe","names":[],"sources":["../../src/runtime/index.ts"],"sourcesContent":["export { test } from \"./test.mjs\"; // Explicitly import the test file with .ts extension\n\n// Module resolution test imports, using no extensions\nexport { tsModule } from \"./modules/ts-module.mjs\";\n\nexport { TsxComponent } from \"./components/tsx.mjs\";\n\n// @ts-expect-error - JS test file\nexport { jsModule } from \"./modules/js-module.js\";\n\n// @ts-expect-error - JSX test file\nexport { JsxComponent } from \"./components/jsx.mjs\";\n\nexport default \"default export\";\n"],"version":"3","file":"index.mjs"}",
+  ],
+  [
+    "runtime/modules/js-module.js",
+    "export function jsModule() {
+  return "js-module";
+}
+",
+  ],
+  [
+    "runtime/modules/mjs-module.mjs",
+    "export function mjsModule() {
+  return "mjs-module";
+}
+",
+  ],
+  [
+    "runtime/modules/ts-module.d.mts",
+    "export declare function tsModule(): string;
+",
+  ],
+  [
+    "runtime/modules/ts-module.mjs",
+    "export function tsModule() {
+	return "ts-module";
+}
+",
+  ],
+  [
+    "runtime/modules/ts-module.mjs.map",
+    "{"mappings":"AAAA,OAAO,SAAS,WAAW;AACzB,QAAO;AACR","names":[],"sources":["../../../src/runtime/modules/ts-module.ts"],"sourcesContent":["export function tsModule() {\n  return \"ts-module\";\n}\n"],"version":"3","file":"ts-module.mjs"}",
+  ],
+  [
+    "runtime/test.d.mts",
+    "export declare function test(): string;
+",
+  ],
+  [
+    "runtime/test.mjs",
+    "export function test() {
+	return "test";
+}
+",
+  ],
+  [
+    "runtime/test.mjs.map",
+    "{"mappings":"AAAA,OAAO,SAAS,OAAO;AACrB,QAAO;AACR","names":[],"sources":["../../src/runtime/test.ts"],"sourcesContent":["export function test() {\n  return \"test\";\n}\n"],"version":"3","file":"test.mjs"}",
+  ],
+  [
+    "utils.d.mts",
+    "//#region src/utils.d.ts
+declare function test(): string;
+declare const _default: string;
+//#endregion
+export { _default as default, test };",
+  ],
+  [
+    "utils.mjs",
+    "//#region src/utils.ts
+function test() {
+	return "utils bundled";
+}
+var utils_default = "default utils export";
+
+//#endregion
+export { utils_default as default, test };",
+  ],
+]
