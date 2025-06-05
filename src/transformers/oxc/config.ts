@@ -72,7 +72,6 @@ export function resolveProcessOptions(
         stripInternal: true,
       },
       ...options?.transform?.typescript,
-      ...(sourceConfig?.transform ? {} : { declaration: undefined }),
     },
     sourcemap,
   };
