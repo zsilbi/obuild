@@ -54,12 +54,14 @@ export async function transform(
   };
 
   const declarationFile: DeclarationFile = {
-    srcPath: input.srcPath,
+    // Enable post-transform generation if `oxc-transform` didn't provide a declaration
+    declaration: declarationContents === undefined,
+    // Use the original contents if no declaration was generated
     contents: declarationContents || input.contents,
     path: input.path,
+    srcPath: input.srcPath,
     extension: ".d.mts",
     type: "declaration",
-    declaration: declarationContents === undefined,
   };
 
   if (!sourceMap) {
