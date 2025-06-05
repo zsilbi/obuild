@@ -1,3 +1,5 @@
+// Ported from https://github.com/unjs/mkdist/blob/main/src/utils/dts.ts
+
 import { statSync } from "node:fs";
 import { resolve } from "pathe";
 import type { CompilerHost, CompilerOptions, EmitResult } from "typescript";

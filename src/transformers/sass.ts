@@ -1,3 +1,5 @@
+// Ported from https://github.com/unjs/mkdist/blob/main/src/loaders/sass.ts
+
 import { pathToFileURL } from "node:url";
 import { basename } from "pathe";
 import type { InputFile, Transformer, TransformResult } from "./types.ts";

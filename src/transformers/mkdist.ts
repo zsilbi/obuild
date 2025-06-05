@@ -33,6 +33,7 @@ export type MkdistLoader = (
 
 /**
  * Creates a transformer that uses a mkdist loader for compatibility.
+ * @see https://github.com/unjs/mkdist/blob/main/src/loader.ts
  *
  * @param loader - The mkdist loader function to use.
  * @param loaderOptions - Additional options for the mkdist loader.
@@ -48,6 +49,7 @@ export function mkdistLoader(
 
   /**
    * mkdist compatible JS loader that adds declaration file output for `.js` files also
+   * @see https://github.com/unjs/mkdist/blob/main/src/loaders/js.ts
    */
   const jsLoader = async (
     input: InputFile,

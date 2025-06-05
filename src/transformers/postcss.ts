@@ -1,3 +1,5 @@
+// Ported from https://github.com/unjs/mkdist/blob/main/src/loaders/postcss.ts
+
 import cssnano from "cssnano";
 import autoprefixer from "autoprefixer";
 import postcss from "postcss";

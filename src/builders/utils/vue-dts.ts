@@ -1,3 +1,5 @@
+// Ported from https://github.com/unjs/mkdist/blob/main/src/utils/vue-dts.ts
+
 import { createRequire } from "node:module";
 import {
   augmentWithDiagnostics,
