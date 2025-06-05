@@ -5,7 +5,8 @@ import { consola } from "consola";
 import { glob } from "tinyglobby";
 import { fmtPath, normalizePath } from "../utils.ts";
 import { colors as c } from "consola/utils";
-import { readTSConfig, type TSConfig } from "pkg-types";
+import { getTsconfig } from "get-tsconfig";
+import { type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./declarations/vue-dts.ts";
 
@@ -263,7 +264,13 @@ function serializeSourceMapFiles(
  */
 async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
   // Read the TypeScript configuration from tsconfig.json
-  const packageTsConfig = await readTSConfig();
+  const tsConfigResult = getTsconfig();
+
+  if (tsConfigResult === null) {
+    consola.warn(`Failed to read tsconfig.json`);
+  }
+
+  const packageTsConfig: TSConfig = tsConfigResult?.config || {};
   const dtsOptions = typeof entry.dts === "object" ? entry.dts : {};
 
   // Override the TypeScript configuration with the entry's declaration options

@@ -60,6 +60,7 @@
     "changelogen": "^0.6.1",
     "eslint": "^9.28.0",
     "eslint-config-unjs": "^0.4.2",
+    "get-tsconfig": "^4.10.1",
     "modern-normalize": "^3.0.1",
     "prettier": "^3.5.3",
     "sass": "^1.89.1",
