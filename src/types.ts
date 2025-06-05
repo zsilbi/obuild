@@ -107,7 +107,6 @@ export type TransformEntry = _BuildEntry & {
    * Declaration generation options.
    *
    * Set to `false` to disable declaration generation, or provide options to customize it.
-   * NOTE: If an object is provided, it is ignored for entries that use `isolatedDeclarations`.
    */
   dts?: boolean | Omit<DeclarationOptions, "rootDir">;
 };
