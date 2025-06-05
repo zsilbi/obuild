@@ -16,9 +16,7 @@ export async function minify(
   const { code: minifedCode, map: sourceMap } = oxcMinify(
     input.path,
     input.contents,
-    {
-      ...options,
-    },
+    options,
   );
 
   const minifiedFile: MinifiedFile = {

@@ -120,7 +120,7 @@ export async function transformDir(
   }
 
   const sourceMapFiles = outputFiles.filter(
-    (file): file is SourceMapFile => file?.type === "source-map",
+    (file): file is SourceMapFile => file.type === "source-map",
   );
 
   // Rewrite source maps to relative paths and serialize them

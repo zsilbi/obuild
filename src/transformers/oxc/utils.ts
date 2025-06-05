@@ -45,7 +45,7 @@ export function rewriteSpecifiers(
 
   if (srcPath === undefined) {
     // Skip rewriting if srcPath is not available
-    return { ...file };
+    return file;
   }
 
   const parsed = oxcParse(file.path, file.contents, options?.parser);
