@@ -54,10 +54,10 @@ function resolveTransformers(
     .filter((transformer) => transformer !== undefined);
 }
 
-/**
+/*
+ * Creates a transformer function that can process input files using specified transformers.
  *
- * @param transformers - List of transformers to use. Can be a list of transformer names (e.g. "oxc", "vue") or transformer functions.
- * @param options - Options to pass to the transformers, such as `resolve` options for module resolution.
+ * @param options - Configuration options for the transformer.
  * @returns An object with a `transformFile` method to transform files.
  */
 export function createTransformer(options: CreateTransformerOptions): {

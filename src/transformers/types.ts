@@ -127,7 +127,8 @@ export interface SourceMapFile extends OutputFile {
 
   /**
    * The source map associated with the output file.
-   * Fields `file` and `sources` must be relative to the `input` of the `TransformEntry`!
+   *
+   * NOTE: Fields `file` and `sources` must be relative to the `input` of the `TransformEntry` to be automatically resolved relative to the `mapDir` output directory.
    */
   map: RawSourceMap;
 }

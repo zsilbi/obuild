@@ -58,6 +58,13 @@ export const oxcTransformer: Transformer = async (
   return outputFiles.filter((file) => file !== undefined);
 };
 
+/**
+ * Transforms and minifies a file based on the provided options.
+ *
+ * @param file - The file to process.
+ * @param options - The options for processing the file.
+ * @returns An array of output files, which may include `undefined`.
+ */
 async function processFile(
   file: Readonly<ProcessableFile>,
   options: ProcessOptions,
