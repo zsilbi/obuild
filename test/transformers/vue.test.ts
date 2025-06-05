@@ -1,15 +1,15 @@
 import { describe, test, expect } from "vitest";
 
-import {
-  vueTransformer,
-  type VueTransformerOptions,
-} from "../../src/transformers/vue.ts";
-import type { InputFile } from "../../src/transformers/types.ts";
+import { vueTransformer } from "../../src/transformers/vue.ts";
+import type {
+  InputFile,
+  TransformerOptions,
+} from "../../src/transformers/types.ts";
 
 describe("Vue transformer", () => {
   const vueTransform = async (
     contents: string,
-    options: VueTransformerOptions["vue"],
+    options: TransformerOptions,
   ) => {
     const transforms: InputFile[] = [];
     const outputFiles = await vueTransformer(
@@ -26,9 +26,7 @@ describe("Vue transformer", () => {
 
           return [];
         },
-        options: {
-          vue: options,
-        },
+        options,
       },
     );
 

@@ -2,6 +2,7 @@ import type { RawSourceMap } from "source-map-js";
 import type { OxcTransformerOptions } from "./oxc.ts";
 import type { PostcssTransformerOptions } from "./postcss.ts";
 import type { VueTransformerOptions } from "./vue.ts";
+import type { TSConfig } from "pkg-types";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -15,10 +16,34 @@ export type TransformerName =
 export interface TransformerOptions
   extends OxcTransformerOptions,
     VueTransformerOptions,
-    PostcssTransformerOptions {}
+    PostcssTransformerOptions {
+  /**
+   * Declaration generation.
+   *
+   * Set to `false` to disable.
+   */
+  dts?: boolean;
+}
+
+export interface CreateTransformerOptions extends TransformerOptions {
+  /**
+   * List of transformers to use. Can be a list of transformer names (e.g. "oxc", "vue") or transformer functions.
+   */
+  transformers?: Array<TransformerName | Transformer>;
+
+  /**
+   * TypeScript configuration for the project.
+   */
+  tsConfig?: TSConfig;
+}
 
 export interface TransformerContext {
   transformFile: TransformFile;
+
+  /**
+   * TypeScript configuration for the project.
+   */
+  tsConfig?: TSConfig;
 
   /**
    * Options passed to the transformer, such as `resolve` options for module resolution.
@@ -102,6 +127,7 @@ export interface SourceMapFile extends OutputFile {
 
   /**
    * The source map associated with the output file.
+   * Fields `file` and `sources` must be relative to the `input` of the `TransformEntry`!
    */
   map: RawSourceMap;
 }

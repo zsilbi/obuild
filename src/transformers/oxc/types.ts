@@ -11,7 +11,7 @@ export interface ProcessableFile extends OutputFile {
   extension: string;
 }
 
-export interface DeclarationFile extends ProcessableFile {
+export interface DeclarationFile extends OutputFile {
   type: "declaration";
 }
 
@@ -38,4 +38,5 @@ export type ProcessOptions = {
   transform: OxcTransformOptions;
   minify: OxcMinifyOptions | undefined;
   sourceConfig: ProcessSourceConfig;
+  dts: boolean | undefined;
 };

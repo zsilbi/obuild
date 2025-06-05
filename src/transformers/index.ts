@@ -8,8 +8,8 @@ import type {
   OutputFile,
   TransformerContext,
   TransformerName,
-  TransformerOptions,
   TransformFile,
+  CreateTransformerOptions,
 } from "./types.ts";
 import { postcssTransformer } from "./postcss.ts";
 import { sassTransformer } from "./sass.ts";
@@ -60,13 +60,12 @@ function resolveTransformers(
  * @param options - Options to pass to the transformers, such as `resolve` options for module resolution.
  * @returns An object with a `transformFile` method to transform files.
  */
-export function createTransformer(
-  transformers: Array<TransformerName | Transformer> = defaultTransformers,
-  options: TransformerOptions = {},
-): {
+export function createTransformer(options: CreateTransformerOptions): {
   transformFile: TransformFile;
 } {
-  const resolvedTransformers = resolveTransformers(transformers);
+  const resolvedTransformers = resolveTransformers(
+    options.transformers || defaultTransformers,
+  );
 
   const transformFile = async function (
     input: InputFile,
@@ -74,6 +73,7 @@ export function createTransformer(
     const context: TransformerContext = {
       transformFile,
       options,
+      tsConfig: options.tsConfig,
     };
 
     for (const transformer of resolvedTransformers) {

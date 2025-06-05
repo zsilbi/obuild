@@ -109,7 +109,7 @@ export type TransformEntry = _BuildEntry & {
    * NOTE: This has no effect on the built-in `oxc` transformer.
    * You can configure that in the `oxc` transform options.
    */
-  declaration?: Omit<DeclarationOptions, "rootDir">;
+  dts?: boolean | Omit<DeclarationOptions, "rootDir">;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;

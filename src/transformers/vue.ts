@@ -4,14 +4,8 @@ import { mkdistLoader, type MkdistLoader } from "./mkdist.ts";
 import type { InputFile, Transformer, TransformerContext } from "./types.ts";
 
 export interface VueTransformerOptions {
-  vue?: {
-    /**
-     * Declaration generation.
-     *
-     * Set to `false` to disable.
-     */
-    dts?: boolean;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  vue?: {};
 }
 
 let cachedVueLoader: MkdistLoader | undefined;
@@ -34,7 +28,7 @@ export const vueTransformer: Transformer = async (
   }
 
   const vueTransformer = mkdistLoader(cachedVueLoader, {
-    declaration: context.options.vue?.dts,
+    declaration: context.options.dts,
   });
 
   return vueTransformer(inputFile, context);

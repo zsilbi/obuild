@@ -20,13 +20,12 @@ export async function transform(
   input: Readonly<ProcessableFile>,
   options?: ProcessOptions["transform"],
 ): Promise<
-  | [ProcessableFile]
   | [ProcessableFile, DeclarationFile]
   | [ProcessableFile, DeclarationFile, TransformedSourceMapFile]
 > {
   const {
     code: transformedCode,
-    declaration,
+    declaration: declarationContents,
     map: sourceMap,
     errors: transformErrors,
   } = oxcTransform(input.path, input.contents, options);
@@ -54,16 +53,13 @@ export async function transform(
     contents: transformedCode,
   };
 
-  if (!declaration) {
-    return [transformedFile];
-  }
-
   const declarationFile: DeclarationFile = {
     srcPath: input.srcPath,
-    contents: declaration,
+    contents: declarationContents || input.contents,
     path: input.path,
     extension: ".d.mts",
     type: "declaration",
+    declaration: declarationContents === undefined,
   };
 
   if (!sourceMap) {

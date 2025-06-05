@@ -66,7 +66,7 @@ export function resolveProcessOptions(
     return;
   }
 
-  const { oxc: options } = context.options;
+  const { oxc: options, dts } = context.options;
 
   const resolve: ExsolveOptions = {
     ...options?.resolve,
@@ -92,15 +92,21 @@ export function resolveProcessOptions(
     (typeof options?.minify === "object" && options.minify.sourcemap) ||
     options?.transform?.sourcemap;
 
+  const isolatedDeclarations: boolean | undefined =
+    context.tsConfig?.compilerOptions?.isolatedDeclarations;
+
   const transform: OxcTransformOptions = {
     ...options?.transform,
     ...parser,
     cwd: input.srcPath ? dirname(input.srcPath) : undefined,
     typescript: {
-      declaration: {
-        // @todo - Should we make this also the default for the bundler?
-        stripInternal: true,
-      },
+      declaration:
+        dts !== false && isolatedDeclarations === true
+          ? {
+              // @todo - Should we make this also the default for the bundler?
+              stripInternal: true,
+            }
+          : undefined,
       ...options?.transform?.typescript,
     },
     sourcemap: sourceMapEnabled,
@@ -119,5 +125,6 @@ export function resolveProcessOptions(
     transform,
     minify,
     sourceConfig: processSourceConfig,
+    dts,
   };
 }

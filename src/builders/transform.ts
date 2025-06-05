@@ -43,7 +43,12 @@ export async function transformDir(
     return;
   }
 
-  const transformer = createTransformer(entry.transformers, entry);
+  const tsConfig = await resolveTSConfig(entry);
+  const transformer = createTransformer({
+    ...entry,
+    tsConfig,
+    dts: entry.dts !== false,
+  });
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
   const transformPromises: Promise<OutputFile[]>[] = inputFileNames.map(
     async (inputFileName) => {
@@ -64,8 +69,16 @@ export async function transformDir(
     results.flat(),
   );
 
-  // Post transform declaration generation
-  await generateDeclarations(outputFiles, entry, context);
+  if (entry.dts === false) {
+    for (const outputFile of outputFiles) {
+      if (outputFile.type === "declaration") {
+        outputFile.skip = true; // Skip declaration files if dts is false
+      }
+    }
+  } else {
+    // Post transform declaration generation
+    await generateDeclarations(outputFiles, tsConfig, entry, context);
+  }
 
   // Rename files to their desired extensions
   renameFiles(outputFiles);
@@ -117,12 +130,14 @@ export async function transformDir(
  * Files marked with `declaration: true` will be processed.
  *
  * @param files - The output files to check. Files marked with `skip` or without a `srcPath` will be ignored.
+ * @param tsConfig - TypeScript configuration to use for declaration generation.
  * @param entry - Transform entry
  * @param context - Build context
  * @returns A promise that resolves when declaration generation is complete.
  */
 async function generateDeclarations(
   files: OutputFile[],
+  tsConfig: TSConfig,
   entry: TransformEntry,
   context: BuildContext,
 ): Promise<void> {
@@ -152,9 +167,9 @@ async function generateDeclarations(
   }
 
   const declarationOptions: DeclarationOptions = {
-    ...entry.declaration,
+    ...(typeof entry.dts === "object" ? entry.dts : {}),
     rootDir: context.pkgDir,
-    typescript: await resolveTSConfig(entry),
+    typescript: tsConfig,
   };
 
   const vfs = new Map(
@@ -249,10 +264,11 @@ function serializeSourceMapFiles(
 async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
   // Read the TypeScript configuration from tsconfig.json
   const packageTsConfig = await readTSConfig();
+  const dtsOptions = typeof entry.dts === "object" ? entry.dts : {};
 
   // Override the TypeScript configuration with the entry's declaration options
   const tsConfig: TSConfig = defu(
-    entry.declaration?.typescript || {},
+    dtsOptions?.typescript || {},
     packageTsConfig,
   );
 
