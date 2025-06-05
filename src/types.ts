@@ -82,6 +82,13 @@ export type TransformEntry = _BuildEntry & {
   transformers?: Array<TransformerName | Transformer>;
 
   /**
+   * Source map directory relative to project root.
+   *
+   * Defaults to `outDir` if not provided.
+   */
+  mapDir?: string;
+
+  /**
    * Options for the `oxc` transformer.
    */
   oxc?: TransformerOptions["oxc"];

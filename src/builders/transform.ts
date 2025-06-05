@@ -1,20 +1,15 @@
-import {
-  copyFile,
-  mkdir,
-  readFile,
-  symlink,
-  writeFile,
-} from "node:fs/promises";
-import { basename, dirname, extname, join, relative } from "pathe";
+import path from "pathe";
+import { promises as fsp } from "node:fs";
 import { defu } from "defu";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
+import { fmtPath } from "../utils.ts";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./utils/vue-dts.ts";
-import { fmtPath } from "../utils.ts";
 import { getDeclarations, normalizeCompilerOptions } from "./utils/dts.ts";
+
 import {
   hasFileShebang,
   hasShebang,
@@ -39,7 +34,7 @@ export async function transformDir(
     consola.log(
       `${c.magenta("[stub transform]   ")} ${c.underline(fmtPath(entry.outDir!) + "/")}`,
     );
-    await symlink(entry.input, entry.outDir!, "junction");
+    await fsp.symlink(entry.input, entry.outDir!, "junction");
     return;
   }
 
@@ -47,14 +42,14 @@ export async function transformDir(
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
   const transformPromises: Promise<OutputFile[]>[] = inputFileNames.map(
     async (inputFileName) => {
-      const inputFilePath = join(entry.input, inputFileName);
+      const inputFilePath = path.join(entry.input, inputFileName);
 
       return transformer.transformFile({
         path: inputFileName,
-        extension: extname(inputFilePath),
+        extension: path.extname(inputFilePath),
         srcPath: inputFilePath,
         getContents() {
-          return readFile(inputFilePath, "utf8");
+          return fsp.readFile(inputFilePath, "utf8");
         },
       });
     },
@@ -65,45 +60,45 @@ export async function transformDir(
   );
 
   // Post transform declaration generation
-  await generateDeclarations(outputFiles, context, entry);
+  await generateDeclarations(outputFiles, entry, context);
 
   // Rename files to their desired extensions
   renameFiles(outputFiles);
 
   // Rewrite source map sources to relative paths
-  rewriteSourceMapSources(outputFiles, entry);
+  serializeSourceMapFiles(outputFiles, entry, context);
 
-  const outputPromises: Promise<string>[] = outputFiles
+  const writePromises: Promise<string>[] = outputFiles
     .filter((outputFile) => !outputFile.skip)
     .map(async (outputFile) => {
-      const { path, raw, contents = "" } = outputFile;
-      const outPath = join(entry.outDir!, path);
+      const { path: filePath, raw, contents = "" } = outputFile;
+      const outputFilePath = getOutputFilePath(outputFile, entry, context);
 
-      await mkdir(dirname(outPath), { recursive: true });
+      await fsp.mkdir(path.dirname(outputFilePath), { recursive: true });
 
       let shebangFound: boolean;
 
       if (raw) {
-        const srcPath = outputFile.srcPath || join(entry.input, path);
+        const srcPath = outputFile.srcPath || path.join(entry.input, filePath);
 
         [shebangFound] = await Promise.all([
           // Avoid loading possibly large raw file contents into memory
           hasFileShebang(srcPath),
-          copyFile(srcPath, outPath),
+          fsp.copyFile(srcPath, outputFilePath),
         ]);
       } else {
         shebangFound = hasShebang(contents);
-        await writeFile(outPath, contents, "utf8");
+        await fsp.writeFile(outputFilePath, contents, "utf8");
       }
 
       if (shebangFound) {
-        await makeExecutable(outPath);
+        await makeExecutable(outputFilePath);
       }
 
-      return outPath;
+      return outputFilePath;
     });
 
-  const writtenFiles = await Promise.all(outputPromises);
+  const writtenFiles = await Promise.all(writePromises);
 
   consola.log(
     `\n${c.magenta("[transform] ")}${c.underline(fmtPath(entry.outDir!) + "/")}\n${writtenFiles
@@ -117,33 +112,38 @@ export async function transformDir(
  * Files marked with `declaration: true` will be processed.
  *
  * @param files - The output files to check. Files marked with `skip` or without a `srcPath` will be ignored.
- * @param context - Build context
  * @param entry - Transform entry
+ * @param context - Build context
  * @returns A promise that resolves when declaration generation is complete.
  */
 async function generateDeclarations(
   files: OutputFile[],
-  context: BuildContext,
   entry: TransformEntry,
+  context: BuildContext,
 ): Promise<void> {
-  const dtsOutputFiles = files.filter(
-    (output) =>
-      output.srcPath !== undefined &&
-      !output.skip &&
-      output.declaration === true,
-  ) as Array<OutputFile & { srcPath: string }>;
+  const declarationFiles: Array<OutputFile & { srcPath: string }> = [];
 
-  if (dtsOutputFiles.length === 0) {
-    return;
-  }
+  for (const file of files) {
+    if (
+      file.srcPath === undefined ||
+      file.skip === true ||
+      file.declaration !== true
+    ) {
+      continue;
+    }
 
-  for (const output of dtsOutputFiles) {
-    if (output.extension !== ".d.mts") {
+    declarationFiles.push(file as OutputFile & { srcPath: string });
+
+    if (file.extension !== ".d.mts") {
       continue;
     }
 
     // If the desired extension is `.d.mts` the input files must be `.mts`
-    output.srcPath = output.srcPath.replace(/\.ts$/, ".mts");
+    file.srcPath = file.srcPath.replace(/\.ts$/, ".mts");
+  }
+
+  if (declarationFiles.length === 0) {
+    return;
   }
 
   const declarationOptions: DeclarationOptions = {
@@ -152,21 +152,23 @@ async function generateDeclarations(
     typescript: await resolveTSConfig(entry),
   };
 
-  const vfs = new Map(dtsOutputFiles.map((o) => [o.srcPath, o.contents || ""]));
+  const vfs = new Map(
+    declarationFiles.map((file) => [file.srcPath, file.contents || ""]),
+  );
 
   const declarations: DeclarationOutput = Object.create(null);
   for (const dtsGenerator of [getVueDeclarations, getDeclarations]) {
     Object.assign(declarations, await dtsGenerator(vfs, declarationOptions));
   }
 
-  for (const output of dtsOutputFiles) {
-    const result = declarations[output.srcPath];
+  for (const declarationFile of declarationFiles) {
+    const result = declarations[declarationFile.srcPath];
 
-    output.type = "declaration";
-    output.contents = result?.contents || "";
+    declarationFile.type = "declaration";
+    declarationFile.contents = result?.contents || "";
 
     if (result?.errors) {
-      output.skip = true;
+      declarationFile.skip = true;
     }
   }
 }
@@ -177,39 +179,58 @@ async function generateDeclarations(
  * @param files - The output files to process.
  */
 function renameFiles(files: OutputFile[]): void {
-  for (const output of files.filter((output) => output.extension)) {
-    const originalExtension = extname(output.path);
-
-    if (originalExtension === output.extension) {
+  for (const file of files) {
+    if (file.extension === undefined) {
       continue;
     }
 
-    output.path = join(
-      dirname(output.path),
-      basename(output.path, originalExtension) + output.extension,
+    const originalExtension = path.extname(file.path);
+
+    if (originalExtension === file.extension) {
+      continue;
+    }
+
+    file.path = path.join(
+      path.dirname(file.path),
+      path.basename(file.path, originalExtension) + file.extension,
     );
   }
 }
 
 /**
- * Rewrite source map sources to relative paths.
+ * Rewrite source map sources and file paths to relative paths and serialize them.
  *
  * @param files - The files to process.
  * @param entry - The transform entry containing the output directory.
  */
-function rewriteSourceMapSources(
+function serializeSourceMapFiles(
   files: OutputFile[],
   entry: TransformEntry,
+  context: BuildContext,
 ): void {
+  const mapDir = resolveMapDir(entry, context);
   const sourceMapFiles = files.filter(
     (file): file is SourceMapFile => file.type === "source-map",
   );
 
   // Rewrite source maps to relative paths and serialize them
   for (const sourceMapFile of sourceMapFiles) {
-    sourceMapFile.map.sources = sourceMapFile.map.sources.map((source) => {
-      return relative(join(entry.outDir!, source), join(entry.input, source));
+    const { map } = sourceMapFile;
+
+    map.sources = map.sources.map((source) => {
+      return path.relative(
+        path.dirname(path.join(mapDir, source)),
+        path.join(entry.input, source),
+      );
     });
+
+    if (map.file !== undefined) {
+      map.file = path.relative(
+        path.dirname(path.join(mapDir, sourceMapFile.path)),
+        path.join(entry.outDir!, map.file),
+      );
+    }
+
     sourceMapFile.contents = JSON.stringify(sourceMapFile.map);
   }
 }
@@ -254,4 +275,43 @@ async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
   );
 
   return tsConfig;
+}
+
+/**
+ * Get the output path for a given output file in a transform entry.
+ *
+ * @param outputFile - Output file to resolve the path for
+ * @param entry - Transform entry
+ * @param context - Build context
+ * @returns - The absolute path to the output file.
+ */
+function getOutputFilePath(
+  outputFile: OutputFile,
+  entry: TransformEntry,
+  context: BuildContext,
+): string {
+  if (outputFile.type === "source-map") {
+    return path.join(resolveMapDir(entry, context), outputFile.path);
+  }
+
+  return path.join(entry.outDir!, outputFile.path);
+}
+
+/**
+ * Resolve the absolute path to store the source maps.
+ *
+ * @param entry - Transform entry
+ * @param context - Build context
+ * @returns The absolute path to the source map directory.
+ */
+function resolveMapDir(entry: TransformEntry, context: BuildContext): string {
+  if (entry.mapDir === undefined) {
+    return entry.outDir!;
+  }
+
+  if (path.isAbsolute(entry.mapDir)) {
+    return entry.mapDir;
+  }
+
+  return path.resolve(context.pkgDir, entry.mapDir);
 }

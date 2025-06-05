@@ -1,5 +1,4 @@
 import { writeFile } from "node:fs/promises";
-import { basename } from "pathe";
 import { replaceExtension } from "./utils.ts";
 import { transform as oxcTransform } from "oxc-transform";
 
@@ -79,7 +78,7 @@ export async function transform(
     origin: "transformed",
     map: {
       ...sourceMap,
-      file: replaceExtension(basename(input.path), input.extension),
+      file: replaceExtension(input.path, input.extension),
       version: String(sourceMap.version),
     },
   };

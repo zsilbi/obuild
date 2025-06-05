@@ -1,4 +1,3 @@
-import { basename } from "pathe";
 import { replaceExtension } from "./utils.ts";
 import { minify as oxcMinify } from "oxc-minify";
 
@@ -44,7 +43,7 @@ export async function minify(
     origin: "minified",
     map: {
       ...sourceMap,
-      file: basename(replaceExtension(input.path)),
+      file: replaceExtension(input.path),
       version: String(sourceMap.version),
     },
   };

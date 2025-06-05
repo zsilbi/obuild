@@ -88,7 +88,7 @@ export function resolveProcessOptions(
   };
 
   // Enable source map for both transform and minify if it's enabled in any of them
-  const sourcemap: boolean | undefined =
+  const sourceMapEnabled: boolean | undefined =
     (typeof options?.minify === "object" && options.minify.sourcemap) ||
     options?.transform?.sourcemap;
 
@@ -103,14 +103,14 @@ export function resolveProcessOptions(
       },
       ...options?.transform?.typescript,
     },
-    sourcemap,
+    sourcemap: sourceMapEnabled,
   };
 
   const minify: OxcMinifyOptions | undefined =
     options?.minify === true
-      ? { sourcemap }
+      ? { sourcemap: sourceMapEnabled }
       : options?.minify
-        ? { ...options?.minify, sourcemap }
+        ? { ...options?.minify, sourcemap: sourceMapEnabled }
         : undefined;
 
   return {
