@@ -36,6 +36,6 @@ export type ProcessOptions = {
   resolve: ExsolveOptions;
   parser: OxcParserOptions;
   transform: OxcTransformOptions;
-  minify: OxcMinifyOptions | false | undefined;
+  minify: OxcMinifyOptions | false;
   sourceConfig: ProcessSourceConfig;
 };

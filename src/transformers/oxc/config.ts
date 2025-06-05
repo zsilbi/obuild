@@ -77,12 +77,12 @@ export function resolveProcessOptions(
     sourcemap,
   };
 
-  const minify: OxcMinifyOptions | false | undefined =
+  const minify: OxcMinifyOptions | false =
     options?.minify === true
       ? { sourcemap }
-      : options?.minify === undefined
-        ? undefined
-        : { ...options?.minify, sourcemap };
+      : options?.minify
+        ? { ...options?.minify, sourcemap }
+        : false;
 
   return {
     resolve,
