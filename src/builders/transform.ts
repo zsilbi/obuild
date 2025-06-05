@@ -5,31 +5,25 @@ import {
   symlink,
   writeFile,
 } from "node:fs/promises";
-import { basename, dirname, extname, join } from "pathe";
-
+import { basename, dirname, extname, join, relative } from "pathe";
 import { defu } from "defu";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
 import { colors as c } from "consola/utils";
 import { readTSConfig, type TSConfig } from "pkg-types";
-
 import { createTransformer } from "../transformers/index.ts";
 import { getVueDeclarations } from "./utils/vue-dts.ts";
 import { fmtPath } from "../utils.ts";
-import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
-import type { BuildContext, TransformEntry } from "../types.ts";
+import { getDeclarations, normalizeCompilerOptions } from "./utils/dts.ts";
 import {
   hasFileShebang,
   hasShebang,
   makeExecutable,
 } from "./plugins/shebang.ts";
-import {
-  getDeclarations,
-  normalizeCompilerOptions,
-  type DeclarationOptions,
-  type DeclarationOutput,
-} from "./utils/dts.ts";
-import { relative } from "node:path";
+
+import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
+import type { BuildContext, TransformEntry } from "../types.ts";
+import type { DeclarationOptions, DeclarationOutput } from "./utils/dts.ts";
 
 /**
  * Transform all files in a directory using oxc-transform.
