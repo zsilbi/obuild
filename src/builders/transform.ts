@@ -8,7 +8,7 @@ import { colors as c } from "consola/utils";
 import { getTsconfig } from "get-tsconfig";
 import { type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
-import { getVueDeclarations } from "./declarations/vue-dts.ts";
+import { generateDeclarations } from "../declarations/index.ts";
 
 import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
@@ -18,13 +18,6 @@ import {
   hasShebang,
   makeExecutable,
 } from "./plugins/shebang.ts";
-
-import {
-  getDeclarations,
-  normalizeCompilerOptions,
-  type DeclarationOutput,
-  type DeclarationOptions,
-} from "./declarations/dts.ts";
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
@@ -44,7 +37,15 @@ export async function transformDir(
     return;
   }
 
-  const tsConfig = await resolveTSConfig(entry);
+  const tsConfig = resolveTSConfig(entry);
+
+  if (tsConfig === null) {
+    consola.warn(
+      `No TypeScript configuration found for ${fmtPath(entry.input)}`,
+    );
+    return;
+  }
+
   const transformer = createTransformer({
     ...entry,
     tsConfig,
@@ -119,86 +120,6 @@ export async function transformDir(
 }
 
 /**
- * Post-process output files to generate declarations.
- * Files marked with `declaration: true` will be processed.
- *
- * @param files - The output files to check. Files marked with `skip` or without a `srcPath` will be ignored.
- * @param tsConfig - TypeScript configuration to use for declaration generation.
- * @param entry - Transform entry
- * @param context - Build context
- * @returns A promise that resolves when declaration generation is complete.
- */
-async function generateDeclarations(
-  files: OutputFile[],
-  tsConfig: TSConfig,
-  entry: TransformEntry,
-  context: BuildContext,
-): Promise<void> {
-  if (entry.dts === false) {
-    for (const file of files) {
-      if (file.type !== "declaration" || file.declaration !== true) {
-        continue;
-      }
-
-      file.skip = true;
-    }
-
-    return;
-  }
-
-  const declarationFiles: Array<OutputFile & { srcPath: string }> = [];
-
-  for (const file of files) {
-    if (
-      file.srcPath === undefined ||
-      file.skip === true ||
-      file.declaration !== true
-    ) {
-      continue;
-    }
-
-    declarationFiles.push(file as OutputFile & { srcPath: string });
-
-    if (file.extension !== ".d.mts") {
-      continue;
-    }
-
-    // If the desired extension is `.d.mts` the input files must be `.mts`
-    file.srcPath = file.srcPath.replace(/\.ts$/, ".mts");
-  }
-
-  if (declarationFiles.length === 0) {
-    return;
-  }
-
-  const declarationOptions: DeclarationOptions = {
-    ...(typeof entry.dts === "object" ? entry.dts : {}),
-    rootDir: context.pkgDir,
-    typescript: tsConfig,
-  };
-
-  const vfs = new Map(
-    declarationFiles.map((file) => [file.srcPath, file.contents || ""]),
-  );
-
-  const declarations: DeclarationOutput = Object.create(null);
-  for (const dtsGenerator of [getVueDeclarations, getDeclarations]) {
-    Object.assign(declarations, await dtsGenerator(vfs, declarationOptions));
-  }
-
-  for (const declarationFile of declarationFiles) {
-    const result = declarations[declarationFile.srcPath];
-
-    declarationFile.type = "declaration";
-    declarationFile.contents = result?.contents || "";
-
-    if (result?.errors) {
-      declarationFile.skip = true;
-    }
-  }
-}
-
-/**
  * Rename output files to their desired extensions.
  *
  * @param files - The output files to process.
@@ -233,7 +154,7 @@ function serializeSourceMapFiles(
   entry: TransformEntry,
   context: BuildContext,
 ): void {
-  const mapDir = resolveMapDir(entry, context);
+  const mapDir = resolveSourceMapDir(entry, context);
   const sourceMapFiles = files.filter(
     (file): file is SourceMapFile => file.type === "source-map",
   );
@@ -266,7 +187,7 @@ function serializeSourceMapFiles(
  * @param entry - The transform entry containing the declaration options.
  * @returns The TypeScript configuration.
  */
-async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
+function resolveTSConfig(entry: TransformEntry): TSConfig {
   // Read the TypeScript configuration from tsconfig.json
   const tsConfigResult = getTsconfig();
 
@@ -283,12 +204,6 @@ async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
     packageTsConfig,
   );
 
-  if (tsConfig.compilerOptions) {
-    tsConfig.compilerOptions = await normalizeCompilerOptions(
-      tsConfig.compilerOptions,
-    );
-  }
-
   // Ensure the TypeScript configuration has the necessary defaults
   tsConfig.compilerOptions = defu(
     {
@@ -302,7 +217,6 @@ async function resolveTSConfig(entry: TransformEntry): Promise<TSConfig> {
       strictNullChecks: true,
       emitDeclarationOnly: true,
       allowImportingTsExtensions: true,
-      allowNonTsExtensions: true,
     } satisfies TSConfig["compilerOptions"],
   );
 
@@ -323,7 +237,7 @@ function getOutputFilePath(
   context: BuildContext,
 ): string {
   if (outputFile.type === "source-map") {
-    return path.join(resolveMapDir(entry, context), outputFile.path);
+    return path.join(resolveSourceMapDir(entry, context), outputFile.path);
   }
 
   return path.join(entry.outDir!, outputFile.path);
@@ -336,7 +250,10 @@ function getOutputFilePath(
  * @param context - Build context
  * @returns The absolute path to the source map directory.
  */
-function resolveMapDir(entry: TransformEntry, context: BuildContext): string {
+function resolveSourceMapDir(
+  entry: TransformEntry,
+  context: BuildContext,
+): string {
   if (entry.mapDir === undefined) {
     return entry.outDir!;
   }

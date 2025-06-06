@@ -15,6 +15,9 @@ describe("obuild", () => {
 
   test("build fixture", async () => {
     await build({
+      experimental: {
+        tsgo: false,
+      },
       cwd: fixtureDir,
       entries: [
         { type: "bundle", input: ["src/index", "src/cli"] },
@@ -54,10 +57,15 @@ describe("obuild", () => {
         },
         {
           type: "transform",
-          input: "src/dts",
-          outDir: "dist/dts",
+          input: "src/dts-only",
+          outDir: "dist/dts-only",
           dts: {
-            addRelativeDeclarationExtensions: true,
+            typescript: {
+              compilerOptions: {
+                isolatedDeclarations: false,
+              },
+            },
+            relativeExtensions: true,
           },
           transformers: [
             async (input) => {
@@ -98,6 +106,11 @@ describe("obuild", () => {
       [
         "cli.d.mts",
         "cli.mjs",
+        "dts-only/a-types.d.mts",
+        "dts-only/b-types.d.mts",
+        "dts-only/c-types.d.mts",
+        "dts-only/dir/index.d.mts",
+        "dts-only/module.d.mts",
         "index.d.mts",
         "index.mjs",
         "min/components/jsx.d.mts",

@@ -8,7 +8,7 @@ export { TsxComponent } from "./components/tsx.tsx";
 // @ts-expect-error - JS test file
 export { jsModule } from "./modules/js-module";
 
-// @ts-expect-error - JSX test file
+// @ts-ignore - MJS test file
 export { JsxComponent } from "./components/jsx.jsx";
 
 export default "default export";

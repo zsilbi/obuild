@@ -1,0 +1,105 @@
+import {
+  getTscDeclarations,
+  getTsgoDeclarations,
+  getVueDeclarations,
+  type DeclarationOptions,
+  type DeclarationOutput,
+} from "./index.ts";
+
+import type { TSConfig } from "pkg-types";
+import type { OutputFile } from "../transformers/types.ts";
+import type { BuildContext, TransformEntry } from "../types.ts";
+
+export { getTscDeclarations } from "./tsc.ts";
+export { getTsgoDeclarations } from "./tsgo.ts";
+export { getVueDeclarations } from "./vue-tsc.ts";
+
+export type { DeclarationOptions, DeclarationOutput } from "./common.ts";
+
+/**
+ * Post-process output files to generate declarations.
+ * Files marked with `declaration: true` will be processed.
+ *
+ * @param files - The output files to check. Files marked with `skip` or without a `srcPath` will be ignored.
+ * @param tsConfig - TypeScript configuration to use for declaration generation.
+ * @param entry - Transform entry
+ * @param context - Build context
+ * @returns A promise that resolves when declaration generation is complete.
+ */
+export async function generateDeclarations(
+  files: OutputFile[],
+  tsConfig: TSConfig,
+  entry: TransformEntry,
+  context: BuildContext,
+): Promise<void> {
+  if (entry.dts === false) {
+    for (const file of files) {
+      if (file.type !== "declaration" || file.declaration !== true) {
+        continue;
+      }
+
+      file.skip = true;
+    }
+
+    return;
+  }
+
+  const declarationFiles: Array<OutputFile & { srcPath: string }> = [];
+
+  for (const file of files) {
+    if (
+      file.srcPath === undefined ||
+      file.skip === true ||
+      file.declaration !== true
+    ) {
+      continue;
+    }
+
+    declarationFiles.push(file as OutputFile & { srcPath: string });
+
+    if (file.extension !== ".d.mts") {
+      continue;
+    }
+
+    // If the desired extension is `.d.mts` the input files must be `.mts`
+    file.srcPath = file.srcPath.replace(/\.ts$/, ".mts");
+  }
+
+  if (declarationFiles.length === 0) {
+    return;
+  }
+
+  const declarationOptions: DeclarationOptions = {
+    ...(typeof entry.dts === "object" ? entry.dts : {}),
+    rootDir: context.pkgDir,
+    inputDir: entry.input,
+    typescript: tsConfig,
+  };
+
+  const vfs = new Map(
+    declarationFiles.map((file) => [file.srcPath, file.contents || ""]),
+  );
+
+  const dtsGenerators = [
+    getVueDeclarations,
+    context.experimental?.tsgo === true
+      ? getTsgoDeclarations
+      : getTscDeclarations,
+  ];
+
+  const declarations: DeclarationOutput = Object.create(null);
+  for (const dtsGenerator of dtsGenerators) {
+    Object.assign(declarations, await dtsGenerator(vfs, declarationOptions));
+  }
+
+  for (const declarationFile of declarationFiles) {
+    const result = declarations[declarationFile.srcPath];
+
+    declarationFile.type = "declaration";
+    declarationFile.contents = result?.contents || "";
+
+    if (result?.errors) {
+      declarationFile.skip = true;
+    }
+  }
+}

@@ -22,7 +22,11 @@ export async function build(config: BuildConfig): Promise<void> {
 
   const pkgDir = normalizePath(config.cwd);
   const pkg = await readPackageJSON(pkgDir);
-  const ctx: BuildContext = { pkg, pkgDir };
+  const ctx: BuildContext = {
+    pkg,
+    pkgDir,
+    experimental: config.experimental,
+  };
 
   consola.log(
     `📦 Building \`${ctx.pkg.name || "<no name>"}\` (\`${ctx.pkgDir}\`)`,

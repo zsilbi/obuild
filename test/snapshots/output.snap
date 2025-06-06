@@ -12,6 +12,75 @@ console.log("hello world");
 //#endregion",
   ],
   [
+    "dts-only/a-types.d.mts",
+    "import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
+export interface User {
+    id: UserID;
+    name: string;
+    email: string;
+    status: Status;
+    profile?: Profile;
+}
+export interface Profile {
+    bio: string;
+    age: number;
+    interests: string[];
+}
+",
+  ],
+  [
+    "dts-only/b-types.d.mts",
+    "export type UserID = string | number;
+",
+  ],
+  [
+    "dts-only/c-types.d.mts",
+    "export type Status = "active" | "inactive" | "pending";
+",
+  ],
+  [
+    "dts-only/dir/index.d.mts",
+    "export declare enum Role {
+    Admin = "ADMIN",
+    User = "USER",
+    Guest = "GUEST"
+}
+declare const _default: {};
+export default _default;
+",
+  ],
+  [
+    "dts-only/module.d.mts",
+    "import type { User } from "./a-types.mjs";
+import type { UserID } from "./b-types.mjs";
+import type { Status } from "./c-types.mjs";
+import { Role } from "./dir/index.mjs";
+export type A = typeof import("./a-types.mjs");
+export type B = typeof import("./b-types.mjs");
+export type C = typeof import("./c-types.mjs");
+export type Dir = typeof import("./dir/index.mjs");
+export declare class UserManager {
+    private users;
+    addUser(user: User): void;
+    getUser(id: UserID): User | undefined;
+    getAllUsers(): User[];
+}
+export declare function createUser(name: string, email: string, status?: Status): User;
+export declare function isActive(user: User): boolean;
+export declare const DEFAULT_STATUS: Status;
+export declare const ROLES: Role[];
+export type ApiResponse<T> = {
+    data: T;
+    error?: string;
+};
+export declare namespace Utils {
+    function capitalize(str: string): string;
+    function isEmail(email: string): boolean;
+}
+",
+  ],
+  [
     "index.d.mts",
     "//#region src/index.d.ts
 declare function test(): string;
@@ -152,14 +221,14 @@ export { tsModule } from "./modules/ts-module.mjs";
 export { TsxComponent } from "./components/tsx.mjs";
 // @ts-expect-error - JS test file
 export { jsModule } from "./modules/js-module.js";
-// @ts-expect-error - JSX test file
+// @ts-ignore - MJS test file
 export { JsxComponent } from "./components/jsx.mjs";
 export default "default export";
 ",
   ],
   [
     "non-isolated/index.mjs.map",
-    "{"mappings":"AAAA,SAAS,YAAY;;AAGrB,SAAS,gBAAgB;AAEzB,SAAS,oBAAoB;;AAG7B,SAAS,gBAAgB;;AAGzB,SAAS,oBAAoB;AAE7B,eAAe","names":[],"sources":["../../src/non-isolated/index.ts"],"sourcesContent":["export { test } from \"./test.mjs\"; // Explicitly import the test file with .ts extension\n\n// Module resolution test imports, using no extensions\nexport { tsModule } from \"./modules/ts-module.mjs\";\n\nexport { TsxComponent } from \"./components/tsx.mjs\";\n\n// @ts-expect-error - JS test file\nexport { jsModule } from \"./modules/js-module.js\";\n\n// @ts-expect-error - JSX test file\nexport { JsxComponent } from \"./components/jsx.mjs\";\n\nexport default \"default export\";\n"],"version":"3","file":"index.mjs"}",
+    "{"mappings":"AAAA,SAAS,YAAY;;AAGrB,SAAS,gBAAgB;AAEzB,SAAS,oBAAoB;;AAG7B,SAAS,gBAAgB;;AAGzB,SAAS,oBAAoB;AAE7B,eAAe","names":[],"sources":["../../src/non-isolated/index.ts"],"sourcesContent":["export { test } from \"./test.mjs\"; // Explicitly import the test file with .ts extension\n\n// Module resolution test imports, using no extensions\nexport { tsModule } from \"./modules/ts-module.mjs\";\n\nexport { TsxComponent } from \"./components/tsx.mjs\";\n\n// @ts-expect-error - JS test file\nexport { jsModule } from \"./modules/js-module.js\";\n\n// @ts-ignore - MJS test file\nexport { JsxComponent } from \"./components/jsx.mjs\";\n\nexport default \"default export\";\n"],"version":"3","file":"index.mjs"}",
   ],
   [
     "non-isolated/modules/js-module.js",

@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { replaceExtension } from "./utils.ts";
+import { replaceExtension, rewriteSpecifiers } from "./utils.ts";
 import { transform as oxcTransform } from "oxc-transform";
 
 import type {
@@ -18,17 +18,18 @@ import type {
  */
 export async function transform(
   input: Readonly<ProcessableFile>,
-  options?: ProcessOptions["transform"],
+  options?: Pick<ProcessOptions, "transform" | "resolve" | "parser">,
 ): Promise<
   | [ProcessableFile, DeclarationFile]
   | [ProcessableFile, DeclarationFile, TransformedSourceMapFile]
 > {
+  const { contents } = rewriteSpecifiers(input, options);
   const {
     code: transformedCode,
     declaration: declarationContents,
     map: sourceMap,
     errors: transformErrors,
-  } = oxcTransform(input.path, input.contents, options);
+  } = oxcTransform(input.path, contents, options?.transform);
 
   const errors = transformErrors.filter(
     (err) => !err.message.includes("--isolatedDeclarations"),
@@ -57,7 +58,7 @@ export async function transform(
     // Enable post-transform generation if `oxc-transform` didn't provide a declaration
     declaration: declarationContents === undefined,
     // Use the original contents if no declaration was generated
-    contents: declarationContents || input.contents,
+    contents: declarationContents || contents,
     path: input.path,
     srcPath: input.srcPath,
     extension: ".d.mts",
