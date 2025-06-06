@@ -26,7 +26,7 @@
     "prepack": "pnpm build",
     "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && pnpm vitest run --coverage",
-    "test:types": "tsc --noEmit --skipLibCheck -p tsconfig.test.json"
+    "test:types": "tsc --noEmit --skipLibCheck -p tsconfig.src.json"
   },
   "dependencies": {
     "autoprefixer": "^10.4.21",
