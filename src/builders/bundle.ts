@@ -8,7 +8,7 @@ import { dts } from "rolldown-plugin-dts";
 import oxcParser from "oxc-parser";
 import { resolveModulePath } from "exsolve";
 import prettyBytes from "pretty-bytes";
-import { distSize, fmtPath, sideEffectSize } from "../utils.ts";
+import { distSize, fmtPath, normalizePath, sideEffectSize } from "../utils.ts";
 import { makeExecutable, shebangPlugin } from "./plugins/shebang.ts";
 import { defu } from "defu";
 
@@ -82,12 +82,18 @@ export async function rolldownBuild(
   } satisfies InputOptions);
 
   if (entry.dts !== false) {
-    rolldownConfig.plugins.push(
-      ...dts({
-        // ...(ctx.experimental?.tsgo === true ? { tsgo: true } : {}),
-        ...(entry.dts as DtsOptions),
-      }),
-    );
+    const tsgo = typeof entry.dts === "object" ? entry.dts.tsgo : false;
+    const dtsOptions: DtsOptions = {
+      ...(entry.dts as DtsOptions),
+      ...(tsgo
+        ? {
+            tsgo:
+              typeof tsgo === "string" ? normalizePath(tsgo, ctx.pkgDir) : true,
+          }
+        : {}),
+    };
+
+    rolldownConfig.plugins.push(...dts(dtsOptions));
   }
 
   await hooks.rolldownConfig?.(rolldownConfig, ctx);
