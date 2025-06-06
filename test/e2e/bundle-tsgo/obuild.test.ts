@@ -9,6 +9,7 @@ const distDir = new URL("dist/", fixtureDir);
 
 const dts: BuildEntry["dts"] = {
   tsconfig: new URL("tsconfig.json", fixtureDir).pathname,
+  tsgo: "src",
 };
 
 describe("bundle", () => {
@@ -18,9 +19,6 @@ describe("bundle", () => {
 
   test("build fixture", async () => {
     await build({
-      experimental: {
-        tsgo: true,
-      },
       cwd: fixtureDir,
       entries: [
         { type: "bundle", input: ["src/index", "src/cli"], dts },

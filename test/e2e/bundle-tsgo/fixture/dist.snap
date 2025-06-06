@@ -15,7 +15,7 @@ console.log("hello world");
     "index.d.mts",
     "//#region src/index.d.ts
 declare function test(): string;
-declare const _default: "default export";
+declare const _default: string;
 //#endregion
 export { _default as default, test };",
   ],
@@ -34,7 +34,7 @@ export { src_default as default, test };",
     "utils.d.mts",
     "//#region src/utils.d.ts
 declare function test(): string;
-declare const _default: "default utils export";
+declare const _default: string;
 //#endregion
 export { _default as default, test };",
   ],

@@ -28,6 +28,14 @@ export type DeclarationOptions = {
   relativeExtensions?: boolean;
 
   /**
+   * Enable experimental support for `tsgo` in rolldown and declaration generation.
+   * To use this option, make sure `@typescript/native-preview` is installed as a dependency.
+   *
+   * NOTE: This option is experimental and may change in the future.
+   */
+  tsgo?: boolean;
+
+  /**
    * TypeScript compiler options.
    */
   typescript?: {

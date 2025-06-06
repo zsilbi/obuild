@@ -9,6 +9,7 @@ import {
 import type { TSConfig } from "pkg-types";
 import type { OutputFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
+import consola from "consola";
 
 export { getTscDeclarations } from "./tsc.ts";
 export { getTsgoDeclarations } from "./tsgo.ts";
@@ -80,11 +81,17 @@ export async function generateDeclarations(
     declarationFiles.map((file) => [file.srcPath, file.contents || ""]),
   );
 
+  const tsgo = typeof entry.dts === "object" && entry.dts.tsgo;
+
+  if (tsgo) {
+    consola.warn(
+      "The `tsgo` option is experimental and may change in the future.",
+    );
+  }
+
   const dtsGenerators = [
     getVueDeclarations,
-    context.experimental?.tsgo === true
-      ? getTsgoDeclarations
-      : getTscDeclarations,
+    tsgo ? getTsgoDeclarations : getTscDeclarations,
   ];
 
   const declarations: DeclarationOutput = Object.create(null);

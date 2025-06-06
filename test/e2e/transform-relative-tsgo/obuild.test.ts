@@ -13,6 +13,7 @@ const tsConfig = getTsconfig(new URL("tsconfig.json", fixtureDir).pathname);
 const dts: TransformEntry["dts"] = {
   typescript: tsConfig?.config,
   relativeExtensions: true,
+  tsgo: true,
 };
 
 describe("transform with relativeExtensions", () => {
@@ -22,9 +23,6 @@ describe("transform with relativeExtensions", () => {
 
   test("build fixture", async () => {
     await build({
-      experimental: {
-        tsgo: true,
-      },
       cwd: fixtureDir,
       entries: [
         {

@@ -12,6 +12,7 @@ const distDir = new URL("dist/", fixtureDir);
 const tsConfig = getTsconfig(new URL("tsconfig.json", fixtureDir).pathname);
 const dts: TransformEntry["dts"] = {
   typescript: tsConfig?.config,
+  tsgo: true,
 };
 
 describe("transform components", () => {
@@ -21,9 +22,6 @@ describe("transform components", () => {
 
   test("build fixture", async () => {
     await build({
-      experimental: {
-        tsgo: true,
-      },
       cwd: fixtureDir,
       entries: [
         {

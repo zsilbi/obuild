@@ -18,14 +18,6 @@ import type {
 export interface BuildContext {
   pkgDir: string;
   pkg: PackageJson;
-  experimental?: {
-    /**
-     * Enable experimental support for `tsgo` in rolldown and declaration generation.
-     *
-     * To use this option, make sure `@typescript/native-preview` is installed as a dependency.
-     */
-    tsgo?: boolean;
-  };
 }
 
 export type _BuildEntry = {
@@ -140,9 +132,4 @@ export interface BuildConfig {
   cwd?: string | URL;
   entries?: (BuildEntry | string)[];
   hooks?: BuildHooks;
-
-  /**
-   * Experimental features.
-   */
-  experimental?: BuildContext["experimental"];
 }
