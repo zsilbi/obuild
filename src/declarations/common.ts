@@ -9,6 +9,8 @@ import {
   findTypeExports,
 } from "mlly";
 
+export type VFS = Map<string, string>;
+
 export type DeclarationOptions = {
   /**
    * Directory where the output files will be written.
@@ -65,7 +67,7 @@ export async function normalizeCompilerOptions(
  * @returns A TypeScript compiler host that reads from and writes to the VFS.
  */
 export function createVfsCompilerHost(
-  vfs: Map<string, string>,
+  vfs: VFS,
   options: CompilerOptions,
   ts: typeof import("typescript"),
 ): CompilerHost {
@@ -97,7 +99,7 @@ export function createVfsCompilerHost(
  * @returns An object containing the generated declaration files and any errors encountered.
  */
 export async function extractDeclarations(
-  vfs: Map<string, string>,
+  vfs: VFS,
   inputFiles: string[],
   options: DeclarationOptions,
 ): Promise<DeclarationOutput> {
@@ -129,7 +131,7 @@ export async function extractDeclarations(
 function addRelativeExtensions(
   contents: string,
   fileName: string,
-  vfs: Map<string, string>,
+  vfs: VFS,
 ): string {
   const ext = fileName.match(JS_EXT_RE)?.[0].replace(/ts$/, "js") || ".mjs";
 

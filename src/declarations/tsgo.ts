@@ -11,12 +11,14 @@ import {
   extractDeclarations,
   type DeclarationOptions,
   type DeclarationOutput,
+  type VFS,
 } from "./common.ts";
 
 const SRC_DIR_NAME = "src";
 const DIST_DIR_NAME = "dist";
-const CACHE_PREFIX = "obuild-tsgo-";
-const KNOWN_EXT_RE = /\.(m)?[tj]sx?$/;
+const CACHE_PREFIX = "obuild-";
+const KNOWN_EXT_RE = /(?<!\.d)\.(m)?[tj]sx?$/;
+const DECLARATION_RE = /\.d\.m?ts$/;
 
 /**
  * Generates TypeScript declarations using the native `tsgo` compiler.
@@ -30,14 +32,15 @@ const KNOWN_EXT_RE = /\.(m)?[tj]sx?$/;
  * @returns A promise that resolves to the declaration output, or undefined if there are no files.
  */
 export async function getTsgoDeclarations(
-  vfs: Map<string, string>,
+  vfs: VFS,
   options: DeclarationOptions,
 ): Promise<DeclarationOutput | undefined> {
-  if (vfs.size === 0) {
+  if (
+    vfs.size === 0 ||
+    vfs.keys().some((filePath) => KNOWN_EXT_RE.test(filePath)) === false
+  ) {
     return undefined;
   }
-
-  console.log("WTF?");
 
   const { tempDir, distDir } = await setupTemporaryProject(vfs, options);
 
@@ -53,6 +56,52 @@ export async function getTsgoDeclarations(
   }
 }
 
+export async function findNearestNodeModules(
+  startDir: string,
+): Promise<string | null> {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const candidate = path.join(currentDir, "node_modules");
+
+    try {
+      await fsp.access(candidate);
+
+      return candidate;
+    } catch {
+      const parentDir = path.dirname(currentDir);
+
+      if (parentDir === currentDir) {
+        return null;
+      }
+
+      currentDir = parentDir;
+    }
+  }
+}
+
+async function linkNodeModules(
+  tempDir: string,
+  inputDir: string,
+): Promise<void> {
+  const nodeModulesPath = await findNearestNodeModules(inputDir);
+
+  if (!nodeModulesPath) {
+    consola.warn(
+      `No node_modules found in "${inputDir}" or its parent directories.`,
+    );
+    return;
+  }
+
+  const tempNodeModulesPath = path.join(tempDir, "node_modules");
+
+  try {
+    await fsp.symlink(nodeModulesPath, tempNodeModulesPath, "dir");
+  } catch (error: any) {
+    consola.error(`Failed to link node_modules: ${error.message}`);
+  }
+}
+
 /**
  * Sets up a temporary directory with the project source files and configuration.
  *
@@ -60,16 +109,17 @@ export async function getTsgoDeclarations(
  * @param options - The declaration options.
  * @return An object containing the temporary directory, source directory, and distribution directory.
  */
-async function setupTemporaryProject(
-  vfs: Map<string, string>,
-  options: DeclarationOptions,
-) {
+async function setupTemporaryProject(vfs: VFS, options: DeclarationOptions) {
   const tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), CACHE_PREFIX));
   const srcDir = path.join(tempDir, SRC_DIR_NAME);
   const distDir = path.join(tempDir, DIST_DIR_NAME);
 
-  // Create source and distribution directories
-  await Promise.all([fsp.mkdir(srcDir), fsp.mkdir(distDir)]);
+  // Create source and distribution directories and link node_modules
+  await Promise.all([
+    fsp.mkdir(srcDir),
+    fsp.mkdir(distDir),
+    linkNodeModules(tempDir, options.inputDir),
+  ]);
 
   // Write the virtual file system contents to the source directory
   await Promise.all(
@@ -109,24 +159,29 @@ async function setupTemporaryProject(
  * @returns A promise that resolves when all declaration files have been read and added to the VFS.
  */
 async function updateVfsWithDeclarations(
-  vfs: Map<string, string>,
+  vfs: VFS,
   inputFiles: string[],
   distDir: string,
   inputDir: string,
 ): Promise<void> {
   await Promise.all(
-    inputFiles.map(async (filePath) => {
-      const dtsFileName = filePath.replace(KNOWN_EXT_RE, ".d.$1ts");
-      const dtsPath = path.join(distDir, path.relative(inputDir, dtsFileName));
-
-      try {
-        vfs.set(dtsFileName, await fsp.readFile(dtsPath, "utf8"));
-      } catch (error: any) {
-        consola.warn(
-          `Could not read declaration file for "${filePath}" at "${dtsPath}": ${error.message}`,
+    inputFiles
+      .filter((inputFilePath) => !DECLARATION_RE.test(inputFilePath))
+      .map(async (inputFilePath) => {
+        const dtsFileName = inputFilePath.replace(KNOWN_EXT_RE, ".d.$1ts");
+        const dtsPath = path.join(
+          distDir,
+          path.relative(inputDir, dtsFileName),
         );
-      }
-    }),
+
+        try {
+          vfs.set(dtsFileName, await fsp.readFile(dtsPath, "utf8"));
+        } catch (error: any) {
+          consola.warn(
+            `Could not read declaration file for "${inputFilePath}" at "${dtsPath}": ${error.message}`,
+          );
+        }
+      }),
   );
 }
 
@@ -154,6 +209,7 @@ function createTsConfig(
           outDir: distDir,
           rootDir: srcDir,
           noEmit: false,
+          noCheck: true,
         },
       },
       options?.typescript || {},
@@ -180,7 +236,6 @@ async function runTsGo(cwd: string): Promise<void> {
 
   const { default: tsgo } = await import(pathToFileURL(getExePath).href);
 
-  // This must return a promise to be awaited
   return new Promise<void>((resolve, reject) => {
     const process = spawn(tsgo(), [], {
       cwd,

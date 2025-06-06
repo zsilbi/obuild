@@ -10,6 +10,7 @@ import {
   normalizeCompilerOptions,
   type DeclarationOptions,
   type DeclarationOutput,
+  type VFS,
 } from "./common.ts";
 
 const SFC_EXT_RE = /\.vue\.m?[jt]s$/;
@@ -23,7 +24,7 @@ const SFC_EXT_RE = /\.vue\.m?[jt]s$/;
  * @returns Declaration output containing generated files and diagnostics, or undefined if no Vue SFCs are found.
  */
 export async function getVueDeclarations(
-  vfs: Map<string, string>,
+  vfs: VFS,
   options: DeclarationOptions,
 ): Promise<DeclarationOutput | undefined> {
   const fileMapping = getFileMapping(vfs);
@@ -91,7 +92,7 @@ export async function getVueDeclarations(
  * @param vfs - The virtual file system containing the source files.
  * @returns A record mapping .vue files to their original source paths.
  */
-function getFileMapping(vfs: Map<string, string>): Record<string, string> {
+function getFileMapping(vfs: VFS): Record<string, string> {
   const files: Record<string, string> = Object.create(null);
 
   for (const srcPath of vfs.keys()) {
