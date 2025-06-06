@@ -121,7 +121,7 @@ export async function extractDeclarations(
 }
 
 /**
- * Adds declaration extensions to relative imports in the given contents.
+ * Add declaration extensions to relative imports in the given contents.
  *
  * @param contents - The source code contents to modify.
  * @param fileName - The name of the file being processed.
@@ -151,32 +151,39 @@ function addRelativeExtensions(
     }),
   ];
 
-  for (const imp of imports) {
-    if (!imp.specifier || !RELATIVE_RE.test(imp.specifier)) {
+  for (const statement of imports) {
+    if (!statement.specifier || !RELATIVE_RE.test(statement.specifier)) {
       continue;
     }
 
-    const srcPath = resolve(fileName, "..", imp.specifier);
-    const srcDtsPath = srcPath + ext.replace(JS_EXT_RE, ".d.$1ts");
+    const srcPath = resolve(fileName, "..", statement.specifier);
+    const srcDtsPath =
+      // Clear the extension to ensure we get the correct declaration file path
+      srcPath.replace(JS_EXT_RE, "") + ext.replace(JS_EXT_RE, ".d.$1ts");
 
-    let specifier = imp.specifier;
+    const hasDts = vfs.has(srcDtsPath);
+
+    if (hasDts === false && JS_EXT_RE.test(srcPath)) {
+      // Already has an extension, but not a declaration file, it's probably an untransfrmed JS file.
+      continue;
+    }
+
+    let specifier = statement.specifier;
     try {
-      if (!vfs.has(srcDtsPath) && statSync(srcPath).isDirectory()) {
+      if (hasDts === false && statSync(srcPath).isDirectory()) {
         specifier += "/index";
       }
     } catch {
       // src file does not exists
     }
 
-    contents = contents.replace(
-      imp.code,
-      imp.code.replace(
-        imp.specifier,
-        JS_EXT_RE.test(specifier)
-          ? specifier.replace(JS_EXT_RE, "") + ext
-          : specifier + ext,
-      ),
+    const replacement = statement.code.replace(
+      statement.specifier,
+      // add file extension for relative paths, but avoid double extension
+      specifier.replace(JS_EXT_RE, "") + ext,
     );
+
+    contents = contents.replace(statement.code, replacement);
   }
 
   return contents;
