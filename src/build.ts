@@ -25,7 +25,6 @@ export async function build(config: BuildConfig): Promise<void> {
   const ctx: BuildContext = {
     pkg,
     pkgDir,
-    experimental: config.experimental,
   };
 
   consola.log(
