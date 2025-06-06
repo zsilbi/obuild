@@ -58,6 +58,8 @@ describe("transform components", () => {
         "components/ts.vue.d.ts",
         "components/tsx.d.mts",
         "components/tsx.mjs",
+        "components/vue-component.d.mts",
+        "components/vue-component.mjs",
         "prop-types/index.d.mts",
         "prop-types/index.mjs",
       ]

@@ -261,6 +261,99 @@ export const Test = () => /* @__PURE__ */ _jsx("div", { children: "42" });
 ",
   ],
   [
+    "components/vue-component.d.mts",
+    "declare const FooBarComponent: import("vue").DefineComponent<import("vue").ExtractPropTypes<{
+    fooString: {
+        type: StringConstructor;
+        default: () => string;
+    };
+    barNumber: {
+        type: NumberConstructor;
+        default: () => number;
+    };
+    bazBoolean: {
+        type: BooleanConstructor;
+        default: () => boolean;
+    };
+    quxArray: {
+        type: ArrayConstructor;
+        default: () => never[];
+    };
+    quuxObject: {
+        type: ObjectConstructor;
+        default: () => {};
+    };
+}>, {}, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
+    "foo-bar-event"(_payload: unknown): true;
+}, string, import("vue").PublicProps, Readonly<import("vue").ExtractPropTypes<{
+    fooString: {
+        type: StringConstructor;
+        default: () => string;
+    };
+    barNumber: {
+        type: NumberConstructor;
+        default: () => number;
+    };
+    bazBoolean: {
+        type: BooleanConstructor;
+        default: () => boolean;
+    };
+    quxArray: {
+        type: ArrayConstructor;
+        default: () => never[];
+    };
+    quuxObject: {
+        type: ObjectConstructor;
+        default: () => {};
+    };
+}>> & Readonly<{
+    "onFoo-bar-event"?: ((_payload: unknown) => any) | undefined;
+}>, {
+    fooString: string;
+    barNumber: number;
+    bazBoolean: boolean;
+    quxArray: unknown[];
+    quuxObject: Record<string, any>;
+}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
+export default FooBarComponent;
+",
+  ],
+  [
+    "components/vue-component.mjs",
+    "import { defineComponent } from "vue";
+const FooBarComponent = defineComponent({
+	name: "FooBarComponent",
+	inheritAttrs: false,
+	props: {
+		fooString: {
+			type: String,
+			default: () => "foo"
+		},
+		barNumber: {
+			type: Number,
+			default: () => 42
+		},
+		bazBoolean: {
+			type: Boolean,
+			default: () => true
+		},
+		quxArray: {
+			type: Array,
+			default: () => []
+		},
+		quuxObject: {
+			type: Object,
+			default: () => ({})
+		}
+	},
+	emits: { "foo-bar-event"(_payload) {
+		return true;
+	} }
+});
+export default FooBarComponent;
+",
+  ],
+  [
     "prop-types/index.d.mts",
     "export interface Color {
     red: number;
