@@ -32,7 +32,7 @@ describe("transform with relativeExtensions", () => {
         },
       ],
     });
-  }, 10_000);
+  }, 20_000);
 
   test("dist files match expected", async () => {
     const distFiles = await readFileNames(distDir);

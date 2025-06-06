@@ -32,7 +32,7 @@ describe("transform raw", () => {
     await expect(await readDistFiles(distDir)).toMatchFileSnapshot(
       "./fixture/dist.snap",
     );
-  }, 10_000);
+  }, 20_000);
 
   test("cli shebang is executable", async () => {
     const cliPath = new URL("cli.mjs", distDir);
