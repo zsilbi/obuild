@@ -48,7 +48,7 @@ export async function getTsgoDeclarations(
     await runTsGo(tempDir);
 
     const inputFiles = [...vfs.keys()];
-    await updateVfsWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
+    await updateVFSWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
 
     return await extractDeclarations(vfs, inputFiles, options);
   } finally {
@@ -56,7 +56,13 @@ export async function getTsgoDeclarations(
   }
 }
 
-export async function findNearestNodeModules(
+/**
+ * Finds the nearest `node_modules` directory starting from the given directory.
+ *
+ * @param startDir - The directory to start searching from.
+ * @returns The path to the nearest `node_modules` directory, or null if not found.
+ */
+async function findNearestNodeModules(
   startDir: string,
 ): Promise<string | null> {
   let currentDir = path.resolve(startDir);
@@ -80,6 +86,12 @@ export async function findNearestNodeModules(
   }
 }
 
+/**
+ * Links the nearest `node_modules` directory to the temporary project directory.
+ *
+ * @param tempDir - The temporary directory where the project is set up.
+ * @param inputDir - The input directory where the source files are located.
+ */
 async function linkNodeModules(
   tempDir: string,
   inputDir: string,
@@ -158,7 +170,7 @@ async function setupTemporaryProject(vfs: VFS, options: DeclarationOptions) {
  * @param inputDir - The root directory of the source files.
  * @returns A promise that resolves when all declaration files have been read and added to the VFS.
  */
-async function updateVfsWithDeclarations(
+async function updateVFSWithDeclarations(
   vfs: VFS,
   inputFiles: string[],
   distDir: string,
