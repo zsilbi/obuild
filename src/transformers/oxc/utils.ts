@@ -112,6 +112,13 @@ export function rewriteSpecifiers(
   };
 }
 
+/**
+ * Combines two source map files into one.
+ *
+ * @param transformedSourceMapFile - The transformed source map file, which is based on the original source code.
+ * @param minifiedSourceMapFile - The minified source map file, which is based on the minified code.
+ * @returns A merged source map file that combines the transformed and minified source maps.
+ */
 export function mergeSourceMapFiles(
   transformedSourceMapFile: Readonly<TransformedSourceMapFile> | undefined,
   minifiedSourceMapFile: Readonly<MinifiedSourceMapFile> | undefined,

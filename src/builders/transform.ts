@@ -38,14 +38,6 @@ export async function transformDir(
   }
 
   const tsConfig = resolveTSConfig(entry);
-
-  if (tsConfig === null) {
-    consola.warn(
-      `No TypeScript configuration found for ${fmtPath(entry.input)}`,
-    );
-    return;
-  }
-
   const transformer = createTransformer({
     ...entry,
     tsConfig,
@@ -77,7 +69,7 @@ export async function transformDir(
   // Rename files to their desired extensions
   renameFiles(outputFiles);
 
-  // Rewrite source map sources to relative paths
+  // Rewrite and serialize source map sources to relative paths
   serializeSourceMapFiles(outputFiles, entry, context);
 
   const writePromises: Promise<string>[] = outputFiles
