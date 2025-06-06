@@ -3,8 +3,8 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "noEmit": true,
     "isolatedDeclarations": false,
-    "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true
   },
   "include": ["src"]

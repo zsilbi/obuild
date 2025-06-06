@@ -3,9 +3,8 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "composite": true,
+    "noEmit": true,
     "isolatedDeclarations": false,
-    "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "paths": {

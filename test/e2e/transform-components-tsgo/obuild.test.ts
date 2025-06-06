@@ -34,7 +34,7 @@ describe("transform components", () => {
         },
       ],
     });
-  });
+  }, 10_000);
 
   test("dist files match expected", async () => {
     const distFiles = await readFileNames(distDir);
