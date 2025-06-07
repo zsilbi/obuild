@@ -1,7 +1,7 @@
 import { statSync } from "node:fs";
 import { resolve } from "pathe";
 import type { CompilerHost, CompilerOptions, EmitResult } from "typescript";
-import type { TSConfig } from "pkg-types";
+import type { PackageJson, TSConfig } from "pkg-types";
 import {
   findStaticImports,
   findDynamicImports,
@@ -13,9 +13,14 @@ export type VFS = Map<string, string>;
 
 export type DeclarationOptions = {
   /**
+   * Package.json object representing the project.
+   */
+  pkg: PackageJson;
+
+  /**
    * Directory where the root of the project is located.
    */
-  rootDir: string;
+  pkgDir: string;
 
   /**
    * Directory containing the input files to process.

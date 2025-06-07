@@ -7,8 +7,8 @@ import type {
 } from "rolldown";
 
 import type { PackageJson } from "pkg-types";
-import type { Options as DtsOptions } from "rolldown-plugin-dts";
-import type { DeclarationOptions } from "./declarations/index.ts";
+import type { Options as BundleDtsOptions } from "rolldown-plugin-dts";
+import type { TransformDtsOptions } from "./declarations/index.ts";
 import type {
   Transformer,
   TransformerName,
@@ -65,7 +65,7 @@ export type BundleEntry = _BuildEntry & {
    *
    * Set to `false` to disable.
    */
-  dts?: boolean | DtsOptions;
+  dts?: boolean | BundleDtsOptions;
 };
 
 export type TransformEntry = _BuildEntry & {
@@ -108,7 +108,7 @@ export type TransformEntry = _BuildEntry & {
    *
    * Set to `false` to disable declaration generation, or provide options to customize it.
    */
-  dts?: boolean | Omit<DeclarationOptions, "rootDir" | "inputDir">;
+  dts?: boolean | TransformDtsOptions;
 };
 
 export type BuildEntry = BundleEntry | TransformEntry;

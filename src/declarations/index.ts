@@ -1,21 +1,20 @@
-import {
-  getTscDeclarations,
-  getTsgoDeclarations,
-  getVueDeclarations,
-  type DeclarationOptions,
-  type DeclarationOutput,
-} from "./index.ts";
+import consola from "consola";
+import { getTscDeclarations } from "./tsc.ts";
+import { getTsgoDeclarations } from "./tsgo.ts";
+import { getVueDeclarations } from "./vue-tsc.ts";
 
 import type { TSConfig } from "pkg-types";
 import type { OutputFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
-import consola from "consola";
+import type { DeclarationOptions } from "./common.ts";
+import type { DeclarationOutput } from "./common.ts";
 
-export { getTscDeclarations } from "./tsc.ts";
-export { getTsgoDeclarations } from "./tsgo.ts";
-export { getVueDeclarations } from "./vue-tsc.ts";
+export { type DeclarationOutput } from "./common.ts";
 
-export type { DeclarationOptions, DeclarationOutput } from "./common.ts";
+export type TransformDtsOptions = Pick<
+  DeclarationOptions,
+  "relativeExtensions" | "tsgo" | "typescript"
+>;
 
 /**
  * Post-process output files to generate declarations.
@@ -72,7 +71,8 @@ export async function generateDeclarations(
 
   const declarationOptions: DeclarationOptions = {
     ...(typeof entry.dts === "object" ? entry.dts : {}),
-    rootDir: context.pkgDir,
+    pkg: context.pkg,
+    pkgDir: context.pkgDir,
     inputDir: entry.input,
     typescript: tsConfig,
   };

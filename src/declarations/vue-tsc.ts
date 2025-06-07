@@ -66,7 +66,7 @@ export async function getVueDeclarations(
       vueLanguageCore.createParsedCommandLineByJson(
         ts,
         ts.sys,
-        options.rootDir,
+        options.pkgDir,
         {},
       ).vueOptions,
       (id: string) => id,
