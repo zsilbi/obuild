@@ -46,6 +46,7 @@ export async function getTsgoDeclarations(
 
   try {
     await runTsGo(tempDir);
+    // await runTsc(tempDir);
 
     const inputFiles = [...vfs.keys()];
     await updateVFSWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
@@ -154,7 +155,7 @@ async function setupTemporaryProject(vfs: VFS, options: DeclarationOptions) {
     ),
     fsp.writeFile(
       path.join(tempDir, "package.json"),
-      JSON.stringify({ type: "module" }, null, 2),
+      JSON.stringify(options.pkg, null, 2),
     ),
   ]);
 
@@ -216,10 +217,10 @@ function createTsConfig(
         verbatimModuleSyntax: false,
         emitDeclarationOnly: true,
         declaration: true,
-        removeComments: true,
         outDir: distDir,
         rootDir: srcDir,
         noEmit: false,
+        noCheck: true,
       },
       options.typescript?.compilerOptions,
     ),
@@ -231,7 +232,6 @@ function createTsConfig(
  * Locates the `tsgo` executable and runs it in the specified directory.
  *
  * @param cwd - The working directory to run the compiler in.
- * @returns A promise that resolves on success or rejects on failure.
  */
 async function runTsGo(cwd: string): Promise<void> {
   const require = createRequire(import.meta.url);
@@ -286,3 +286,55 @@ async function runTsGo(cwd: string): Promise<void> {
       });
   });
 }
+
+// /**
+//  * Locates the `tsc` executable and runs it in the specified directory.
+//  *
+//  * @param cwd - The working directory to run the compiler in.
+//  */
+// async function runTsc(cwd: string): Promise<void> {
+//   const require = createRequire(import.meta.url);
+//   const packageJsonPath = require.resolve("typescript/package.json");
+//   const tscPath = path.join(path.dirname(packageJsonPath), "bin", "tsc");
+
+//   return await new Promise<void>((resolve, reject) => {
+//     const process = spawn(tscPath, [], {
+//       cwd,
+//       stdio: "inherit",
+//     });
+
+//     process.on("close", () => {
+//       resolve();
+//     });
+
+//     process.on("exit", (code) => {
+//       if (code === 0) {
+//         resolve();
+//       } else {
+//         reject(new Error(`Process exited with code ${code}`));
+//       }
+//     });
+
+//     process.on("error", (error) => {
+//       reject(new Error(`Failed to start process: ${error.message}`));
+//     });
+//   }).catch((error) => {
+//     return fsp
+//       .readFile(path.join(cwd, "tsconfig.json"), "utf8")
+//       .then((tsconfigContent) => {
+//         // Show `tsconfig.json` for debugging
+//         consola.info("tsconfig.json:\n");
+//         console.dir(JSON.parse(tsconfigContent), {
+//           depth: 5,
+//         });
+//       })
+//       .finally(() => {
+//         consola.warn(
+//           `Error while generating declarations with tsgo: ${error.message}`,
+//         );
+
+//         // @todo: to throw or not to throw?
+//         // throw error;
+//       });
+//   });
+// }
