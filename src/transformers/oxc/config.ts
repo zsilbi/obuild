@@ -32,9 +32,12 @@ const sourceConfig: Record<string, ProcessSourceConfig | undefined> = {
     transform: "jsx",
     extension: ".mjs",
   },
-  ".js": {},
-  ".mjs": {},
-  ".cjs": {},
+  ".js": {
+    transform: "js",
+  },
+  ".mjs": {
+    transform: "js",
+  },
 };
 
 /**

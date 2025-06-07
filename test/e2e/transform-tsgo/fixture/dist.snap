@@ -209,16 +209,26 @@ export default "default export";
 ",
   ],
   [
+    "modules/js-module.d.ts",
+    "export declare function jsModule(): string;
+",
+  ],
+  [
     "modules/js-module.js",
     "export function jsModule() {
-  return "js-module";
+	return "js-module";
 }
+",
+  ],
+  [
+    "modules/mjs-module.d.mts",
+    "export declare function mjsModule(): string;
 ",
   ],
   [
     "modules/mjs-module.mjs",
     "export function mjsModule() {
-  return "mjs-module";
+	return "mjs-module";
 }
 ",
   ],

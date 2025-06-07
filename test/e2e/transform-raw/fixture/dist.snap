@@ -1,8 +1,14 @@
 [
   [
-    "cli.mjs",
+    "cli.d.mts",
     "#!/usr/bin/env node
 
+console.log("hello world");
+",
+  ],
+  [
+    "cli.mjs",
+    "#!/usr/bin/env node
 console.log("hello world");
 ",
   ],

@@ -205,12 +205,22 @@ export default _default;
     "{"version":3,"sources":["../src/index.ts"],"names":[],"mappings":"AAAA,OAAS,SAAY,aAErB,OAAS,aAAgB,0BAEzB,OAAS,aAAgB,yBACzB,eAAe","file":"index.mjs","sourcesContent":["export { test } from \"./test.mjs\"; // Explicitly import the test file with .ts extension\n\n// Module resolution test imports, using no extensions\nexport { tsModule } from \"./modules/ts-module.mjs\";\n\n// @ts-expect-error - JS test file\nexport { jsModule } from \"./modules/js-module.js\";\n\nexport default \"default export\";\n"]}",
   ],
   [
+    "modules/js-module.d.ts",
+    "export function jsModule(): string;
+",
+  ],
+  [
     "modules/js-module.js",
     "export function jsModule(){return`js-module`}",
   ],
   [
     "modules/js-module.js.map",
-    "{"mappings":"AAAA,OAAO,SAAS,UAAW,CACzB,MAAO,WACR","names":[],"sources":["../../src/modules/js-module.js"],"sourcesContent":["export function jsModule() {\n  return \"js-module\";\n}\n"],"version":"3","file":"js-module.js"}",
+    "{"version":3,"sources":["../../src/modules/js-module.js"],"names":[],"mappings":"AAAA,OAAO,SAAS,UAAW,CACzB,MAAO,WACR","file":"../js-module.js","sourcesContent":["export function jsModule() {\n  return \"js-module\";\n}\n"]}",
+  ],
+  [
+    "modules/mjs-module.d.mts",
+    "export function mjsModule(): string;
+",
   ],
   [
     "modules/mjs-module.mjs",
@@ -218,7 +228,7 @@ export default _default;
   ],
   [
     "modules/mjs-module.mjs.map",
-    "{"mappings":"AAAA,OAAO,SAAS,WAAY,CAC1B,MAAO,YACR","names":[],"sources":["../../src/modules/mjs-module.mjs"],"sourcesContent":["export function mjsModule() {\n  return \"mjs-module\";\n}\n"],"version":"3","file":"mjs-module.mjs"}",
+    "{"version":3,"sources":["../../src/modules/mjs-module.mjs"],"names":[],"mappings":"AAAA,OAAO,SAAS,WAAY,CAC1B,MAAO,YACR","file":"../mjs-module.mjs","sourcesContent":["export function mjsModule() {\n  return \"mjs-module\";\n}\n"]}",
   ],
   [
     "modules/ts-module.d.mts",
