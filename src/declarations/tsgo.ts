@@ -51,13 +51,6 @@ export async function getTsgoDeclarations(
     await updateVFSWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
 
     return await extractDeclarations(vfs, inputFiles, options);
-  } catch (error: any) {
-    consola.error(
-      `Error while generating declarations with tsgo: ${error.message}`,
-    );
-
-    // @todo: to throw or not to throw?
-    // throw error;
   } finally {
     await fsp.rm(tempDir, { recursive: true, force: true });
   }
@@ -273,7 +266,14 @@ async function runTsGo(cwd: string): Promise<void> {
     });
 
     process.on("error", (error) => {
-      reject(new Error(`Failed to start tsgo process: ${error.message}`));
+      reject(new Error(`Failed to start process: ${error.message}`));
     });
+  }).catch((error) => {
+    consola.warn(
+      `Error while generating declarations with tsgo: ${error.message}`,
+    );
+
+    // @todo: to throw or not to throw?
+    // throw error;
   });
 }
