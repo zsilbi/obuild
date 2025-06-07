@@ -51,6 +51,13 @@ export async function getTsgoDeclarations(
     await updateVFSWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
 
     return await extractDeclarations(vfs, inputFiles, options);
+  } catch (error: any) {
+    consola.error(
+      `Error while generating declarations with tsgo: ${error.message}`,
+    );
+
+    // @todo: to throw or not to throw?
+    // throw error;
   } finally {
     await fsp.rm(tempDir, { recursive: true, force: true });
   }
@@ -221,7 +228,6 @@ function createTsConfig(
           outDir: distDir,
           rootDir: srcDir,
           noEmit: false,
-          noCheck: true,
         },
       },
       options?.typescript || {},
@@ -256,6 +262,14 @@ async function runTsGo(cwd: string): Promise<void> {
 
     process.on("close", () => {
       resolve();
+    });
+
+    process.on("exit", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Process exited with code ${code}`));
+      }
     });
 
     process.on("error", (error) => {
