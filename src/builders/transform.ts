@@ -37,7 +37,7 @@ export async function transformDir(
     return;
   }
 
-  const tsConfig = resolveTSConfig(entry, context);
+  const tsConfig = resolveTSConfig(entry);
   const transformer = createTransformer({
     ...entry,
     tsConfig,
@@ -177,13 +177,9 @@ function serializeSourceMapFiles(
  * Resolve the TypeScript configuration for a transform entry.
  *
  * @param entry - The transform entry containing the declaration options.
- * @param context - Build context
  * @returns The TypeScript configuration.
  */
-function resolveTSConfig(
-  entry: TransformEntry,
-  context: BuildContext,
-): TSConfig {
+function resolveTSConfig(entry: TransformEntry): TSConfig {
   // Read the TypeScript configuration from tsconfig.json
   const tsConfigResult = getTsconfig();
 
@@ -215,23 +211,6 @@ function resolveTSConfig(
       allowImportingTsExtensions: true,
     } satisfies TSConfig["compilerOptions"],
   );
-
-  // Rewrite paths in `tsconfig.json` from relative to absolute paths
-  if (typeof tsConfig.compilerOptions.paths === "object") {
-    const tsConfigDir = tsConfigResult?.path
-      ? path.dirname(tsConfigResult.path)
-      : context.pkgDir;
-
-    for (const key in tsConfig.compilerOptions.paths) {
-      tsConfig.compilerOptions.paths[key] = Array.isArray(
-        tsConfig.compilerOptions.paths[key],
-      )
-        ? tsConfig.compilerOptions.paths[key].map((p) =>
-            normalizePath(p, tsConfigDir),
-          )
-        : normalizePath(tsConfig.compilerOptions.paths[key], tsConfigDir);
-    }
-  }
 
   return tsConfig;
 }
