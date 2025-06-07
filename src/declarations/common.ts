@@ -13,7 +13,7 @@ export type VFS = Map<string, string>;
 
 export type DeclarationOptions = {
   /**
-   * Directory where the output files will be written.
+   * Directory where the root of the project is located.
    */
   rootDir: string;
 

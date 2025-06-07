@@ -201,8 +201,8 @@ async function updateVFSWithDeclarations(
  * Creates the tsconfig.json object.
  *
  * @param options - The declaration options.
- * @param distDir - The output directory for compiled declaration files.
- * @param srcDir - The source directory containing TypeScript files.
+ * @param distDir - The temporary output directory for compiled declaration files.
+ * @param srcDir - The temporary source directory containing TypeScript files.
  * @return The tsconfig.json object.
  */
 function createTsConfig(
@@ -211,19 +211,17 @@ function createTsConfig(
   srcDir: string,
 ) {
   return {
-    ...defu(
+    compilerOptions: defu(
       {
-        compilerOptions: {
-          verbatimModuleSyntax: false,
-          emitDeclarationOnly: true,
-          declaration: true,
-          removeComments: true,
-          outDir: distDir,
-          rootDir: srcDir,
-          noEmit: false,
-        },
+        verbatimModuleSyntax: false,
+        emitDeclarationOnly: true,
+        declaration: true,
+        removeComments: true,
+        outDir: distDir,
+        rootDir: srcDir,
+        noEmit: false,
       },
-      options?.typescript || {},
+      options.typescript?.compilerOptions,
     ),
     include: [SRC_DIR_NAME],
   };
@@ -247,7 +245,7 @@ async function runTsGo(cwd: string): Promise<void> {
 
   const { default: tsgo } = await import(pathToFileURL(getExePath).href);
 
-  return new Promise<void>((resolve, reject) => {
+  return await new Promise<void>((resolve, reject) => {
     const process = spawn(tsgo(), [], {
       cwd,
       stdio: "inherit",
@@ -269,11 +267,22 @@ async function runTsGo(cwd: string): Promise<void> {
       reject(new Error(`Failed to start process: ${error.message}`));
     });
   }).catch((error) => {
-    consola.warn(
-      `Error while generating declarations with tsgo: ${error.message}`,
-    );
+    return fsp
+      .readFile(path.join(cwd, "tsconfig.json"), "utf8")
+      .then((tsconfigContent) => {
+        // Show `tsconfig.json` for debugging
+        consola.info("tsconfig.json:\n");
+        console.dir(JSON.parse(tsconfigContent), {
+          depth: 5,
+        });
+      })
+      .finally(() => {
+        consola.warn(
+          `Error while generating declarations with tsgo: ${error.message}`,
+        );
 
-    // @todo: to throw or not to throw?
-    // throw error;
+        // @todo: to throw or not to throw?
+        // throw error;
+      });
   });
 }
