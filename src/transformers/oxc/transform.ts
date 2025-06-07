@@ -57,12 +57,12 @@ export async function transform(
   };
 
   const m = input.extension?.match(M_LETTER_RE)?.[0] || "";
-
+  const generate = declarationContents === undefined;
   const declarationFile: DeclarationFile = {
     // Enable post-transform generation if `oxc-transform` didn't provide a declaration
-    declaration: declarationContents === undefined,
+    declaration: generate,
     // Use the original contents if no declaration was generated
-    contents: declarationContents || contents,
+    contents: generate ? contents : declarationContents,
     path: input.path,
     srcPath: input.srcPath,
     extension: `.d.${m}ts`,
