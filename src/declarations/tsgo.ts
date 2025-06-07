@@ -330,7 +330,7 @@ async function runTsGo(cwd: string): Promise<void> {
 //       })
 //       .finally(() => {
 //         consola.warn(
-//           `Error while generating declarations with tsgo: ${error.message}`,
+//           `Error while generating declarations with tsc: ${error.message}`,
 //         );
 
 //         // @todo: to throw or not to throw?
