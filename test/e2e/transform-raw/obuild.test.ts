@@ -24,6 +24,7 @@ describe("transform raw", () => {
 
     expect(distFiles).toMatchInlineSnapshot(`
       [
+        "cli.d.mts",
         "cli.mjs",
         "data.json",
       ]
