@@ -177,7 +177,7 @@ function addRelativeExtensions(
     const hasDts = vfs.has(srcDtsPath);
 
     if (hasDts === false && JS_EXT_RE.test(srcPath)) {
-      // Already has an extension, but not a declaration file, it's probably an untransfrmed JS file.
+      // Already has an extension, but not a declaration
       continue;
     }
 
