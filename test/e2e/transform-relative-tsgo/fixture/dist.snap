@@ -190,7 +190,8 @@ summary {
   [
     "index.d.mts",
     "export { dynamicModule };
-export { test } from "./test.mjs";
+export { test } from "./test.mjs"; // Explicitly import the test file with .ts extension
+// Module resolution test imports, using no extensions
 export { indexModule } from "./modules/index.mjs";
 export { tsModule } from "./modules/ts-module.mjs";
 export { jsModule } from "./modules/js-module.js";

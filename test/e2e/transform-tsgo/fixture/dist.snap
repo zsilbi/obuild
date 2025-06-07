@@ -189,8 +189,10 @@ summary {
   ],
   [
     "index.d.mts",
-    "export { test } from "./test.mjs";
+    "export { test } from "./test.mjs"; // Explicitly import the test file with .ts extension
+// Module resolution test imports, using no extensions
 export { tsModule } from "./modules/ts-module.mjs";
+// @ts-expect-error - JS test file
 export { jsModule } from "./modules/js-module.js";
 declare const _default: string;
 export default _default;

@@ -103,8 +103,10 @@ export default _default;
   ],
   [
     "components/index.d.mts",
-    "export * as jsx from "./jsx.mjs";
+    "// JSX
+export * as jsx from "./jsx.mjs";
 export * as tsx from "./tsx.mjs";
+// Vue
 export * as blank from "./blank.vue";
 export * as scriptSetupTS from "./script-setup-ts.vue";
 export * as scriptMultiBlock from "./script-multi-block.vue";
