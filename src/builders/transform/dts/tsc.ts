@@ -1,12 +1,11 @@
 import {
   augmentWithDiagnostics,
-  createVfsCompilerHost,
+  createVFSCompilerHost,
   extractDeclarations,
   normalizeCompilerOptions,
-  type DeclarationOptions,
-  type DeclarationOutput,
-  type VFS,
 } from "./common.ts";
+
+import type { DeclarationOptions, DeclarationOutput, VFS } from "./common.ts";
 
 /**
  * Generates TypeScript declarations using the TypeScript compiler (tsc).
@@ -31,7 +30,7 @@ export async function getTscDeclarations(
     options.typescript?.compilerOptions || {},
   );
 
-  const tsHost = createVfsCompilerHost(vfs, compilerOptions, ts);
+  const tsHost = createVFSCompilerHost(vfs, compilerOptions, ts);
   const program = ts.createProgram(inputFiles, compilerOptions, tsHost);
   const result = program.emit();
   const output = await extractDeclarations(vfs, inputFiles, options);

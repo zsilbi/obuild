@@ -1,13 +1,14 @@
 import { statSync } from "node:fs";
 import { resolve } from "pathe";
-import type { CompilerHost, CompilerOptions, EmitResult } from "typescript";
-import type { PackageJson, TSConfig } from "pkg-types";
 import {
   findStaticImports,
   findDynamicImports,
   findExports,
   findTypeExports,
 } from "mlly";
+
+import type { CompilerHost, CompilerOptions, EmitResult } from "typescript";
+import type { PackageJson, TSConfig } from "pkg-types";
 
 export type VFS = Map<string, string>;
 
@@ -79,7 +80,7 @@ export async function normalizeCompilerOptions(
  * @param ts - The TypeScript module to use for creating the compiler host.
  * @returns A TypeScript compiler host that reads from and writes to the VFS.
  */
-export function createVfsCompilerHost(
+export function createVFSCompilerHost(
   vfs: VFS,
   options: CompilerOptions,
   ts: typeof import("typescript"),

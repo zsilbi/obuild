@@ -5,13 +5,12 @@ import consola from "consola";
 
 import {
   augmentWithDiagnostics,
-  createVfsCompilerHost,
+  createVFSCompilerHost,
   extractDeclarations,
   normalizeCompilerOptions,
-  type DeclarationOptions,
-  type DeclarationOutput,
-  type VFS,
 } from "./common.ts";
+
+import type { DeclarationOptions, DeclarationOutput, VFS } from "./common.ts";
 
 const SFC_EXT_RE = /\.vue\.m?[jt]s$/;
 
@@ -58,7 +57,7 @@ export async function getVueDeclarations(
     allowNonTsExtensions: true,
   };
 
-  const tsHost = createVfsCompilerHost(vfs, compilerOptions, ts);
+  const tsHost = createVFSCompilerHost(vfs, compilerOptions, ts);
   const createProgram = volarTs.proxyCreateProgram(ts, ts.createProgram, () => [
     vueLanguageCore.createVueLanguagePlugin(
       ts,

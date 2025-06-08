@@ -1,16 +1,14 @@
 import path from "pathe";
 import { promises as fsp } from "node:fs";
-import { defu } from "defu";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
-import { fmtPath, normalizePath } from "../utils.ts";
+import { fmtPath } from "../utils.ts";
 import { colors as c } from "consola/utils";
-import { getTsconfig } from "get-tsconfig";
-import { type TSConfig } from "pkg-types";
 import { createTransformer } from "../transformers/index.ts";
-import { generateDeclarations } from "../declarations/index.ts";
+import { resolveTSConfig } from "./transform/ts-config.ts";
+import { generateDeclarations } from "./transform/dts/index.ts";
 
-import type { OutputFile, SourceMapFile } from "../transformers/types.ts";
+import type { OutputFile } from "../transformers/types.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
 
 import {
@@ -18,6 +16,7 @@ import {
   hasShebang,
   makeExecutable,
 } from "./plugins/shebang.ts";
+import { resolveSourceMapDir, serializeSourceMapFiles } from "./transform/source-map.ts";
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
@@ -37,7 +36,7 @@ export async function transformDir(
     return;
   }
 
-  const tsConfig = resolveTSConfig(entry);
+  const tsConfig = resolveTSConfig(entry, context);
   const transformer = createTransformer({
     ...entry,
     tsConfig,
@@ -136,86 +135,6 @@ function renameFiles(files: OutputFile[]): void {
 }
 
 /**
- * Rewrite source map sources and file paths to relative paths and serialize them.
- *
- * @param files - The files to process.
- * @param entry - The transform entry containing the output directory.
- */
-function serializeSourceMapFiles(
-  files: OutputFile[],
-  entry: TransformEntry,
-  context: BuildContext,
-): void {
-  const mapDir = resolveSourceMapDir(entry, context);
-  const sourceMapFiles = files.filter(
-    (file): file is SourceMapFile => file.type === "source-map",
-  );
-
-  // Rewrite source maps to relative paths and serialize them
-  for (const sourceMapFile of sourceMapFiles) {
-    const { map } = sourceMapFile;
-
-    map.sources = map.sources.map((source) => {
-      return path.relative(
-        path.dirname(path.join(mapDir, source)),
-        path.join(entry.input, source),
-      );
-    });
-
-    if (map.file !== undefined) {
-      map.file = path.relative(
-        path.dirname(path.join(mapDir, sourceMapFile.path)),
-        path.join(entry.outDir!, map.file),
-      );
-    }
-
-    sourceMapFile.contents = JSON.stringify(sourceMapFile.map);
-  }
-}
-
-/**
- * Resolve the TypeScript configuration for a transform entry.
- *
- * @param entry - The transform entry containing the declaration options.
- * @returns The TypeScript configuration.
- */
-function resolveTSConfig(entry: TransformEntry): TSConfig {
-  // Read the TypeScript configuration from tsconfig.json
-  const tsConfigResult = getTsconfig();
-
-  if (tsConfigResult === null) {
-    consola.warn(`Failed to read tsconfig.json`);
-  }
-
-  const packageTsConfig: TSConfig = tsConfigResult?.config || {};
-  const dtsOptions = typeof entry.dts === "object" ? entry.dts : {};
-
-  // Override the TypeScript configuration with the entry's declaration options
-  const tsConfig: TSConfig = defu(
-    dtsOptions?.typescript || {},
-    packageTsConfig,
-  );
-
-  // Ensure the TypeScript configuration has the necessary defaults
-  tsConfig.compilerOptions = defu(
-    {
-      noEmit: false,
-    } satisfies TSConfig["compilerOptions"],
-    tsConfig.compilerOptions,
-    {
-      allowJs: true,
-      declaration: true,
-      skipLibCheck: true,
-      strictNullChecks: true,
-      emitDeclarationOnly: true,
-      allowImportingTsExtensions: true,
-    } satisfies TSConfig["compilerOptions"],
-  );
-
-  return tsConfig;
-}
-
-/**
  * Get the output path for a given output file in a transform entry.
  *
  * @param outputFile - Output file to resolve the path for
@@ -228,27 +147,13 @@ function getOutputFilePath(
   entry: TransformEntry,
   context: BuildContext,
 ): string {
-  if (outputFile.type === "source-map") {
-    return path.join(resolveSourceMapDir(entry, context), outputFile.path);
+  switch (outputFile.type) {
+    case "source-map": {
+      return path.join(resolveSourceMapDir(entry, context), outputFile.path);
+    }
+
+    default: {
+      return path.join(entry.outDir!, outputFile.path);
+    }
   }
-
-  return path.join(entry.outDir!, outputFile.path);
-}
-
-/**
- * Resolve the absolute path to store the source maps.
- *
- * @param entry - Transform entry
- * @param context - Build context
- * @returns The absolute path to the source map directory.
- */
-function resolveSourceMapDir(
-  entry: TransformEntry,
-  context: BuildContext,
-): string {
-  if (entry.mapDir === undefined) {
-    return entry.outDir!;
-  }
-
-  return normalizePath(entry.mapDir, context.pkgDir);
 }
