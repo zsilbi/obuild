@@ -7,16 +7,18 @@ import { colors as c } from "consola/utils";
 import { createTransformer } from "../transformers/index.ts";
 import { resolveTSConfig } from "./transform/ts-config.ts";
 import { generateDeclarations } from "./transform/dts/index.ts";
-
-import type { OutputFile } from "../transformers/types.ts";
-import type { BuildContext, TransformEntry } from "../types.ts";
-
 import {
   hasFileShebang,
   hasShebang,
   makeExecutable,
 } from "./plugins/shebang.ts";
-import { resolveSourceMapDir, serializeSourceMapFiles } from "./transform/source-map.ts";
+import {
+  resolveSourceMapDir,
+  serializeSourceMapFiles,
+} from "./transform/source-map.ts";
+
+import type { OutputFile } from "../transformers/types.ts";
+import type { BuildContext, TransformEntry } from "../types.ts";
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
