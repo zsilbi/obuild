@@ -4,14 +4,11 @@ import { build } from "../../../src/build.ts";
 import { rm } from "node:fs/promises";
 import { readDistFiles, readFileNames } from "../../utils.ts";
 import type { TransformEntry } from "../../../src/types.ts";
-import { getTsconfig } from "get-tsconfig";
 
 const fixtureDir = new URL("fixture/", import.meta.url);
 const distDir = new URL("dist/", fixtureDir);
 
-const tsConfig = getTsconfig(new URL("tsconfig.json", fixtureDir).pathname);
 const dts: TransformEntry["dts"] = {
-  typescript: tsConfig?.config,
   tsgo: true,
 };
 
