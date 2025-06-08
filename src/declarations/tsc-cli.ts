@@ -1,7 +1,6 @@
 import { spawn } from "node:child_process";
 import { promises as fsp } from "node:fs";
 import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
 import os from "node:os";
 import path from "pathe";
 import { defu } from "defu";
@@ -20,18 +19,32 @@ const CACHE_PREFIX = "obuild-";
 const KNOWN_EXT_RE = /(?<!\.d)\.(m)?[tj]sx?$/;
 const DECLARATION_RE = /\.d\.m?ts$/;
 
+type Compiler = "tsc" | "tsgo";
+type Distribution = { packageName: string; bin: string };
+
+const distributions: Record<Compiler, Distribution> = {
+  tsc: {
+    packageName: "typescript",
+    bin: "tsc",
+  },
+  tsgo: {
+    packageName: "@typescript/native-preview",
+    bin: "tsgo.js",
+  },
+};
+
 /**
- * Generates TypeScript declarations using the native `tsgo` compiler.
+ * Generates TypeScript declarations using the executable CLI tools `tsc` or `tsgo`.
  *
- * This function creates a temporary project on disk, runs `tsgo` to generate
+ * This function creates a temporary project on disk, runs the CLI to generate
  * declaration files, reads the output back into the virtual file system,
  * and then cleans up the temporary directory.
  *
  * @param vfs A Map representing a virtual file system (filePath -> content).
  * @param options Options for declaration generation.
- * @returns A promise that resolves to the declaration output, or undefined if there are no files.
+ * @returns The declaration output, or undefined if there are no files.
  */
-export async function getTsgoDeclarations(
+export async function getTscCliDeclarations(
   vfs: VFS,
   options: DeclarationOptions,
 ): Promise<DeclarationOutput | undefined> {
@@ -45,15 +58,15 @@ export async function getTsgoDeclarations(
   const { tempDir, distDir } = await setupTemporaryProject(vfs, options);
 
   try {
-    await runTsGo(tempDir);
-    // await runTsc(tempDir);
+    await runTscCli("tsgo", tempDir);
+    // await runTs("tsc", tempDir);
 
     const inputFiles = [...vfs.keys()];
     await updateVFSWithDeclarations(vfs, inputFiles, distDir, options.inputDir);
 
     return await extractDeclarations(vfs, inputFiles, options);
   } finally {
-    await fsp.rm(tempDir, { recursive: true, force: true });
+    await cleanTemporaryProject(tempDir);
   }
 }
 
@@ -124,42 +137,57 @@ async function linkNodeModules(
  */
 async function setupTemporaryProject(vfs: VFS, options: DeclarationOptions) {
   const tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), CACHE_PREFIX));
-  const srcDir = path.join(tempDir, SRC_DIR_NAME);
-  const distDir = path.join(tempDir, DIST_DIR_NAME);
 
-  // Create source and distribution directories and link node_modules
-  await Promise.all([
-    fsp.mkdir(srcDir),
-    fsp.mkdir(distDir),
-    linkNodeModules(tempDir, options.inputDir),
-  ]);
+  try {
+    const srcDir = path.join(tempDir, SRC_DIR_NAME);
+    const distDir = path.join(tempDir, DIST_DIR_NAME);
 
-  // Write the virtual file system contents to the source directory
-  await Promise.all(
-    [...vfs.entries()].map(async ([filePath, content]) => {
-      const outFilePath = path.join(
-        srcDir,
-        path.relative(options.inputDir, filePath),
-      );
+    // Create source and distribution directories and link node_modules
+    await Promise.all([
+      fsp.mkdir(srcDir),
+      fsp.mkdir(distDir),
+      linkNodeModules(tempDir, options.inputDir),
+    ]);
 
-      await fsp.mkdir(path.dirname(outFilePath), { recursive: true });
-      await fsp.writeFile(outFilePath, content);
-    }),
-  );
+    // Write the virtual file system contents to the source directory
+    await Promise.all(
+      [...vfs.entries()].map(async ([filePath, content]) => {
+        const outFilePath = path.join(
+          srcDir,
+          path.relative(options.inputDir, filePath),
+        );
 
-  // Create tsconfig.json and package.json in the temporary directory
-  await Promise.all([
-    fsp.writeFile(
-      path.join(tempDir, "tsconfig.json"),
-      JSON.stringify(createTsConfig(options, distDir, srcDir), null, 2),
-    ),
-    fsp.writeFile(
-      path.join(tempDir, "package.json"),
-      JSON.stringify(options.pkg, null, 2),
-    ),
-  ]);
+        await fsp.mkdir(path.dirname(outFilePath), { recursive: true });
+        await fsp.writeFile(outFilePath, content);
+      }),
+    );
 
-  return { tempDir, srcDir, distDir };
+    // Create tsconfig.json and package.json in the temporary directory
+    await Promise.all([
+      fsp.writeFile(
+        path.join(tempDir, "tsconfig.json"),
+        JSON.stringify(createTsConfig(options, distDir, srcDir), null, 2),
+      ),
+      fsp.writeFile(
+        path.join(tempDir, "package.json"),
+        JSON.stringify(options.pkg, null, 2),
+      ),
+    ]);
+
+    return { tempDir, srcDir, distDir };
+  } catch (error: unknown) {
+    await cleanTemporaryProject(tempDir);
+    throw error;
+  }
+}
+
+/**
+ * Cleans up the temporary project directory.
+ *
+ * @param tempDir - The temporary directory to clean up.
+ */
+async function cleanTemporaryProject(tempDir: string): Promise<void> {
+  return fsp.rm(tempDir, { recursive: true, force: true });
 }
 
 /**
@@ -217,8 +245,8 @@ function createTsConfig(
         verbatimModuleSyntax: false,
         emitDeclarationOnly: true,
         declaration: true,
-        outDir: distDir,
-        rootDir: srcDir,
+        outDir: `./${DIST_DIR_NAME}`,
+        rootDir: `./${SRC_DIR_NAME}`,
         noEmit: false,
         noCheck: true,
       },
@@ -228,25 +256,15 @@ function createTsConfig(
   };
 }
 
-/**
- * Locates the `tsgo` executable and runs it in the specified directory.
- *
- * @param cwd - The working directory to run the compiler in.
- */
-async function runTsGo(cwd: string): Promise<void> {
+async function runTscCli(compiler: Compiler, cwd: string): Promise<void> {
+  const { packageName, bin } = distributions[compiler];
   const require = createRequire(import.meta.url);
-  const packageJsonPath = require.resolve(
-    "@typescript/native-preview/package.json",
+  const packagePath = path.dirname(
+    require.resolve(path.join(packageName, "package.json")),
   );
-  const getExePath = path.join(
-    path.dirname(packageJsonPath),
-    "lib/getExePath.js",
-  );
-
-  const { default: tsgo } = await import(pathToFileURL(getExePath).href);
 
   return await new Promise<void>((resolve, reject) => {
-    const process = spawn(tsgo(), [], {
+    const process = spawn(path.join(packagePath, "bin", bin), [], {
       cwd,
       stdio: "inherit",
     });
@@ -278,7 +296,7 @@ async function runTsGo(cwd: string): Promise<void> {
       })
       .finally(() => {
         consola.warn(
-          `Error while generating declarations with tsgo: ${error.message}`,
+          `Error while generating declarations with ${compiler}: ${error.message}`,
         );
 
         // @todo: to throw or not to throw?
@@ -286,55 +304,3 @@ async function runTsGo(cwd: string): Promise<void> {
       });
   });
 }
-
-// /**
-//  * Locates the `tsc` executable and runs it in the specified directory.
-//  *
-//  * @param cwd - The working directory to run the compiler in.
-//  */
-// async function runTsc(cwd: string): Promise<void> {
-//   const require = createRequire(import.meta.url);
-//   const packageJsonPath = require.resolve("typescript/package.json");
-//   const tscPath = path.join(path.dirname(packageJsonPath), "bin", "tsc");
-
-//   return await new Promise<void>((resolve, reject) => {
-//     const process = spawn(tscPath, [], {
-//       cwd,
-//       stdio: "inherit",
-//     });
-
-//     process.on("close", () => {
-//       resolve();
-//     });
-
-//     process.on("exit", (code) => {
-//       if (code === 0) {
-//         resolve();
-//       } else {
-//         reject(new Error(`Process exited with code ${code}`));
-//       }
-//     });
-
-//     process.on("error", (error) => {
-//       reject(new Error(`Failed to start process: ${error.message}`));
-//     });
-//   }).catch((error) => {
-//     return fsp
-//       .readFile(path.join(cwd, "tsconfig.json"), "utf8")
-//       .then((tsconfigContent) => {
-//         // Show `tsconfig.json` for debugging
-//         consola.info("tsconfig.json:\n");
-//         console.dir(JSON.parse(tsconfigContent), {
-//           depth: 5,
-//         });
-//       })
-//       .finally(() => {
-//         consola.warn(
-//           `Error while generating declarations with tsc: ${error.message}`,
-//         );
-
-//         // @todo: to throw or not to throw?
-//         // throw error;
-//       });
-//   });
-// }

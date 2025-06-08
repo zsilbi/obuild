@@ -1,6 +1,6 @@
 import consola from "consola";
 import { getTscDeclarations } from "./tsc.ts";
-import { getTsgoDeclarations } from "./tsgo.ts";
+import { getTscCliDeclarations } from "./tsc-cli.ts";
 import { getVueDeclarations } from "./vue-tsc.ts";
 
 import type { TSConfig } from "pkg-types";
@@ -91,7 +91,7 @@ export async function generateDeclarations(
 
   const dtsGenerators = [
     getVueDeclarations,
-    tsgo ? getTsgoDeclarations : getTscDeclarations,
+    tsgo ? getTscCliDeclarations : getTscDeclarations,
   ];
 
   const declarations: DeclarationOutput = Object.create(null);
