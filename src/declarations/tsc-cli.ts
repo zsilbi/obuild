@@ -298,9 +298,6 @@ async function runTscCli(compiler: Compiler, cwd: string): Promise<void> {
         consola.warn(
           `Error while generating declarations with ${compiler}: ${error.message}`,
         );
-
-        // @todo: to throw or not to throw?
-        // throw error;
       });
   });
 }
