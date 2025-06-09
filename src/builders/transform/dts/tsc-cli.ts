@@ -11,7 +11,7 @@ import type { TSConfig } from "pkg-types";
 import type { DeclarationOptions, DeclarationOutput, VFS } from "./common.ts";
 
 type Compiler = "tsc" | "tsgo";
-type Distribution = { pkgName: string; exe: string };
+type Distribution = { pkgName: string; exePath: string[] };
 
 /**
  * Represents the project structure for generating TypeScript declarations.
@@ -53,12 +53,19 @@ type Project = {
   distDir: string;
 
   /**
+   * Initializes the project by creating the necessary directories and writing files.
+   *
+   * @returns The project object
+   */
+  prepare: () => Promise<Project>;
+
+  /**
    * Runs the TypeScript compiler CLI to generate declarations.
    *
    * @param compiler - The TypeScript compiler to use, either "tsc" or "tsgo".
    * @returns The declaration output or undefined if no files were processed.
    */
-  run: (compiler: Compiler) => Promise<DeclarationOutput | undefined>;
+  generate: (compiler: Compiler) => Promise<DeclarationOutput | undefined>;
 
   /**
    * Clears the entire temporary directory.
@@ -78,11 +85,11 @@ const DECLARATION_RE = /\.d\.m?ts$/;
 const distributions: Record<Compiler, Distribution> = {
   tsc: {
     pkgName: "typescript",
-    exe: "tsc",
+    exePath: ["bin", "tsc"],
   },
   tsgo: {
     pkgName: "@typescript/native-preview",
-    exe: "tsgo.js",
+    exePath: ["bin", "tsgo.js"],
   },
 };
 
@@ -112,17 +119,17 @@ export async function getTscCliDeclarations(
 
   const project = await createProject(vfs, options);
 
-  return project.run(compiler).finally(() => {
-    project.clear();
+  return project.generate(compiler).finally(() => {
+    // project.clear();
   });
 }
 
 /**
  * Sets up a temporary directory with the project source files and configuration.
  *
- * @param vfs - The virtual file system containing source files.
+ * @param vfs - A Map representing a virtual file system (filePath -> content).
  * @param options - The declaration options.
- * @return A project object containing paths.
+ * @return A prepared project ready for generating declarations.
  */
 async function createProject(
   vfs: VFS,
@@ -130,9 +137,10 @@ async function createProject(
 ): Promise<Project> {
   const { inputDir, pkg, pkgDir } = options;
   const inputName = path.relative(pkgDir, inputDir).replace(/[\\/]/g, "-");
+
+  // @todo - Switch to store within node_modules whenever `tsgo` supports it
   const tempDir = path.join(
     pkgDir,
-    // @todo Switch to store within node_modules whenever `tsgo` supports it
     // "node_modules",
     // ".cache",
     TMP_DIR_NAME,
@@ -149,7 +157,39 @@ async function createProject(
     distDir,
     pkgDir,
     rootDir,
-    run: async (compiler: Compiler) => {
+    prepare: async () => {
+      await project.clear();
+
+      await Promise.all([
+        fsp.mkdir(srcDir, { recursive: true }),
+        fsp.mkdir(distDir, { recursive: true }),
+      ]);
+
+      await Promise.all([
+        linkNodeModules(project),
+        fsp.writeFile(
+          path.join(tempDir, "package.json"),
+          JSON.stringify(pkg, null, 2),
+        ),
+        fsp.writeFile(
+          path.join(tempDir, "tsconfig.json"),
+          JSON.stringify(createProjectTSConfig(project, options), null, 2),
+        ),
+        // Write the virtual file system contents to the source directory
+        ...[...vfs.entries()].map(async ([filePath, content]) => {
+          const outFilePath = path.join(
+            srcDir,
+            path.relative(inputDir, filePath),
+          );
+
+          await fsp.mkdir(path.dirname(outFilePath), { recursive: true });
+          await fsp.writeFile(outFilePath, content);
+        }),
+      ]);
+
+      return project;
+    },
+    generate: async (compiler: Compiler) => {
       const inputFiles = [...vfs.keys()];
 
       await runTscCli(compiler, tempDir);
@@ -157,38 +197,12 @@ async function createProject(
 
       return extractDeclarations(vfs, inputFiles, options);
     },
-    clear: async () => {
+    clear: () => {
       return fsp.rm(tempDir, { recursive: true, force: true });
     },
   };
 
-  await project.clear();
-
-  await Promise.all([
-    fsp.mkdir(srcDir, { recursive: true }),
-    fsp.mkdir(distDir, { recursive: true }),
-  ]);
-
-  await Promise.all([
-    linkNodeModules(project),
-    fsp.writeFile(
-      path.join(tempDir, "package.json"),
-      JSON.stringify(pkg, null, 2),
-    ),
-    fsp.writeFile(
-      path.join(tempDir, "tsconfig.json"),
-      JSON.stringify(createTSConfig(project, options), null, 2),
-    ),
-    // Write the virtual file system contents to the source directory
-    ...[...vfs.entries()].map(async ([filePath, content]) => {
-      const outFilePath = path.join(srcDir, path.relative(inputDir, filePath));
-
-      await fsp.mkdir(path.dirname(outFilePath), { recursive: true });
-      await fsp.writeFile(outFilePath, content);
-    }),
-  ]);
-
-  return project;
+  return project.prepare();
 }
 
 /**
@@ -198,20 +212,19 @@ async function createProject(
  * @param cwd - The current working directory where the command should be executed.
  */
 async function runTscCli(compiler: Compiler, cwd: string): Promise<void> {
-  const { pkgName, exe } = distributions[compiler];
+  const { pkgName, exePath } = distributions[compiler];
 
-  const exePath = path.join(
+  const tsc = path.join(
     path.dirname(
       createRequire(import.meta.url).resolve(
         path.join(pkgName, "package.json"),
       ),
     ),
-    "bin",
-    exe,
+    ...exePath,
   );
 
   return await new Promise<void>((resolve, reject) => {
-    const process = spawn(exePath, [], {
+    const process = spawn(tsc, [], {
       cwd,
       stdio: "inherit",
     });
@@ -286,13 +299,13 @@ async function updateVFSWithDeclarations(
 }
 
 /**
- * Creates the and serializes tsconfig.json to the temporary directory.
+ * Creates a tsconfig.json object for the project based on the provided options.
  *
  * @param project - The project object containing paths.
  * @param options - The declaration options.
  * @return The tsconfig.json object.
  */
-function createTSConfig(
+function createProjectTSConfig(
   project: Project,
   options: DeclarationOptions,
 ): TSConfig {
@@ -312,6 +325,7 @@ function createTSConfig(
     include: [path.relative(tempDir, srcDir)],
   };
 
+  // Current version of `tsgo` has issues with absolute paths in `tsconfig.json`
   return rewriteTSConfigPaths(tsConfig, (p) => path.relative(rootDir, p));
 }
 
@@ -324,7 +338,7 @@ async function linkNodeModules(project: Project): Promise<void> {
   const { inputDir, tempDir } = project;
   const nodeModulesPath = await findNearestNodeModules(inputDir);
 
-  if (!nodeModulesPath) {
+  if (nodeModulesPath === undefined) {
     consola.warn(
       `No node_modules found in "${inputDir}" or its parent directories.`,
     );
@@ -344,11 +358,11 @@ async function linkNodeModules(project: Project): Promise<void> {
  * Finds the nearest `node_modules` directory starting from the given directory.
  *
  * @param startDir - The directory to start searching from.
- * @returns The path to the nearest `node_modules` directory, or null if not found.
+ * @returns The path to the nearest `node_modules` directory, or undefined if not found.
  */
 async function findNearestNodeModules(
   startDir: string,
-): Promise<string | null> {
+): Promise<string | undefined> {
   let currentDir = path.resolve(startDir);
 
   while (true) {
@@ -362,7 +376,7 @@ async function findNearestNodeModules(
       const parentDir = path.dirname(currentDir);
 
       if (parentDir === currentDir) {
-        return null;
+        return;
       }
 
       currentDir = parentDir;

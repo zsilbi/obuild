@@ -8,7 +8,7 @@ import type {
 
 import type { PackageJson } from "pkg-types";
 import type { Options as BundleDtsOptions } from "rolldown-plugin-dts";
-import type { TransformDtsOptions } from "./declarations/index.ts";
+import type { TransformDtsOptions } from "./builders/transform/dts/index.ts";
 import type {
   Transformer,
   TransformerName,
