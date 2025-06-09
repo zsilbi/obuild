@@ -9,7 +9,9 @@ import type { BuildContext, TransformEntry } from "../../types.ts";
 
 /**
  * Resolve the TypeScript configuration for a transform entry.
+ *
  * The `rootDir` is set to the directory of the `tsconfig.json` file if it exists, otherwise it defaults to the package directory.
+ * All paths in the TypeScript configuration are rewritten to be absolute paths.
  *
  * @param entry - The transform entry containing the declaration options.
  * @param context - Build context
@@ -52,14 +54,15 @@ export function resolveTSConfig(
   tsConfig.compilerOptions = defu(
     {
       noEmit: false,
+      declaration: true,
+      emitDeclarationOnly: true,
     } satisfies TSConfig["compilerOptions"],
     tsConfig.compilerOptions,
     {
       allowJs: true,
-      declaration: true,
       skipLibCheck: true,
+      stripInternal: true,
       strictNullChecks: true,
-      emitDeclarationOnly: true,
       allowImportingTsExtensions: true,
     } satisfies TSConfig["compilerOptions"],
   );

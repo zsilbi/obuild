@@ -88,6 +88,7 @@ export async function rolldownBuild(
       ...(tsgo
         ? {
             tsgo:
+              // @todo - Does not work in monorepos https://github.com/sxzz/rolldown-plugin-dts/issues/47
               typeof tsgo === "string" ? normalizePath(tsgo, ctx.pkgDir) : true,
           }
         : {}),

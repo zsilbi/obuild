@@ -10,7 +10,7 @@ import { rewriteTSConfigPaths } from "../ts-config.ts";
 import type { TSConfig } from "pkg-types";
 import type { DeclarationOptions, DeclarationOutput, VFS } from "./common.ts";
 
-type Compiler = "tsc" | "tsgo";
+type Compiler = "tsc" | "tsgo" | "vue-tsc";
 type Distribution = { pkgName: string; exePath: string[] };
 
 /**
@@ -73,7 +73,7 @@ type Project = {
   clear: () => Promise<void>;
 };
 
-const DEFAULT_COMPILER: Compiler = "tsgo";
+const DEFAULT_COMPILER: Compiler = "tsc";
 
 const DIST_DIR_NAME = "dist";
 const TMP_DIR_NAME = ".obuild";
@@ -90,6 +90,11 @@ const distributions: Record<Compiler, Distribution> = {
   tsgo: {
     pkgName: "@typescript/native-preview",
     exePath: ["bin", "tsgo.js"],
+  },
+  // This will require new `vue-sfc-compiler` integration
+  "vue-tsc": {
+    pkgName: "vue-tsc",
+    exePath: ["bin", "vue-tsc.js"],
   },
 };
 
@@ -313,20 +318,24 @@ function createProjectTSConfig(
   const tsConfig: TSConfig = {
     compilerOptions: defu(
       {
-        verbatimModuleSyntax: false,
-        emitDeclarationOnly: true,
         declaration: true,
-        outDir: `./${DIST_DIR_NAME}`,
+        emitDeclarationOnly: true,
+        verbatimModuleSyntax: false,
         noEmit: false,
         noCheck: true,
+        outDir: `./${DIST_DIR_NAME}`,
+        rootDir: `./${path.relative(tempDir, rootDir)}`,
       },
       options.typescript?.compilerOptions,
     ),
-    include: [path.relative(tempDir, srcDir)],
+    include: [`./${path.relative(tempDir, srcDir)}/**/*`],
   };
 
   // Current version of `tsgo` has issues with absolute paths in `tsconfig.json`
-  return rewriteTSConfigPaths(tsConfig, (p) => path.relative(rootDir, p));
+  return rewriteTSConfigPaths(
+    tsConfig,
+    (p) => `./${path.relative(rootDir, p)}`,
+  );
 }
 
 /**
