@@ -73,7 +73,7 @@ type Project = {
   clear: () => Promise<void>;
 };
 
-const DEFAULT_COMPILER: Compiler = "tsc";
+const DEFAULT_COMPILER: Compiler = "tsgo";
 
 const DIST_DIR_NAME = "dist";
 const TMP_DIR_NAME = ".obuild";
