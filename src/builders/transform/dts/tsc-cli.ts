@@ -3,6 +3,7 @@ import { promises as fsp } from "node:fs";
 import { createRequire } from "node:module";
 import path from "pathe";
 import consola from "consola";
+import symlinkDir from "symlink-dir";
 import { defu } from "defu";
 import { extractDeclarations } from "./common.ts";
 import { rewriteTSConfigPaths } from "../ts-config.ts";
@@ -39,6 +40,8 @@ type Project = {
 
   /**
    * The temporary directory where the project files will be created.
+   *
+   * NOTE: Must be within `rootDir` to work with `paths` in `tsconfig.json`
    */
   tempDir: string;
 
@@ -91,7 +94,7 @@ const distributions: Record<Compiler, Distribution> = {
     pkgName: "@typescript/native-preview",
     exePath: ["bin", "tsgo.js"],
   },
-  // This will require new `vue-sfc-compiler` integration
+  // @todo - This will require new `vue-sfc-compiler` integration
   "vue-tsc": {
     pkgName: "vue-tsc",
     exePath: ["bin", "vue-tsc.js"],
@@ -125,7 +128,7 @@ export async function getTscCliDeclarations(
   const project = await createProject(vfs, options);
 
   return project.generate(compiler).finally(() => {
-    // project.clear();
+    project.clear();
   });
 }
 
@@ -142,8 +145,9 @@ async function createProject(
 ): Promise<Project> {
   const { inputDir, pkg, pkgDir } = options;
   const inputName = path.relative(pkgDir, inputDir).replace(/[\\/]/g, "-");
+  const rootDir = options.typescript?.compilerOptions?.rootDir || pkgDir;
 
-  // @todo - Switch to store within node_modules whenever `tsgo` supports it
+  // @todo - Store within node_modules whenever `tsgo` supports it: https://github.com/microsoft/typescript-go/blob/f7d02dd5cc61be86f4f61018171c370cefebe3fd/internal/compiler/emitter.go#L312
   const tempDir = path.join(
     pkgDir,
     // "node_modules",
@@ -151,9 +155,15 @@ async function createProject(
     TMP_DIR_NAME,
     `${TMP_PREFIX}${inputName}`,
   );
+
+  if (!tempDir.startsWith(rootDir)) {
+    throw new Error(
+      `Temporary directory "${tempDir}" must be within the package directory "${pkgDir}".`,
+    );
+  }
+
   const srcDir = path.join(tempDir, path.relative(pkgDir, inputDir));
   const distDir = path.join(tempDir, DIST_DIR_NAME);
-  const rootDir = options.typescript?.compilerOptions?.rootDir || pkgDir;
 
   const project: Project = {
     inputDir,
@@ -357,7 +367,7 @@ async function linkNodeModules(project: Project): Promise<void> {
   const tempNodeModulesPath = path.join(tempDir, "node_modules");
 
   try {
-    await fsp.symlink(nodeModulesPath, tempNodeModulesPath, "dir");
+    await symlinkDir(nodeModulesPath, tempNodeModulesPath);
   } catch (error: any) {
     consola.error(`Failed to link node_modules: ${error.message}`);
   }
