@@ -20,7 +20,7 @@ import type { BuildContext, TransformEntry } from "../../types.ts";
 export function resolveTSConfig(
   entry: TransformEntry,
   context: BuildContext,
-): TSConfig {
+): void {
   // Read the TypeScript configuration from tsconfig.json
   const tsConfigResult = getTsconfig(context.pkgDir);
 
@@ -37,12 +37,11 @@ export function resolveTSConfig(
           (p: string) => normalizePath(p, path.dirname(tsConfigResult.path)),
         );
 
-  const dtsOptions = typeof entry.dts === "object" ? entry.dts : {};
   const optionsTsConfig: TSConfig =
-    dtsOptions?.typescript === undefined
+    entry?.tsConfig === undefined
       ? {}
       : rewriteTSConfigPaths(
-          dtsOptions.typescript,
+          entry.tsConfig,
           // Use the package directory as the base path for user provided options
           (p: string) => normalizePath(p, context.pkgDir),
         );
@@ -79,7 +78,7 @@ export function resolveTSConfig(
       ? defaultRootDir
       : normalizePath(compilerOptions.rootDir, defaultRootDir);
 
-  return tsConfig;
+  entry.tsConfig = tsConfig;
 }
 
 /**
@@ -93,28 +92,20 @@ export function rewriteTSConfigPaths(
   tsConfig: TSConfig,
   rewrite: (path: string) => string,
 ): TSConfig {
-  const { compilerOptions } = tsConfig;
+  const updatedTsConfig = structuredClone(tsConfig);
+  const { compilerOptions = {} } = updatedTsConfig;
+  const { paths = {} } = compilerOptions;
 
-  if (
-    compilerOptions?.paths === undefined ||
-    typeof compilerOptions.paths !== "object"
-  ) {
-    return { ...tsConfig };
-  }
-
-  const newPaths: Record<string, string[]> = {};
-  for (const key in compilerOptions.paths) {
-    const value = compilerOptions.paths[key];
-    newPaths[key] = Array.isArray(value)
+  for (const key in paths) {
+    const value = paths[key];
+    paths[key] = Array.isArray(value)
       ? value.map((path) => rewrite(path))
       : [rewrite(value)];
   }
 
-  return {
-    ...tsConfig,
-    compilerOptions: {
-      ...compilerOptions,
-      paths: newPaths,
-    },
-  };
+  if (compilerOptions.declarationDir) {
+    compilerOptions.declarationDir = rewrite(compilerOptions.declarationDir);
+  }
+
+  return updatedTsConfig;
 }

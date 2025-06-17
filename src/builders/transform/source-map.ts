@@ -1,8 +1,8 @@
 import path from "pathe";
 import { normalizePath } from "../../utils.ts";
 
+import type { DeclarationFile, OutputFile } from "@obuild/plugin";
 import type { BuildContext, TransformEntry } from "../../types.ts";
-import type { OutputFile, SourceMapFile } from "../../transformers/types.ts";
 
 /**
  * Rewrite source map sources and file paths to relative paths and serialize them.
@@ -13,33 +13,59 @@ import type { OutputFile, SourceMapFile } from "../../transformers/types.ts";
 export function serializeSourceMapFiles(
   files: OutputFile[],
   entry: TransformEntry,
-  context: BuildContext,
 ): void {
-  const mapDir = resolveSourceMapDir(entry, context);
-  const sourceMapFiles = files.filter(
-    (file): file is SourceMapFile => file.type === "source-map",
-  );
+  const declarationDir =
+    entry.tsConfig?.compilerOptions?.declarationDir || entry.outDir!;
 
   // Rewrite source maps to relative paths and serialize them
-  for (const sourceMapFile of sourceMapFiles) {
-    const { map } = sourceMapFile;
+  for (const file of files) {
+    if (file.type !== "source-map") {
+      continue;
+    }
+    const { map } = file;
 
     map.sources = map.sources.map((source) => {
       return path.relative(
-        path.dirname(path.join(mapDir, source)),
+        path.dirname(path.join(entry.mapDir!, source)),
         path.join(entry.input, source),
       );
     });
 
-    if (map.file !== undefined) {
-      map.file = path.relative(
-        path.dirname(path.join(mapDir, sourceMapFile.path)),
-        path.join(entry.outDir!, map.file),
+    if (
+      (declarationDir !== entry.outDir || entry.mapDir! !== entry.outDir) &&
+      file.outputFile.type === "declaration"
+    ) {
+      const declarationMapPath = path.join(entry.mapDir!, file.path);
+      const declarationPath = path.join(declarationDir, file.path);
+
+      replaceSourceMappingUrl(
+        file.outputFile,
+        path.relative(path.dirname(declarationPath), declarationMapPath),
       );
+
+      if (map.file !== undefined) {
+        map.file = path.relative(
+          path.dirname(path.join(entry.mapDir!, file.path)),
+          path.join(declarationDir, map.file),
+        );
+      }
     }
 
-    sourceMapFile.contents = JSON.stringify(sourceMapFile.map);
+    file.contents = JSON.stringify(file.map, null, 2);
   }
+}
+
+/**
+ * Replaces the `sourceMappingURL` path at the bottom of declaration files.
+ */
+function replaceSourceMappingUrl(
+  declarationFile: DeclarationFile,
+  path: string,
+) {
+  declarationFile.contents = declarationFile.contents.replace(
+    /\/\/# sourceMappingURL=(.*)/,
+    `//# sourceMappingURL=${path}`,
+  );
 }
 
 /**
@@ -47,15 +73,16 @@ export function serializeSourceMapFiles(
  *
  * @param entry - Transform entry
  * @param context - Build context
- * @returns The absolute path to the source map directory.
  */
 export function resolveSourceMapDir(
   entry: TransformEntry,
   context: BuildContext,
-): string {
+): void {
   if (entry.mapDir === undefined) {
-    return entry.outDir!;
+    entry.mapDir = entry.outDir!;
+
+    return;
   }
 
-  return normalizePath(entry.mapDir, context.pkgDir);
+  entry.mapDir = normalizePath(entry.mapDir, context.pkgDir);
 }

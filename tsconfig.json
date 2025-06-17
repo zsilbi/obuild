@@ -10,15 +10,6 @@
     "composite": true,
     "allowImportingTsExtensions": true,
     "isolatedDeclarations": true,
-    "verbatimModuleSyntax": true
   },
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.src.json"
-    },
-    {
-      "path": "./tsconfig.test.json"
-    }
-  ]
+  "include": ["src", "test"]
 }

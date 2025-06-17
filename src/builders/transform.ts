@@ -1,12 +1,11 @@
 import path from "pathe";
-import { promises as fsp } from "node:fs";
+import { promises as fsp, readFileSync } from "node:fs";
 import { consola } from "consola";
 import { glob } from "tinyglobby";
 import { fmtPath } from "../utils.ts";
 import { colors as c } from "consola/utils";
-import { createTransformer } from "../transformers/index.ts";
 import { resolveTSConfig } from "./transform/ts-config.ts";
-import { generateDeclarations } from "./transform/dts/index.ts";
+import { createTransformer } from "./transform/transformer.ts";
 import {
   hasFileShebang,
   hasShebang,
@@ -17,8 +16,16 @@ import {
   serializeSourceMapFiles,
 } from "./transform/source-map.ts";
 
-import type { OutputFile } from "../transformers/types.ts";
+import type { ResolveOptions } from "exsolve";
+import type { OutputFile } from "@obuild/plugin";
 import type { BuildContext, TransformEntry } from "../types.ts";
+
+type WritableFile = OutputFile & { path: string };
+
+const defaultResolveOptions: ResolveOptions = {
+  extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs", ".cjs", ".json"],
+  suffixes: ["", "/index"],
+};
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
@@ -38,53 +45,76 @@ export async function transformDir(
     return;
   }
 
-  const tsConfig = resolveTSConfig(entry, context);
-  const transformer = createTransformer({
-    ...entry,
-    tsConfig,
-    dts: entry.dts !== false,
+  resolveTSConfig(entry, context);
+  resolveSourceMapDir(entry, context);
+
+  const transformer = await createTransformer({
+    ...context,
+    inputDir: entry.input,
+    plugins: entry.plugins,
+    tsConfig: entry.tsConfig,
+    resolve: {
+      ...entry.resolve,
+      // Don't merge these with the defaults
+      extensions: entry.resolve?.extensions ?? defaultResolveOptions.extensions,
+      suffixes: entry.resolve?.suffixes ?? defaultResolveOptions.suffixes,
+    },
   });
+
+  await transformer.callHook("buildStart");
+
   const inputFileNames = await glob("**/*.*", { cwd: entry.input });
   const transformPromises: Promise<OutputFile[]>[] = inputFileNames.map(
-    async (inputFileName) => {
-      const inputFilePath = path.join(entry.input, inputFileName);
+    async (fileName) => {
+      const srcPath = path.join(entry.input, fileName);
 
-      return transformer.transformFile({
-        path: inputFileName,
-        extension: path.extname(inputFilePath),
-        srcPath: inputFilePath,
-        getContents() {
-          return fsp.readFile(inputFilePath, "utf8");
+      let contents: string | undefined;
+
+      return transformer.transform({
+        path: fileName,
+        extension: path.extname(srcPath),
+        srcPath: srcPath,
+        get contents() {
+          if (contents === undefined) {
+            contents = readFileSync(srcPath, "utf8");
+          }
+
+          return contents;
         },
       });
     },
   );
 
-  const outputFiles = await Promise.all(transformPromises).then((results) =>
-    results.flat(),
+  const transformedFiles = await Promise.all(transformPromises).then(
+    (results) => results.flat().filter((file) => file.skip !== true),
   );
 
-  // Post transform declaration generation
-  await generateDeclarations(outputFiles, tsConfig, entry, context);
+  await transformer.callHook("buildEnd", transformedFiles);
+
+  const outputFiles: WritableFile[] = transformedFiles.filter(
+    (file) => file.skip !== true,
+  );
 
   // Rename files to their desired extensions
   renameFiles(outputFiles);
 
   // Rewrite and serialize source map sources to relative paths
-  serializeSourceMapFiles(outputFiles, entry, context);
+  serializeSourceMapFiles(outputFiles, entry);
+
+  await transformer.callHook("writeStart", outputFiles);
 
   const writePromises: Promise<string>[] = outputFiles
-    .filter((outputFile) => !outputFile.skip)
-    .map(async (outputFile) => {
-      const { path: filePath, raw, contents = "" } = outputFile;
-      const outputFilePath = getOutputFilePath(outputFile, entry, context);
+    .filter((file) => file.skip !== true)
+    .map(async (file) => {
+      const { path: filePath, contents = "" } = file;
+      const outputFilePath = getOutputFilePath(file, entry);
 
       await fsp.mkdir(path.dirname(outputFilePath), { recursive: true });
 
       let shebangFound: boolean;
 
-      if (raw) {
-        const srcPath = outputFile.srcPath || path.join(entry.input, filePath);
+      if (file.type === "raw") {
+        const srcPath = file.srcPath || path.join(entry.input, filePath);
 
         [shebangFound] = await Promise.all([
           // Avoid loading possibly large raw file contents into memory
@@ -103,10 +133,12 @@ export async function transformDir(
       return outputFilePath;
     });
 
-  const writtenFiles = await Promise.all(writePromises);
+  const writtenFileNames = await Promise.all(writePromises);
+
+  await transformer.callHook("writeEnd", writtenFileNames);
 
   consola.log(
-    `\n${c.magenta("[transform] ")}${c.underline(fmtPath(entry.outDir!) + "/")}\n${writtenFiles
+    `\n${c.magenta("[transform] ")}${c.underline(fmtPath(entry.outDir!) + "/")}\n${writtenFileNames
       .map((f) => c.dim(fmtPath(f)))
       .join("\n")}`,
   );
@@ -117,9 +149,9 @@ export async function transformDir(
  *
  * @param files - The output files to process.
  */
-function renameFiles(files: OutputFile[]): void {
+function renameFiles(files: WritableFile[]): void {
   for (const file of files) {
-    if (file.extension === undefined) {
+    if (file.extension === undefined || file.path.endsWith(file.extension)) {
       continue;
     }
 
@@ -139,23 +171,25 @@ function renameFiles(files: OutputFile[]): void {
 /**
  * Get the output path for a given output file in a transform entry.
  *
- * @param outputFile - Output file to resolve the path for
+ * @param file - Output file to resolve the path for
  * @param entry - Transform entry
- * @param context - Build context
  * @returns - The absolute path to the output file.
  */
-function getOutputFilePath(
-  outputFile: OutputFile,
-  entry: TransformEntry,
-  context: BuildContext,
-): string {
-  switch (outputFile.type) {
+function getOutputFilePath(file: OutputFile, entry: TransformEntry): string {
+  switch (file.type) {
+    case "declaration": {
+      return path.join(
+        entry.tsConfig?.compilerOptions?.declarationDir || entry.outDir!,
+        file.path,
+      );
+    }
+
     case "source-map": {
-      return path.join(resolveSourceMapDir(entry, context), outputFile.path);
+      return path.join(entry.mapDir!, file.path);
     }
 
     default: {
-      return path.join(entry.outDir!, outputFile.path);
+      return path.join(entry.outDir!, file.path);
     }
   }
 }

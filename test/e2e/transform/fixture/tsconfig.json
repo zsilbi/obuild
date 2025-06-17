@@ -4,7 +4,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
-    "isolatedDeclarations": false,
+    "declaration": true,
+    "isolatedDeclarations": true,
     "allowImportingTsExtensions": true
   },
   "include": ["src"]

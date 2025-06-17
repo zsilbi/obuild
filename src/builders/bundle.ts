@@ -82,19 +82,7 @@ export async function rolldownBuild(
   } satisfies InputOptions);
 
   if (entry.dts !== false) {
-    const tsgo = typeof entry.dts === "object" ? entry.dts.tsgo : false;
-    const dtsOptions: DtsOptions = {
-      ...(entry.dts as DtsOptions),
-      ...(tsgo
-        ? {
-            tsgo:
-              // @todo - Does not work in monorepos https://github.com/sxzz/rolldown-plugin-dts/issues/47
-              typeof tsgo === "string" ? normalizePath(tsgo, ctx.pkgDir) : true,
-          }
-        : {}),
-    };
-
-    rolldownConfig.plugins.push(...dts(dtsOptions));
+    rolldownConfig.plugins.push(...dts({ ...(entry.dts as DtsOptions) }));
   }
 
   await hooks.rolldownConfig?.(rolldownConfig, ctx);

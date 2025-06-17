@@ -6,21 +6,17 @@ import type {
   RolldownPluginOption,
 } from "rolldown";
 
-import type { PackageJson } from "pkg-types";
-import type { Options as BundleDtsOptions } from "rolldown-plugin-dts";
-import type { TransformDtsOptions } from "./builders/transform/dts/index.ts";
-import type {
-  Transformer,
-  TransformerName,
-  TransformerOptions,
-} from "./transformers/types.ts";
+import type { ResolveOptions } from "exsolve";
+import type { PackageJson, TSConfig } from "pkg-types";
+import type { Plugins } from "./builders/transform/plugins.ts";
+import type { Options as DtsOptions } from "rolldown-plugin-dts";
 
 export interface BuildContext {
   pkgDir: string;
   pkg: PackageJson;
 }
 
-export type _BuildEntry = {
+export interface _BuildEntry {
   /**
    * Output directory relative to project root.
    *
@@ -32,9 +28,9 @@ export type _BuildEntry = {
    * Avoid actual build but instead link to the source files.
    */
   stub?: boolean;
-};
+}
 
-export type BundleEntry = _BuildEntry & {
+export interface BundleEntry extends _BuildEntry {
   type: "bundle";
 
   /**
@@ -58,17 +54,16 @@ export type BundleEntry = _BuildEntry & {
 
   /**
    * Declaration generation options.
+   * Options are inferred from the `tsconfig.json` file if available.
    *
    * See [rolldown-plugin-dts](https://github.com/sxzz/rolldown-plugin-dts) for more details.
    *
-   * Options are inferred from the `tsconfig.json` file if available.
-   *
    * Set to `false` to disable.
    */
-  dts?: boolean | BundleDtsOptions;
-};
+  dts?: boolean | DtsOptions;
+}
 
-export type TransformEntry = _BuildEntry & {
+export interface TransformEntry extends _BuildEntry {
   type: "transform";
 
   /**
@@ -77,9 +72,10 @@ export type TransformEntry = _BuildEntry & {
   input: string;
 
   /**
-   * List of transformers to invoke.
+   * List of pluginss to use for the transformation.
+   * The plugins will be applied in the order they are defined.
    */
-  transformers?: Array<TransformerName | Transformer>;
+  plugins?: Plugins;
 
   /**
    * Source map directory relative to project root.
@@ -89,27 +85,20 @@ export type TransformEntry = _BuildEntry & {
   mapDir?: string;
 
   /**
-   * Options for the `oxc` transformer.
-   */
-  oxc?: TransformerOptions["oxc"];
-
-  /**
-   * Options for the `vue` transformer.
-   */
-  vue?: TransformerOptions["vue"];
-
-  /**
-   * Options for the `postcss` transformer.
-   */
-  postcss?: TransformerOptions["postcss"];
-
-  /**
-   * Declaration generation options.
+   * Options for resolving module paths using exsolve.
    *
-   * Set to `false` to disable declaration generation, or provide options to customize it.
+   * See [exsolve](https://github.com/unjs/exsolve) for more details.
    */
-  dts?: boolean | TransformDtsOptions;
-};
+  resolve?: Omit<ResolveOptions, "from">;
+
+  /**
+   * TypeScript configuration for the entry.
+   * Options are inferred from the `tsconfig.json` file if available.
+   *
+   * See [tsconfig.json](https://www.typescriptlang.org/tsconfig) for more details.
+   */
+  tsConfig?: TSConfig;
+}
 
 export type BuildEntry = BundleEntry | TransformEntry;
 
