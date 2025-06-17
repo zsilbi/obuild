@@ -8,7 +8,7 @@ import { dts } from "rolldown-plugin-dts";
 import oxcParser from "oxc-parser";
 import { resolveModulePath } from "exsolve";
 import prettyBytes from "pretty-bytes";
-import { distSize, fmtPath, normalizePath, sideEffectSize } from "../utils.ts";
+import { distSize, fmtPath, sideEffectSize } from "../utils.ts";
 import { makeExecutable, shebangPlugin } from "./plugins/shebang.ts";
 import { defu } from "defu";
 

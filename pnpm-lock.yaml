@@ -53,7 +53,7 @@ importers:
         version: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz(@vue/compiler-core@3.5.16)(esbuild@0.25.5)(vue@3.5.16(typescript@5.8.3))
       '@obuild/plugin-vue-tsc-dts':
         specifier: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz
-        version: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz(@typescript/native-preview@7.0.0-dev.20250608.1)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))
+        version: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz(@typescript/native-preview@7.0.0-dev.20250608.1)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.4)
@@ -431,7 +431,7 @@ packages:
     engines: {node: '>= 8'}
 
   '@obuild/plugin-oxc-dts@file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-Gl1/GruM8gdPencvse0rnSWIbC9bhcPJ9zcHLgYxA+sfx/uMoMAUa4p7QCYIwVyW0LcoVYOSKrYeqJsxrc8Gxg==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-JV2YWR5l9L4VQN7GwvQFUS40j92c6G438U4bSrqlT61vOkrLpYZEB7n8LhqXxkR1/fvAmGAwQgJkSQ3sI309ag==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-oxc-minify@file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz':
@@ -472,19 +472,22 @@ packages:
         optional: true
 
   '@obuild/plugin-tsgo-dts@file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-YuY6o9jzypxXfLMy2QFhWH2W9iylu9iGvSuzh5FvBKBJZrhZ2TeTRsf3NSGnhs78xMTB18E59ZGtBv9ySm32GQ==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-mbslcmHSJU76snq2sSKKdo82Oym7hjVJYQ/Dq6hXy4XAPFw27GRxBJ26IRBupD/aPgX/x3E9pvnY8KbIdo3Kkw==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       '@typescript/native-preview': '>=7.0.0-dev.20250605.1'
 
   '@obuild/plugin-vue-sfc-transformer@file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz':
-    resolution: {integrity: sha512-UvSloT3P9K7fUHJ0q/rJvtL73daoflPIKpo6PWDMnMGsq0V+rNqqqwnY691/VOE3Sj0K8qFsPP1GpAdfD8WEKQ==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
-    version: 0.0.1
-
-  '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-H2aIQrhajLYh6+kgUCLCEDi7txbn2Ypg5lqDiqljPxC7ZuU+NwTVrWTsZQ4Yvb9lZRqelIHuyGh0aQgOrBrCKw==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-7m9eV4lXjfGP23GWQ08HPi+FB1RSGmyhaXaVfovFexsjutkDxydcMwSPdLWvggudwffBR7gNgfXGQHKOOH2+1Q==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
+      vue: ^3.5.0
+
+  '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz':
+    resolution: {integrity: sha512-adFdkczRFdJ0mfCiN63l3gdtKXNCUkYcMIp9unNuh8z+t+IpkaYuzxDATHfXcRIzKbrDIHm+cFmnWr6LQ+h7nA==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
+    version: 0.0.1
+    peerDependencies:
+      vue: ^3.5.0
       vue-tsc: ^2.2.0
 
   '@obuild/plugin@file:plugins/obuild-plugin-0.0.1.tgz':
@@ -3083,16 +3086,17 @@ snapshots:
       '@obuild/plugin-shared': file:plugins/obuild-plugin-shared-0.0.1.tgz
       defu: 6.1.4
       pathe: 2.0.3
+      vue: 3.5.16(typescript@5.8.3)
       vue-sfc-transformer: 0.1.16(@vue/compiler-core@3.5.16)(esbuild@0.25.5)(vue@3.5.16(typescript@5.8.3))
     transitivePeerDependencies:
       - '@vue/compiler-core'
       - esbuild
-      - vue
 
-  '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz(@typescript/native-preview@7.0.0-dev.20250608.1)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))':
+  '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz(@typescript/native-preview@7.0.0-dev.20250608.1)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))(vue@3.5.16(typescript@5.8.3))':
     dependencies:
       '@obuild/plugin': file:plugins/obuild-plugin-0.0.1.tgz
       '@obuild/plugin-tsc-dts': file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz(@typescript/native-preview@7.0.0-dev.20250608.1)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))
+      vue: 3.5.16(typescript@5.8.3)
       vue-tsc: 2.2.10(typescript@5.8.3)
     transitivePeerDependencies:
       - '@typescript/native-preview'
