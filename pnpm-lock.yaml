@@ -431,7 +431,7 @@ packages:
     engines: {node: '>= 8'}
 
   '@obuild/plugin-oxc-dts@file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-JV2YWR5l9L4VQN7GwvQFUS40j92c6G438U4bSrqlT61vOkrLpYZEB7n8LhqXxkR1/fvAmGAwQgJkSQ3sI309ag==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-IvYJbGJT+HkW4YvJOloqsioQCJ3RsFC1nklET+XtCVTBv2WjOOzAqLdeAywfVxX9TTTYflEvQ6oaskTwxzQoWg==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-oxc-minify@file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz':
@@ -439,15 +439,15 @@ packages:
     version: 0.0.1
 
   '@obuild/plugin-oxc-transform@file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz':
-    resolution: {integrity: sha512-v4P4/8yBnWbPL6NdgLI9tZWUn3iTEipLMZCbCAOlupM6cPymxW+2oh6kem6SKpH9yVPJCR4GLpuYGRk4vf5Fcg==, tarball: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz}
+    resolution: {integrity: sha512-WQiNUY0Rv+8RxruETblspnL7FxOCSrcrCEuYACEmD+YYMhwrB9y6BD6Vu3LQ0pqWitD/nLG5ARLuf1qdTAV61g==, tarball: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-postcss@file:plugins/obuild-plugin-postcss-0.0.1.tgz':
-    resolution: {integrity: sha512-J91zWBeERhf/EvQqq89+UfiyFdT/T8rQoY3q+Vst3axhQPPtGSSOux34t85ElJwKvt3fkXxrQZnNPxu+/mJczw==, tarball: file:plugins/obuild-plugin-postcss-0.0.1.tgz}
+    resolution: {integrity: sha512-WsW9VKvLeg57YuAe34fj5gS/e3Yi5GozZJv+9F/flXtpfgcJGMl3Y4q71LcmdcR49J+erfyCexEd8PUKgZmO9Q==, tarball: file:plugins/obuild-plugin-postcss-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-sass@file:plugins/obuild-plugin-sass-0.0.1.tgz':
-    resolution: {integrity: sha512-hLLEkqG5F0ZFRcaBuZoLJOdvWUh0T/RnY8v6wCgI5skungb+Hu46GJVy711sCUAmzS1Cu9EyhGAnUL4anWPXYw==, tarball: file:plugins/obuild-plugin-sass-0.0.1.tgz}
+    resolution: {integrity: sha512-LOtij3pQgg3LyGK8KRidMVtJlOzMbUqZ4hDOqbEQ6xyZ0I0KkwAc4+o00hZgXFMuF9XghlG8wGj32nAY9Pjfvg==, tarball: file:plugins/obuild-plugin-sass-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       sass: ^1.85.0
@@ -457,7 +457,7 @@ packages:
     version: 0.0.1
 
   '@obuild/plugin-tsc-dts@file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-DzCiK4x+LhupE2SsbN+FmZ94zeAwrvjqsOYIFpYMIB4stx6U/TpspO5M4UjrY00MkErP0iEpMsMHIzend7Q+sg==, tarball: file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-1LAhLHFxBc590xU/JYnAwtS1u0azkgNUEUIL79v/7d8u5CSL3lPrNZJSHgoe/znJMxPzsLZGsbeMr9DoO87Qyg==, tarball: file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       '@typescript/native-preview': '>=7.0.0-dev.20250605.1'
@@ -472,19 +472,19 @@ packages:
         optional: true
 
   '@obuild/plugin-tsgo-dts@file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-mbslcmHSJU76snq2sSKKdo82Oym7hjVJYQ/Dq6hXy4XAPFw27GRxBJ26IRBupD/aPgX/x3E9pvnY8KbIdo3Kkw==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-eDmZL7jBM3RXBB3U3xZjbfOap942LotqUT7VsJx9Z4ZYudo3XtnSEtRJvTVUYfQLd2xf8bndilgVpOPxVq3w+g==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       '@typescript/native-preview': '>=7.0.0-dev.20250605.1'
 
   '@obuild/plugin-vue-sfc-transformer@file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz':
-    resolution: {integrity: sha512-7m9eV4lXjfGP23GWQ08HPi+FB1RSGmyhaXaVfovFexsjutkDxydcMwSPdLWvggudwffBR7gNgfXGQHKOOH2+1Q==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
+    resolution: {integrity: sha512-Fmhvor8sRgt86gtzvoHoFvjcju+XSQC4G3J750Qsspr4Sb7TEDFT2MaLyplrHLDFUexkWWBhRHC8QMUIKp43qw==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       vue: ^3.5.0
 
   '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-adFdkczRFdJ0mfCiN63l3gdtKXNCUkYcMIp9unNuh8z+t+IpkaYuzxDATHfXcRIzKbrDIHm+cFmnWr6LQ+h7nA==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-lMG0zL/0X1MYaSS+8AWfz1Jxtsd6QULSkTGIgeKnJQ5mopxaLXMgtBHzpQv14ybHkN5h1XBYO9ea+4ytJDruxg==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       vue: ^3.5.0
