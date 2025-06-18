@@ -1,3 +1,79 @@
-import { describe, test, expect, beforeAll } from "vitest";
+import { describe, test, expect } from "vitest";
+import { vi } from "vitest";
+import { resolveSourceMapDir } from "../src/builders/transform/source-map.ts";
 
-describe("source-map", () => {});
+describe("source-map", () => {
+  describe("resolveSourceMapDir", () => {
+    vi.mock("../src/utils.ts", () => ({
+      normalizePath: vi.fn(),
+    }));
+
+    test("resolveSourceMapDir sets mapDir to outDir when mapDir is undefined", async () => {
+      const mockNormalizePath = vi.mocked(
+        await import("../src/utils.ts"),
+      ).normalizePath;
+
+      const entry = {
+        outDir: "/path/to/output",
+        mapDir: undefined,
+      } as any;
+
+      const context = {
+        pkgDir: "/path/to/package",
+      } as any;
+
+      resolveSourceMapDir(entry, context);
+
+      expect(entry.mapDir).toBe("/path/to/output");
+      expect(mockNormalizePath).not.toHaveBeenCalled();
+    });
+
+    test("resolveSourceMapDir normalizes mapDir when mapDir is defined", async () => {
+      const mockNormalizePath = vi.mocked(
+        await import("../src/utils.ts"),
+      ).normalizePath;
+      mockNormalizePath.mockReturnValue("/normalized/path");
+
+      const entry = {
+        outDir: "/path/to/output",
+        mapDir: "./relative/maps",
+      } as any;
+
+      const context = {
+        pkgDir: "/path/to/package",
+      } as any;
+
+      resolveSourceMapDir(entry, context);
+
+      expect(mockNormalizePath).toHaveBeenCalledWith(
+        "./relative/maps",
+        "/path/to/package",
+      );
+      expect(entry.mapDir).toBe("/normalized/path");
+    });
+
+    test("resolveSourceMapDir handles absolute mapDir path", async () => {
+      const mockNormalizePath = vi.mocked(
+        await import("../src/utils.ts"),
+      ).normalizePath;
+      mockNormalizePath.mockReturnValue("/absolute/normalized/path");
+
+      const entry = {
+        outDir: "/path/to/output",
+        mapDir: "/absolute/maps",
+      } as any;
+
+      const context = {
+        pkgDir: "/path/to/package",
+      } as any;
+
+      resolveSourceMapDir(entry, context);
+
+      expect(mockNormalizePath).toHaveBeenCalledWith(
+        "/absolute/maps",
+        "/path/to/package",
+      );
+      expect(entry.mapDir).toBe("/absolute/normalized/path");
+    });
+  });
+});
