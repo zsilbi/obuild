@@ -7,13 +7,13 @@ import type {
 } from "rolldown";
 
 import type { ResolveOptions } from "exsolve";
-import type { PackageJson, TSConfig } from "pkg-types";
 import type { Plugins } from "./builders/transform/plugins.ts";
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
+import type { TsConfigJsonResolved as TSConfig } from "get-tsconfig";
 
 export interface BuildContext {
   pkgDir: string;
-  pkg: PackageJson;
+  pkg: { name: string } & Record<string, unknown>;
 }
 
 export interface _BuildEntry {

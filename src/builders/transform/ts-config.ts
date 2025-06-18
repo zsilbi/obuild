@@ -4,8 +4,8 @@ import { defu } from "defu";
 import { getTsconfig } from "get-tsconfig";
 import { normalizePath } from "../../utils.ts";
 
-import type { TSConfig } from "pkg-types";
 import type { BuildContext, TransformEntry } from "../../types.ts";
+import type { TsConfigJsonResolved as TSConfig } from "get-tsconfig";
 
 /**
  * Resolve the TypeScript configuration for a transform entry.

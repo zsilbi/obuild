@@ -1,8 +1,8 @@
 import { pathToFileURL } from "node:url";
 import { resolveModulePath } from "exsolve";
+import { sortOutputFiles } from "./output.ts";
 import { defaultPlugins, resolvePlugins } from "./plugins.ts";
 
-import type { TSConfig } from "pkg-types";
 import type { PluginName } from "./plugins.ts";
 import type { ResolveOptions } from "exsolve";
 import type { BuildContext } from "../../types.ts";
@@ -15,7 +15,7 @@ import type {
   PluginContext,
   PluginStorage,
 } from "@obuild/plugin";
-import { sortOutputFiles } from "./output.ts";
+import type { TsConfigJsonResolved as TSConfig } from "get-tsconfig";
 
 type TransformResult<T extends boolean = false> = T extends true
   ? OutputFile[] | undefined
