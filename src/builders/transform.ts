@@ -16,16 +16,10 @@ import {
   serializeSourceMapFiles,
 } from "./transform/source-map.ts";
 
-import type { ResolveOptions } from "exsolve";
 import type { OutputFile } from "@obuild/plugin";
 import type { BuildContext, TransformEntry } from "../types.ts";
 
 type WritableFile = OutputFile & { path: string };
-
-const defaultResolveOptions: ResolveOptions = {
-  extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs", ".cjs", ".json"],
-  suffixes: ["", "/index"],
-};
 
 /**
  * Transform a directory of files using the specified transformers in the entry.
@@ -50,15 +44,7 @@ export async function transformDir(
 
   const transformer = await createTransformer({
     ...context,
-    inputDir: entry.input,
-    plugins: entry.plugins,
-    tsConfig: entry.tsConfig,
-    resolve: {
-      ...entry.resolve,
-      // Don't merge these with the defaults
-      extensions: entry.resolve?.extensions ?? defaultResolveOptions.extensions,
-      suffixes: entry.resolve?.suffixes ?? defaultResolveOptions.suffixes,
-    },
+    entry,
   });
 
   await transformer.callHook("buildStart");
