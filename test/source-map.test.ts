@@ -2,6 +2,9 @@ import { describe, test, expect } from "vitest";
 import { vi } from "vitest";
 import { resolveSourceMapDir } from "../src/builders/transform/source-map.ts";
 
+const utilsModule = await import("../src/utils.ts");
+const mockNormalizePath = vi.mocked(utilsModule).normalizePath;
+
 describe("source-map", () => {
   describe("resolveSourceMapDir", () => {
     vi.mock("../src/utils.ts", () => ({
@@ -9,10 +12,6 @@ describe("source-map", () => {
     }));
 
     test("resolveSourceMapDir sets mapDir to outDir when mapDir is undefined", async () => {
-      const mockNormalizePath = vi.mocked(
-        await import("../src/utils.ts"),
-      ).normalizePath;
-
       const entry = {
         outDir: "/path/to/output",
         mapDir: undefined,
@@ -29,9 +28,6 @@ describe("source-map", () => {
     });
 
     test("resolveSourceMapDir normalizes mapDir when mapDir is defined", async () => {
-      const mockNormalizePath = vi.mocked(
-        await import("../src/utils.ts"),
-      ).normalizePath;
       mockNormalizePath.mockReturnValue("/normalized/path");
 
       const entry = {
@@ -53,9 +49,6 @@ describe("source-map", () => {
     });
 
     test("resolveSourceMapDir handles absolute mapDir path", async () => {
-      const mockNormalizePath = vi.mocked(
-        await import("../src/utils.ts"),
-      ).normalizePath;
       mockNormalizePath.mockReturnValue("/absolute/normalized/path");
 
       const entry = {

@@ -27,12 +27,14 @@ const map: SourceMap = {
   mappings: "AAAA,SAASA,CACT,CAAC,CAAC,CAAC",
 };
 
+const patheModule = await import("pathe");
+
 describe("source-map", () => {
   describe("serializeSourceMapFiles", () => {
     let mockPath: any;
 
     beforeEach(async () => {
-      mockPath = vi.mocked(await import("pathe")).default;
+      mockPath = vi.mocked(patheModule).default;
       vi.clearAllMocks();
     });
 

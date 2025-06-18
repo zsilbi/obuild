@@ -17,11 +17,13 @@ vi.mock("../src/utils.ts", () => ({
   normalizePath: vi.fn(),
 }));
 
-const mockGetTsconfig = vi.mocked(await import("get-tsconfig")).getTsconfig;
-const mockConsola = vi.mocked(await import("consola")).default;
-const mockNormalizePath = vi.mocked(
-  await import("../src/utils.ts"),
-).normalizePath;
+const getTsConfigModule = await import("get-tsconfig");
+const consolaModule = await import("consola");
+const utilsModule = await import("../src/utils.ts");
+
+const mockGetTsconfig = vi.mocked(getTsConfigModule).getTsconfig;
+const mockConsola = vi.mocked(consolaModule).default;
+const mockNormalizePath = vi.mocked(utilsModule).normalizePath;
 
 describe("ts-config", () => {
   beforeEach(() => {

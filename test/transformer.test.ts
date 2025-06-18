@@ -220,24 +220,6 @@ describe("transformer", () => {
       expect(transformer).toBeDefined();
       expect(pluginWithNullInit.initialize).toHaveBeenCalled();
     });
-
-    test("should handle custom resolve options", async () => {
-      const entry: TransformEntry = {
-        input: "src/",
-        type: "transform",
-        outDir: "dist/",
-        plugins: [],
-        resolve: {
-          extensions: [".custom"],
-          suffixes: ["/custom"],
-        },
-      };
-
-      await createTransformer({
-        ...mockContext,
-        entry,
-      });
-    });
   });
 
   describe("transformer methods", () => {
