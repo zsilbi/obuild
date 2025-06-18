@@ -1,13 +1,13 @@
 import { describe, test, expect, beforeAll } from "vitest";
 
-import { build } from "../../../src/build.ts";
+import { build } from "../../../../src/build.ts";
 import { rm } from "node:fs/promises";
-import { readDistFiles, readFileNames } from "../../utils.ts";
+import { readDistFiles, readFileNames } from "../../../utils.ts";
 
 const fixtureDir = new URL("fixture/", import.meta.url);
 const distDir = new URL("dist/", fixtureDir);
 
-describe("transform", () => {
+describe("transform-dts-minify", () => {
   beforeAll(async () => {
     await rm(distDir, { recursive: true, force: true });
   });
@@ -20,6 +20,9 @@ describe("transform", () => {
           type: "transform",
           input: "src/",
           outDir: "dist/",
+          oxc: {
+            minify: {},
+          },
         },
       ],
     });
