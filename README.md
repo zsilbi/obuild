@@ -25,6 +25,7 @@ Some differences are not easy to adopt. Developing as a standalone project allow
 ## Currently used by
 
 - [📦 obuild](https://github.com/unjs/obuild/)
+- [📦 obuild-plugins](https://github.com/unjs/obuild-plugins/)
 - [🌳 rou3](https://github.com/h3js/rou3/)
 - [💥 srvx](https://github.com/h3js/srvx)
 - [🕊️ unenv](https://github.com/unjs/unenv)
@@ -82,7 +83,12 @@ export default defineBuildConfig({
       outDir: "./dist/runtime",
       // stub: false,
       // resolve: {}
-      // plugins: ["oxc-dts", "oxc-transform"],
+      // plugins: [],
+      // oxc: {
+      //   dts: {},
+      //   transform: {},
+      //   minify: false, // Disabled by default
+      // },
     },
   ],
   hooks: {
@@ -100,7 +106,7 @@ export default defineBuildConfig({
 For transform entries, you can use the `plugins` option to specify the plugins to use.
 You can find the available plugins in the [obuild-plugins](https://github.com/unjs/obuild-plugins) repository.
 
-By default, the `oxc-dts` and `oxc-transform` plugins are used.
+By default, the `oxc-dts` and `oxc-transform` plugins are enabled, `oxc-minify` can be turned on using the `oxc.minify` config option.
 
 ## Stub Mode
 
