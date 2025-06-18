@@ -92,20 +92,18 @@ export async function transformDir(
   const writePromises: Promise<string>[] = outputFiles
     .filter((file) => file.skip !== true)
     .map(async (file) => {
-      const { path: filePath, contents = "" } = file;
+      const { contents = "" } = file;
       const outputFilePath = getOutputFilePath(file, entry);
 
       await fsp.mkdir(path.dirname(outputFilePath), { recursive: true });
 
       let shebangFound: boolean;
 
-      if (file.type === "raw") {
-        const srcPath = file.srcPath || path.join(entry.input, filePath);
-
+      if (file.type === "raw" && file.srcPath !== undefined) {
         [shebangFound] = await Promise.all([
           // Avoid loading possibly large raw file contents into memory
-          hasFileShebang(srcPath),
-          fsp.copyFile(srcPath, outputFilePath),
+          hasFileShebang(file.srcPath),
+          fsp.copyFile(file.srcPath, outputFilePath),
         ]);
       } else {
         shebangFound = hasShebang(contents);
