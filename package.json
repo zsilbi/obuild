@@ -59,6 +59,7 @@
     "consola": "^3.4.2",
     "defu": "^6.1.4",
     "exsolve": "^1.0.5",
+    "get-tsconfig": "^4.10.1",
     "oxc-minify": "^0.72.3",
     "oxc-parser": "^0.72.3",
     "pathe": "^2.0.3",
@@ -74,7 +75,6 @@
     "changelogen": "^0.6.1",
     "eslint": "^9.28.0",
     "eslint-config-unjs": "^0.4.2",
-    "get-tsconfig": "^4.10.1",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.2"

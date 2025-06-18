@@ -69,6 +69,9 @@ importers:
       exsolve:
         specifier: ^1.0.5
         version: 1.0.5
+      get-tsconfig:
+        specifier: ^4.10.1
+        version: 4.10.1
       oxc-minify:
         specifier: ^0.72.3
         version: 0.72.3
@@ -109,9 +112,6 @@ importers:
       eslint-config-unjs:
         specifier: ^0.4.2
         version: 0.4.2(eslint@9.28.0(jiti@2.4.2))(typescript@5.8.3)
-      get-tsconfig:
-        specifier: ^4.10.1
-        version: 4.10.1
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -428,33 +428,33 @@ packages:
     engines: {node: '>= 8'}
 
   '@obuild/plugin-oxc-dts@file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-TQoThYPFPjwHngsmxwMCzU5CKfn467H90c7OEY2HIvo+BWSjU1/4yKj37rR771IZgvg1cOpwlqewW0eZn1oSnQ==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-esKt9+0V+j4uiMdRQ0uGE6556Z5pEpvwQ6UY4qDfNB8+we4Xjq1gh+VZWCoa+G3ffjt+I4g4TaAvQAC/6NpD9w==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-oxc-minify@file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz':
-    resolution: {integrity: sha512-+IEmDE2UraqWF8ZxOEixaePetnadaL8kWMh5inhyMkmHLi0vSMfU37cxdPFQ8E9RW4xgUDE9pNa2mwCaFI5W2A==, tarball: file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz}
+    resolution: {integrity: sha512-RbcaPkA+PeJ0GPROmsrxpjCqG2Z+aivR9wkZqe1I02TyDNwA8sI4Q/Ahe+uLZRK0NvYo3cSizoJHNCVCHUdQvg==, tarball: file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-oxc-transform@file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz':
-    resolution: {integrity: sha512-WQiNUY0Rv+8RxruETblspnL7FxOCSrcrCEuYACEmD+YYMhwrB9y6BD6Vu3LQ0pqWitD/nLG5ARLuf1qdTAV61g==, tarball: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz}
+    resolution: {integrity: sha512-1oyVY6WaJ2uJkRhCIUoviF/SQPN/2vQhkNF2zdi7LdqQs8esA2eOK7nxSnweoMQBqXO58Gl6NwUI0D9l9jOdpg==, tarball: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-postcss@file:plugins/obuild-plugin-postcss-0.0.1.tgz':
-    resolution: {integrity: sha512-WsW9VKvLeg57YuAe34fj5gS/e3Yi5GozZJv+9F/flXtpfgcJGMl3Y4q71LcmdcR49J+erfyCexEd8PUKgZmO9Q==, tarball: file:plugins/obuild-plugin-postcss-0.0.1.tgz}
+    resolution: {integrity: sha512-cysiV73zziNLLn7549r0MxW4Di5T+7479yM9jgqDtTZq1hx6HNEAz7qaDE/DOy/69huMFi2KsLLvb38szpOqPQ==, tarball: file:plugins/obuild-plugin-postcss-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-sass@file:plugins/obuild-plugin-sass-0.0.1.tgz':
-    resolution: {integrity: sha512-iY7WvtYp4Ef0VVfXnmROdxbPAw3DVhiP+kn3YJDbF6O2Fda37VdSWx7eLPuOOQ7bOnmBzC0LnF6qYK4pUZCkgQ==, tarball: file:plugins/obuild-plugin-sass-0.0.1.tgz}
+    resolution: {integrity: sha512-S8NBuGIGU5iLgW12L31Lc9+99ekiVjnR5lXvVj4PVvnSPojxWxWGyQPA3q0bBhXbSTtlwXZR+fB3+8d30sBS4g==, tarball: file:plugins/obuild-plugin-sass-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       sass: ^1.85.0
 
   '@obuild/plugin-shared@file:plugins/obuild-plugin-shared-0.0.1.tgz':
-    resolution: {integrity: sha512-Oa5uVUXQ6n0waIP1FNHB2QepYvswR+gH9d64HRis4VajyXIya2syews5M6Vnm7vpHSCM36u2SzeZiwk/8821EA==, tarball: file:plugins/obuild-plugin-shared-0.0.1.tgz}
+    resolution: {integrity: sha512-Gxgw3NsnnYcUtCwVfWqEtJX15NuY5U2inGRCenA6LMdUsce9RQVvZMMHJflKTgHVFSAkQBGRtqonV6t59N8wxQ==, tarball: file:plugins/obuild-plugin-shared-0.0.1.tgz}
     version: 0.0.1
 
   '@obuild/plugin-tsc-dts@file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-1LAhLHFxBc590xU/JYnAwtS1u0azkgNUEUIL79v/7d8u5CSL3lPrNZJSHgoe/znJMxPzsLZGsbeMr9DoO87Qyg==, tarball: file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-Xq4P3cv9nbdu7a/JbXL8piHpqvBUPj+qpBU2tfvjwCYyhzh1AXTbKgcknXQ6wYl4/oESTgl7GxZhpsm+GPY7qA==, tarball: file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       '@typescript/native-preview': '>=7.0.0-dev.20250605.1'
@@ -469,26 +469,26 @@ packages:
         optional: true
 
   '@obuild/plugin-tsgo-dts@file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-eDmZL7jBM3RXBB3U3xZjbfOap942LotqUT7VsJx9Z4ZYudo3XtnSEtRJvTVUYfQLd2xf8bndilgVpOPxVq3w+g==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-Uo3NUAVtMZ9Ud+THUrUzEg4UeXAPTWcfVOdpK7O/3Z5sRixkkdc/K9dYyQWYfEK8Meb+ixSBWVEBtrO/ND7H7Q==, tarball: file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       '@typescript/native-preview': '>=7.0.0-dev.20250605.1'
 
   '@obuild/plugin-vue-sfc-transformer@file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz':
-    resolution: {integrity: sha512-Fmhvor8sRgt86gtzvoHoFvjcju+XSQC4G3J750Qsspr4Sb7TEDFT2MaLyplrHLDFUexkWWBhRHC8QMUIKp43qw==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
+    resolution: {integrity: sha512-Ox0Cs6niPEmwbJd3gpUzdBYbK49GO6u7lpyOk0P3ZEO/2/xQOsOHwUmtZ39IIchciVTwcWhfa6cGeAI0Vkm7sA==, tarball: file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       vue: ^3.5.0
 
   '@obuild/plugin-vue-tsc-dts@file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-omnU/zp28dADDiAyRrsgHIhueWLvm+xdkvRubxQAcxy/q653y8R7RO4GEa64otlJ29WH54GAu2qPYm7vDNQFtg==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
+    resolution: {integrity: sha512-XHy2e/EawOFY4EJHaervArSxuLupKuDdtPjWYiAG4UJfjq4wBfiqY5YkjHBkL/G/OGoQ6+f1rXioHw4lkliSFw==, tarball: file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz}
     version: 0.0.1
     peerDependencies:
       vue: ^3.5.0
       vue-tsc: ^2.2.0
 
   '@obuild/plugin@file:plugins/obuild-plugin-0.0.1.tgz':
-    resolution: {integrity: sha512-g9uOvNSA3Y5XetTRBdFBkW5iB8lcox9ewRjc3H4T3yn/qBTk1F40bRI5K1XEoH7e/aCVNB5082fvoL+XTHZhjg==, tarball: file:plugins/obuild-plugin-0.0.1.tgz}
+    resolution: {integrity: sha512-EsqwWGfei60LRaQBYDwsyQYUfO488wEB85c3HqWnkqFZABFM5TVVl/PyA50v20NeBTZcKpLZz56kvjddudxF9g==, tarball: file:plugins/obuild-plugin-0.0.1.tgz}
     version: 0.0.1
 
   '@oxc-minify/binding-darwin-arm64@0.72.3':
@@ -3101,7 +3101,7 @@ snapshots:
 
   '@obuild/plugin@file:plugins/obuild-plugin-0.0.1.tgz':
     dependencies:
-      pkg-types: 2.1.0
+      get-tsconfig: 4.10.1
 
   '@oxc-minify/binding-darwin-arm64@0.72.3':
     optional: true
