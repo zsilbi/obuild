@@ -9,8 +9,6 @@ import { join } from "pathe";
 import { rm } from "node:fs/promises";
 import { consola } from "consola";
 import { colors as c } from "consola/utils";
-import { rolldownBuild } from "./builders/bundle.ts";
-import { transformDir } from "./builders/transform.ts";
 import { fmtPath, analyzeDir, normalizePath } from "./utils.ts";
 import prettyBytes from "pretty-bytes";
 
@@ -74,9 +72,14 @@ export async function build(config: BuildConfig): Promise<void> {
   }
 
   for (const entry of entries) {
-    await (entry.type === "bundle"
-      ? rolldownBuild(ctx, entry, hooks)
-      : transformDir(ctx, entry));
+    if (entry.type === "bundle") {
+      const { rolldownBuild } = await import("./builders/bundle.ts");
+      await rolldownBuild(ctx, entry as BundleEntry, hooks);
+      continue;
+    }
+
+    const { transformDir } = await import("./builders/transform.ts");
+    await transformDir(ctx, entry as TransformEntry);
   }
 
   await hooks.end?.(ctx);
