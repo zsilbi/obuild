@@ -19,7 +19,7 @@ import type {
   Plugin,
   PluginContext,
   PluginStorage,
-} from "@obuild/plugin";
+} from "./plugins/index.ts";
 
 type TransformResult<T extends boolean = false> = T extends true
   ? OutputFile[] | undefined

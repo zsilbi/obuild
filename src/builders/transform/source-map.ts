@@ -1,7 +1,7 @@
 import path from "pathe";
 import { normalizePath } from "../../utils.ts";
 
-import type { DeclarationFile, OutputFile } from "@obuild/plugin";
+import type { DeclarationFile, OutputFile } from "./plugins/index.ts";
 import type { BuildContext, TransformEntry } from "../../types.ts";
 
 /**

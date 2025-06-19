@@ -1,6 +1,6 @@
 {
   "name": "obuild",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Zero-config ESM/TS package builder",
   "repository": "unjs/obuild",
   "license": "MIT",
@@ -29,31 +29,17 @@
   },
   "pnpm": {
     "overrides": {
-      "@obuild/plugin": "file:plugins/obuild-plugin-0.0.1.tgz",
       "@obuild/plugin-oxc-transform": "file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz",
       "@obuild/plugin-oxc-dts": "file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz",
       "@obuild/plugin-oxc-minify": "file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz",
-      "@obuild/plugin-postcss": "file:plugins/obuild-plugin-postcss-0.0.1.tgz",
-      "@obuild/plugin-sass": "file:plugins/obuild-plugin-sass-0.0.1.tgz",
-      "@obuild/plugin-shared": "file:plugins/obuild-plugin-shared-0.0.1.tgz",
-      "@obuild/plugin-tsc-dts": "file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz",
-      "@obuild/plugin-tsgo-dts": "file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz",
-      "@obuild/plugin-vue-tsc-dts": "file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz",
-      "@obuild/plugin-vue-sfc-transformer": "file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz"
+      "@obuild/plugin-shared": "file:plugins/obuild-plugin-shared-0.0.1.tgz"
     }
   },
   "dependencies": {
-    "@obuild/plugin": "file:plugins/obuild-plugin-0.0.1.tgz",
     "@obuild/plugin-oxc-transform": "file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz",
     "@obuild/plugin-oxc-dts": "file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz",
     "@obuild/plugin-oxc-minify": "file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz",
-    "@obuild/plugin-postcss": "file:plugins/obuild-plugin-postcss-0.0.1.tgz",
-    "@obuild/plugin-sass": "file:plugins/obuild-plugin-sass-0.0.1.tgz",
     "@obuild/plugin-shared": "file:plugins/obuild-plugin-shared-0.0.1.tgz",
-    "@obuild/plugin-tsc-dts": "file:plugins/obuild-plugin-tsc-dts-0.0.1.tgz",
-    "@obuild/plugin-tsgo-dts": "file:plugins/obuild-plugin-tsgo-dts-0.0.1.tgz",
-    "@obuild/plugin-vue-tsc-dts": "file:plugins/obuild-plugin-vue-tsc-dts-0.0.1.tgz",
-    "@obuild/plugin-vue-sfc-transformer": "file:plugins/obuild-plugin-vue-sfc-transformer-0.0.1.tgz",
     "autoprefixer": "^10.4.21",
     "c12": "^3.0.4",
     "consola": "^3.4.2",

@@ -9,7 +9,7 @@ import type {
   MinifiedFile,
   RawFile,
   OutputFile,
-} from "@obuild/plugin";
+} from "../src/builders/transform/plugins/index.ts";
 
 describe("output", () => {
   describe("sortOutputFiles", () => {

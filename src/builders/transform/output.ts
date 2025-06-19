@@ -1,4 +1,4 @@
-import type { OutputFile } from "@obuild/plugin";
+import type { OutputFile } from "./plugins/index.ts";
 
 const outputOrder = {
   "source-map": 0,

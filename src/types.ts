@@ -6,12 +6,12 @@ import type {
   RolldownPluginOption,
 } from "rolldown";
 
-import type { Plugin } from "@obuild/plugin";
 import type { ResolveOptions } from "exsolve";
 import type { Options as DtsOptions } from "rolldown-plugin-dts";
 import type { OxcDtsPluginOptions } from "@obuild/plugin-oxc-dts";
 import type { OxcMinifyPluginOptions } from "@obuild/plugin-oxc-minify";
 import type { OxcTransformPluginOptions } from "@obuild/plugin-oxc-transform";
+import type { Plugin } from "./builders/transform/plugins/index.ts";
 import type { TsConfigJsonResolved as TSConfig } from "get-tsconfig";
 
 export interface BuildContext {

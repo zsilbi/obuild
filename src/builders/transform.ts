@@ -16,7 +16,7 @@ import {
   serializeSourceMapFiles,
 } from "./transform/source-map.ts";
 
-import type { OutputFile } from "@obuild/plugin";
+import type { OutputFile } from "./transform/plugins/index.ts";
 import type { BuildContext, TransformEntry } from "../types.ts";
 
 type WritableFile = OutputFile & { path: string };

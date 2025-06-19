@@ -2,7 +2,11 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { createTransformer } from "../src/builders/transform/transformer.ts";
 
 import type { BuildContext, TransformEntry } from "../src/types.ts";
-import type { InputFile, OutputFile, Plugin } from "@obuild/plugin";
+import type {
+  InputFile,
+  OutputFile,
+  Plugin,
+} from "../src/builders/transform/plugins/index.ts";
 
 vi.mock("@obuild/plugin-oxc-dts");
 vi.mock("@obuild/plugin-oxc-transform");

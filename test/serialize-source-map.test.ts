@@ -1,7 +1,12 @@
 import { describe, test, expect, beforeEach } from "vitest";
 import { vi } from "vitest";
 import { serializeSourceMapFiles } from "../src/builders/transform/source-map.ts";
-import { CodeFile, OutputFile, SourceMap, SourceMapFile } from "@obuild/plugin";
+import {
+  CodeFile,
+  OutputFile,
+  SourceMap,
+  SourceMapFile,
+} from "../src/builders/transform/plugins/index.ts";
 
 vi.mock("pathe", () => ({
   default: {
