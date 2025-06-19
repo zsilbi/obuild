@@ -4,28 +4,19 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@obuild/plugin-oxc-transform': file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz
-  '@obuild/plugin-oxc-dts': file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz
-  '@obuild/plugin-oxc-minify': file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz
-  '@obuild/plugin-shared': file:plugins/obuild-plugin-shared-0.0.1.tgz
-
 importers:
 
   .:
     dependencies:
       '@obuild/plugin-oxc-dts':
-        specifier: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz
-        version: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz
+        specifier: ^0.0.1
+        version: 0.0.1
       '@obuild/plugin-oxc-minify':
-        specifier: file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz
-        version: file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz
+        specifier: ^0.0.1
+        version: 0.0.1
       '@obuild/plugin-oxc-transform':
-        specifier: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz
-        version: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz
-      '@obuild/plugin-shared':
-        specifier: file:plugins/obuild-plugin-shared-0.0.1.tgz
-        version: file:plugins/obuild-plugin-shared-0.0.1.tgz
+        specifier: ^0.0.1
+        version: 0.0.1
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
@@ -395,36 +386,32 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@obuild/plugin-oxc-dts@file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz':
-    resolution: {integrity: sha512-um7MD3dJkJpAEPt28zL7wB9rTjQ2hzn0BGtCrPQz8qJ4AcPrP/R37ehHJ0dimE2lELQ81wrrpRyqUZmeBT6OPw==, tarball: file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz}
-    version: 0.0.1
+  '@obuild/plugin-oxc-dts@0.0.1':
+    resolution: {integrity: sha512-avmsLTb0nx1+iuVkCIjQNuqTpIl5R4xeMegWaaoIoafjzqDFVFnjwKIxGtVRuy/4rnLzLp+y7o1qM/X32W3h9Q==}
     peerDependencies:
       obuild: '>=0.3.0'
     peerDependenciesMeta:
       obuild:
         optional: true
 
-  '@obuild/plugin-oxc-minify@file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz':
-    resolution: {integrity: sha512-3VEd5vHnYVJxssooeqacLc9j5grsLEkuabz0aSH2xZO6hlt7zvKM0z3IDwvOxLzoFwjGgnUykxX3/vkI/ykLkQ==, tarball: file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz}
-    version: 0.0.1
+  '@obuild/plugin-oxc-minify@0.0.1':
+    resolution: {integrity: sha512-C9OLH0k8Y/yMQ1o224cEVlNSwEWvb12G4jt6vfiylTX7+ESb222a/p8qXYMW2UlBV31L15zyD6FOw4FdVBn3bg==}
     peerDependencies:
       obuild: '>=0.3.0'
     peerDependenciesMeta:
       obuild:
         optional: true
 
-  '@obuild/plugin-oxc-transform@file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz':
-    resolution: {integrity: sha512-yZ8OEB7QCWiryeBDF6ZqQA+DL3kbOvKgc7a3lZa0PNw5dLi4ZetjlsvtyXoKuOqfG4q2eWqtQG5ulDKPfBrDxg==, tarball: file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz}
-    version: 0.0.1
+  '@obuild/plugin-oxc-transform@0.0.1':
+    resolution: {integrity: sha512-cVh/9Fz6UwAYfjFzYhL5L98g5Pya8ZnsLEvuF5NGVmjx6jeHEK3BhFOLNyINsG3+QFBaa1Fqi8Xwvx/abEKIzg==}
     peerDependencies:
       obuild: '>=0.3.0'
     peerDependenciesMeta:
       obuild:
         optional: true
 
-  '@obuild/plugin-shared@file:plugins/obuild-plugin-shared-0.0.1.tgz':
-    resolution: {integrity: sha512-gsO9PiKXBPStgjsKSAukSQgTsSRXQxAxYBzpu7fm7sybjVDqp5tks74YEClvtJZfEwaHLlamplYkbHcymW6wjA==, tarball: file:plugins/obuild-plugin-shared-0.0.1.tgz}
-    version: 0.0.1
+  '@obuild/plugin-shared@0.0.1':
+    resolution: {integrity: sha512-IEgV/U1XuarW0q616RB4RkEpYTkNAWcQZmLRAT/tNiy/FEp4UF0DOz9I5Gonx0PXIA/ajslcvfaxRDlFze93kA==}
     peerDependencies:
       obuild: '>=0.3.0'
     peerDependenciesMeta:
@@ -2786,29 +2773,29 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@obuild/plugin-oxc-dts@file:plugins/obuild-plugin-oxc-dts-0.0.1.tgz':
+  '@obuild/plugin-oxc-dts@0.0.1':
     dependencies:
-      '@obuild/plugin-shared': file:plugins/obuild-plugin-shared-0.0.1.tgz
+      '@obuild/plugin-shared': 0.0.1
       defu: 6.1.4
       oxc-transform: 0.73.2
       pathe: 2.0.3
 
-  '@obuild/plugin-oxc-minify@file:plugins/obuild-plugin-oxc-minify-0.0.1.tgz':
+  '@obuild/plugin-oxc-minify@0.0.1':
     dependencies:
-      '@obuild/plugin-shared': file:plugins/obuild-plugin-shared-0.0.1.tgz
+      '@obuild/plugin-shared': 0.0.1
       defu: 6.1.4
       oxc-minify: 0.73.2
       pathe: 2.0.3
 
-  '@obuild/plugin-oxc-transform@file:plugins/obuild-plugin-oxc-transform-0.0.1.tgz':
+  '@obuild/plugin-oxc-transform@0.0.1':
     dependencies:
-      '@obuild/plugin-shared': file:plugins/obuild-plugin-shared-0.0.1.tgz
+      '@obuild/plugin-shared': 0.0.1
       defu: 6.1.4
       oxc-parser: 0.73.2
       oxc-transform: 0.73.2
       pathe: 2.0.3
 
-  '@obuild/plugin-shared@file:plugins/obuild-plugin-shared-0.0.1.tgz':
+  '@obuild/plugin-shared@0.0.1':
     dependencies:
       '@ampproject/remapping': 2.3.0
       defu: 6.1.4
